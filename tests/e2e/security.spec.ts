@@ -63,7 +63,10 @@ test.describe('security headers', () => {
     await recordViolations(page);
     await page.goto('/#contact');
     // The form is an island hydrated when visible: check it before anything scrolls away.
-    await expect(page.locator('#contact astro-island')).not.toHaveAttribute('ssr');
+    await page.locator('#contact form').scrollIntoViewIfNeeded();
+    await expect(page.locator('#contact astro-island')).not.toHaveAttribute('ssr', {
+      timeout: 15_000,
+    });
     // Turnstile renders inside a shadow root; its token in the form proves its script ran.
     await expect(page.locator('#contact input[name="cf-turnstile-response"]')).not.toHaveValue('', {
       timeout: 15_000,
