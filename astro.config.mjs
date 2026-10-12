@@ -28,6 +28,13 @@ export default defineConfig({
         access: 'public',
         default: '1x00000000000000000000AA',
       }),
+      // Cloudflare Web Analytics site token (public by design). Set only for production deploys,
+      // so local runs, tests and pull request previews never send page views (ADR 0013).
+      PUBLIC_WEB_ANALYTICS_TOKEN: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
       TURNSTILE_SECRET_KEY: envField.string({
         context: 'server',
         access: 'secret',
