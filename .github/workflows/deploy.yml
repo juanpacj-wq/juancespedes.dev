@@ -1,0 +1,57 @@
+name: Deploy
+
+# Pull requests get a preview version with its own URL; main goes to production.
+# Disabled until the repository variable CLOUDFLARE_DEPLOY_ENABLED is set to "true"
+# and the secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID exist (see docs/runbooks/deploy.md).
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  deployments: write
+  pull-requests: write
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: vars.CLOUDFLARE_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'push' && 'production' || 'preview' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          APP_VERSION: ${{ github.sha }}
+      - name: Upload preview version
+        if: github.event_name == 'pull_request'
+        id: preview
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: versions upload --message "PR #${{ github.event.number }} ${{ github.sha }}"
+      - name: Comment preview URL
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: preview
+          message: |
+            Preview: ${{ steps.preview.outputs.deployment-url }}
+      - name: Deploy to production
+        if: github.event_name == 'push'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --message "main ${{ github.sha }}"

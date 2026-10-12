@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Phase F2 expands this into the full system (type scale,
+ * spacing, radii, motion). Components must use tokens, never raw values.
+ */
+@theme {
+  --color-canvas: #0d0d0f;
+  --color-surface: #151518;
+  --color-line: #26262b;
+  --color-ink: #ededef;
+  --color-muted: #a1a1aa;
+  --color-signal: #f5a524;
+
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+  }
+}

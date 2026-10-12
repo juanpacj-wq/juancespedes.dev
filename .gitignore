@@ -1,0 +1,30 @@
+# Build output
+dist/
+.astro/
+.wrangler/
+
+# Dependencies
+node_modules/
+
+# Test and quality reports
+coverage/
+test-results/
+playwright-report/
+blob-report/
+.lighthouseci/
+reports/
+
+# Logs
+*.log
+
+# Environment (only .env.example is versioned)
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/

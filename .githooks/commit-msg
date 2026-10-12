@@ -1,0 +1,3 @@
+#!/bin/sh
+# Conventional Commits, enforced locally (CI checks PR titles as well).
+pnpm exec commitlint --edit "$1"

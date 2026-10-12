@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm --silent verify >/dev/null 2>&1 || { echo 'pnpm verify failed: fix lint, types, architecture or tests before finishing.' >&2; exit 2; }",
+            "timeout": 600
+          }
+        ]
+      }
+    ]
+  }
+}

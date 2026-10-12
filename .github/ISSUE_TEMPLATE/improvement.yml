@@ -1,0 +1,17 @@
+name: Improvement
+description: A change to content, design or engineering.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is missing or could be better, and for whom.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal and acceptance criteria
+    validations:
+      required: true

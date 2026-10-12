@@ -1,0 +1,9 @@
+dist/
+.astro/
+.wrangler/
+coverage/
+test-results/
+playwright-report/
+.lighthouseci/
+pnpm-lock.yaml
+CHANGELOG.md

@@ -1,0 +1,7 @@
+#!/bin/sh
+# Fast checks on every commit. The full suite runs in CI and in `pnpm verify`.
+set -e
+pnpm format:check
+pnpm lint
+pnpm arch:check
+pnpm test

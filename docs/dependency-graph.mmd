@@ -1,0 +1,55 @@
+flowchart LR
+
+subgraph src["src"]
+  subgraph src_application["application"]
+    subgraph src_application_ports["ports"]
+      src_application_ports_clock_ts["clock.ts"]
+    end
+    subgraph src_application_use_cases["use-cases"]
+      src_application_use_cases_get_health_status_ts["get-health-status.ts"]
+    end
+  end
+  subgraph src_composition["composition"]
+    src_composition_container_ts["container.ts"]
+  end
+  subgraph src_infrastructure["infrastructure"]
+    subgraph src_infrastructure_system["system"]
+      src_infrastructure_system_system_clock_ts["system-clock.ts"]
+    end
+  end
+  subgraph src_domain["domain"]
+    subgraph src_domain_shared["shared"]
+      src_domain_shared_locale_ts["locale.ts"]
+      src_domain_shared_result_ts["result.ts"]
+    end
+  end
+  subgraph src_pages["pages"]
+    subgraph src_pages_api["api"]
+      src_pages_api_health_ts["health.ts"]
+    end
+  end
+end
+subgraph astro:env["astro:env"]
+  astro:env_server["server"]
+end
+subgraph node_modules["node_modules"]
+  subgraph node_modules__pnpm[".pnpm"]
+    subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae["astro@7.3.8_@types+node@26._d6314243a930c10c84b1626d555854ae"]
+      subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules["node_modules"]
+        subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro["astro"]
+          subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist["dist"]
+            node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js["index.js"]
+          end
+        end
+      end
+    end
+  end
+end
+src_application_use_cases_get_health_status_ts-->src_application_ports_clock_ts
+src_composition_container_ts-->src_application_use_cases_get_health_status_ts
+src_composition_container_ts-->src_infrastructure_system_system_clock_ts
+src_composition_container_ts-->astro:env_server
+src_infrastructure_system_system_clock_ts-->src_application_ports_clock_ts
+src_domain_shared_locale_ts-->src_domain_shared_result_ts
+src_pages_api_health_ts-->src_composition_container_ts
+src_pages_api_health_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js

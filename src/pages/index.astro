@@ -1,0 +1,48 @@
+---
+import { DEFAULT_LOCALE } from '../domain/shared/locale';
+import BaseLayout from '../ui/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Juan Céspedes | Ingeniero de sistemas full-stack"
+  description="Portfolio de Juan Céspedes: desarrollo full-stack, datos y automatización. Sitio en construcción."
+  locale={DEFAULT_LOCALE}
+>
+  <main class="mx-auto flex min-h-dvh max-w-3xl flex-col justify-center gap-6 px-4 py-16">
+    <p class="font-mono text-sm tracking-widest text-signal uppercase">En construcción</p>
+    <h1 class="text-4xl font-semibold tracking-tight sm:text-6xl">Juan Céspedes</h1>
+    <p class="font-mono text-xl text-muted sm:text-2xl">
+      Ingeniero de sistemas · full-stack · datos · automatización
+    </p>
+    <p class="max-w-prose text-muted">
+      Este sitio se está construyendo en público. El código, las decisiones de arquitectura y las
+      pruebas están en el repositorio.
+    </p>
+    <ul class="flex flex-wrap gap-4 text-sm">
+      <li>
+        <a
+          class="underline underline-offset-4 hover:text-signal"
+          href="https://github.com/juanpacj-wq"
+        >
+          GitHub
+        </a>
+      </li>
+      <li>
+        <a
+          class="underline underline-offset-4 hover:text-signal"
+          href="https://www.linkedin.com/in/juan-cespedesjc"
+        >
+          LinkedIn
+        </a>
+      </li>
+      <li>
+        <a
+          class="underline underline-offset-4 hover:text-signal"
+          href="mailto:juanpablocespedesj@gmail.com"
+        >
+          juanpablocespedesj@gmail.com
+        </a>
+      </li>
+    </ul>
+  </main>
+</BaseLayout>
