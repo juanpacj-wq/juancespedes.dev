@@ -51,6 +51,14 @@ subgraph src["src"]
       src_pages_api_health_ts["health.ts"]
     end
   end
+  subgraph src_ui["ui"]
+    subgraph src_ui_i18n["i18n"]
+      src_ui_i18n_dictionary_ts["dictionary.ts"]
+    end
+    subgraph src_ui_icons["icons"]
+      src_ui_icons_icons_ts["icons.ts"]
+    end
+  end
 end
 subgraph astro:env["astro:env"]
   astro:env_server["server"]
@@ -141,3 +149,4 @@ src_content_config_ts-->astro:content
 src_content_config_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_content_loaders_index_js
 src_pages_api_health_ts-->src_composition_container_ts
 src_pages_api_health_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_ui_i18n_dictionary_ts-->src_domain_shared_locale_ts
