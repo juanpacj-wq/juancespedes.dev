@@ -1,0 +1,113 @@
+---
+kind: case-study
+title: A corporate forum platform, from registration to certificate
+summary: I designed, built and single-handedly ran the platform for an energy-sector forum, with the agenda, a digital badge with a QR code, surveys, 156 audited PDF certificates and event memories, all behind corporate sign-in.
+role: Full-stack developer and sole operator, from design to on-call duty on event day
+period: { start: '2026-07', end: '2026-09' }
+capabilities: [frontend, backend, infrastructure]
+stack:
+  - React
+  - TypeScript
+  - Vite
+  - Node.js
+  - Express
+  - Microsoft Entra ID
+  - Microsoft Graph
+  - SQLite
+  - Python
+  - Playwright
+  - nginx
+  - systemd
+metrics:
+  - value: '163'
+    label: guests received their personal QR code by email, each one verified before sending
+    source: Bulk send log, August 2026
+  - value: '156'
+    label: PDF certificates generated and checked by two independent automated auditors
+    source: Certificate generation and audit scripts, August 2026
+  - value: '9 days'
+    label: between the first commit and forum day, with the system running live
+    source: Git history, July and August 2026
+featured: false
+order: 5
+status: published
+confidentiality: anonymized
+problem: The communications team of a power generation company was organizing its first corporate forum and needed one tool for the whole event cycle, from publishing the agenda and speakers to registering and badging guests, measuring satisfaction and delivering certificates and memories.
+responsibilities:
+  - Designed the experience from the official graphic pieces, measuring colors and dimensions straight from the PDFs.
+  - Built the SPA, the server, corporate authentication and the email sends.
+  - Deployed on Linux with nginx and a hardened systemd unit, and was on call on forum day.
+  - After the event, generated the certificates, published the gallery and added a digital business card module.
+constraints:
+  - Nine days between the first commit and forum day.
+  - Hundreds of attendees signing in at once from the same corporate network.
+  - Minimal personal data, because the server was not supposed to know names or ID numbers.
+  - One person in charge of development, deployment and operations.
+decisions:
+  - title: Corporate sign-in with OIDC and PKCE
+    rationale: Guests already had an account in the company directory. Microsoft Entra ID handled identity and roles without new passwords, and Microsoft Graph sent the emails from the institutional mailbox.
+    alternatives:
+      - A custom sign-up with email and password
+  - title: The server only knows opaque identifiers
+    rationale: Certificates and downloads are served through identifier-to-file manifests generated outside the server. Nobody can request someone else's certificate because the route takes no parameters.
+    alternatives:
+      - Store names and ID numbers in the server database
+  - title: The survey unlocks on the server clock
+    rationale: The satisfaction survey link only reaches the browser once the server clock passes the closing time, so nobody answers it before the forum ends.
+    alternatives:
+      - Hide it behind a timer in the browser
+  - title: Two keys for dangerous operations
+    rationale: The bulk send has a dry-run mode, a recipient cap and resume support, and opening it to every guest requires changing two variables at once.
+    alternatives:
+      - A script that sends straight to the whole list
+architecture:
+  summary: A React SPA talks to an Express server that owns HTTP security, Microsoft Entra ID authentication and Microsoft Graph sends. Certificates and memories are generated on the workstation and reach the server as verified artifacts.
+  layers:
+    - name: Attendees
+      nodes:
+        - {
+            id: attendee-app,
+            label: 'Forum SPA',
+            detail: 'Agenda, QR badge, surveys and certificates',
+          }
+    - name: Edge
+      nodes:
+        - { id: edge, label: 'nginx', detail: 'TLS and per-zone rate limiting' }
+    - name: Server
+      nodes:
+        - {
+            id: server,
+            label: 'Express server',
+            detail: 'CSP, CSRF, sessions and routes without free parameters',
+          }
+        - { id: survey-gate, label: 'Survey gate', detail: 'Decides on the server clock' }
+        - { id: cards, label: 'Business cards', detail: 'SQLite' }
+    - name: Microsoft 365
+      nodes:
+        - { id: entra, label: 'Microsoft Entra ID', detail: 'OIDC with PKCE and roles' }
+        - { id: graph, label: 'Microsoft Graph', detail: 'Registration and QR emails' }
+    - name: Workstation
+      nodes:
+        - {
+            id: generators,
+            label: 'Python generators',
+            detail: 'PDF certificates and memories, audited',
+          }
+  flows:
+    - { from: attendee-app, to: edge, label: 'HTTPS' }
+    - { from: edge, to: server, label: 'Navigations and API' }
+    - { from: server, to: entra, label: 'Sign-in' }
+    - { from: server, to: graph, label: 'Transactional email' }
+    - { from: survey-gate, to: attendee-app, label: 'Survey only after closing time' }
+    - { from: generators, to: server, label: 'Artifacts through manifests' }
+outcomes:
+  - The system ran live on forum day without storing personal data on the server.
+  - Each of the 163 QR codes was decoded before sending, and the send happened exactly once.
+  - 156 certificates and 77 photos were published, with streamed downloads of the event memories (the largest package was 1.33 GB).
+  - Production incidents were resolved and documented with their root cause.
+lessons:
+  - I would load-test event day with simulated traffic from a single IP, instead of sizing only with calculations.
+  - I would separate from the start what had to outlive the event, such as the business cards, from what was ephemeral.
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

@@ -29,17 +29,35 @@ const common = {
   confidentiality: z.enum(['public', 'anonymized']),
 };
 
+const architecture = z.strictObject({
+  summary: text,
+  layers: z
+    .array(
+      z.strictObject({
+        name: text,
+        nodes: z
+          .array(z.strictObject({ id: text, label: text, detail: text.nullable().default(null) }))
+          .min(1),
+      }),
+    )
+    .min(2),
+  flows: z.array(z.strictObject({ from: text, to: text, label: text })).default([]),
+});
+
 const caseStudy = z.strictObject({
   kind: z.literal('case-study'),
   ...common,
   problem: text,
+  responsibilities: z.array(text).default([]),
   constraints: z.array(text).min(1),
   decisions: z
     .array(
       z.strictObject({ title: text, rationale: text, alternatives: z.array(text).default([]) }),
     )
     .min(1),
-  lessons: z.array(text).default([]),
+  architecture,
+  outcomes: z.array(text).min(1),
+  lessons: z.array(text).min(1),
 });
 
 const report = z.strictObject({

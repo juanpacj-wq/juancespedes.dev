@@ -1,3 +1,4 @@
+import type { Architecture } from '../../src/domain/project/architecture';
 import {
   createProject,
   type CaseStudyContent,
@@ -23,13 +24,26 @@ const common = {
   confidentiality: 'anonymized',
 } as const;
 
+export const architecture = (overrides: Partial<Architecture> = {}): Architecture => ({
+  summary: 'Browsers talk to an API that stores shifts in SQL Server.',
+  layers: [
+    { name: 'Clients', nodes: [{ id: 'browser', label: 'Browser', detail: null }] },
+    { name: 'Services', nodes: [{ id: 'api', label: 'API', detail: 'Node.js' }] },
+  ],
+  flows: [{ from: 'browser', to: 'api', label: 'HTTPS and WebSockets' }],
+  ...overrides,
+});
+
 export const caseStudyContent = (overrides: Partial<CaseStudyContent> = {}): CaseStudyContent => ({
   ...common,
   kind: 'case-study',
   problem: 'Shift logs lived in Excel.',
+  responsibilities: [],
   constraints: ['Shifts cross midnight'],
   decisions: [{ title: 'Shifts as entities', rationale: 'Immutable history', alternatives: [] }],
-  lessons: [],
+  architecture: architecture(),
+  outcomes: ['Shift handover moved from paper to the app.'],
+  lessons: ['Write the domain glossary first.'],
   ...overrides,
 });
 

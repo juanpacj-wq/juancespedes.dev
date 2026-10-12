@@ -1,0 +1,66 @@
+---
+import { nodeLabels, type Architecture } from '../../domain/project/architecture';
+import type { Dictionary } from '../i18n/dictionary';
+import Icon from '../icons/Icon.astro';
+
+/**
+ * Draws a case study's architecture from data: layers left to right on wide screens, top to
+ * bottom on phones, then the flows as a list. It is real text, so it follows the theme, scales
+ * with the reader's font size and reads in order with a screen reader. No JavaScript.
+ */
+interface Props {
+  t: Dictionary;
+  architecture: Architecture;
+}
+
+const { t, architecture } = Astro.props;
+const labels = nodeLabels(architecture);
+const lastLayer = architecture.layers.length - 1;
+---
+
+<figure class="flex flex-col gap-10">
+  <figcaption class="max-w-3xl text-muted">{architecture.summary}</figcaption>
+
+  <ol
+    aria-label={t.project.diagram}
+    class="grid gap-10 rounded-panel border border-line bg-surface p-5 sm:p-8 lg:grid-flow-col lg:auto-cols-fr"
+  >
+    {architecture.layers.map((layer, index) => (
+      <li class="relative flex flex-col gap-3">
+        <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">{layer.name}</p>
+        <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+          {layer.nodes.map((node) => (
+            <li class="flex flex-col gap-1 rounded-control border border-line-strong bg-canvas px-3 py-2.5">
+              <span class="text-small font-medium text-ink">{node.label}</span>
+              {node.detail && <span class="text-eyebrow text-muted">{node.detail}</span>}
+            </li>
+          ))}
+        </ul>
+        {index < lastLayer && (
+          <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 rotate-90 text-subtle lg:top-8 lg:-right-7 lg:bottom-auto lg:left-auto lg:translate-x-0 lg:rotate-0">
+            <Icon name="arrow-right" size={18} />
+          </span>
+        )}
+      </li>
+    ))}
+  </ol>
+
+  {architecture.flows.length > 0 && (
+    <div class="flex flex-col gap-4">
+      <h3 class="text-title font-medium">{t.project.flows}</h3>
+      <ol class="grid gap-x-8 gap-y-4 md:grid-cols-2">
+        {architecture.flows.map((flow) => (
+          <li class="flex flex-col gap-1 border-l-2 border-line-strong pl-4">
+            <span class="flex flex-wrap items-center gap-x-2 text-small font-medium text-ink">
+              {labels.get(flow.from)}
+              <Icon name="arrow-right" size={14} class="text-accent-ink" />
+              <span class="sr-only">{t.project.flowTo}</span>
+              {labels.get(flow.to)}
+            </span>
+            <span class="text-small text-muted">{flow.label}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )}
+</figure>

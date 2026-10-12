@@ -1,0 +1,103 @@
+---
+kind: case-study
+title: PDF energy invoice extractor for two formats
+summary: A Python desktop application that turns PDF energy invoices from two companies with different formats into structured data, exports them to Excel and cross-checks them against the corporate database.
+role: Sole developer, from template analysis to packaging
+period: { start: '2026-02', end: '2026-06' }
+capabilities: [data-bi, automation-ai]
+stack:
+  - Python
+  - pdfminer.six
+  - pandas
+  - PostgreSQL
+  - Excel
+  - CustomTkinter
+  - PyInstaller
+metrics:
+  - value: '73'
+    label: real invoices pinned as a regression corpus, with 26 fields checked in each one
+    source: Repository regression suite, June 2026
+  - value: '4 in 1'
+    label: earlier projects, one per company, merged into a single codebase
+    source: Git history and folders of the earlier versions
+  - value: '40+'
+    label: extraction patterns, each one audited against a robustness matrix
+    source: Repository pattern coverage audit, 2026
+featured: false
+order: 6
+status: published
+confidentiality: anonymized
+problem: Every billing cycle, dozens of PDF energy invoices from two counterparties with completely different formats had to be keyed in and checked by hand, then compared with the values stored in the corporate database. It was slow, error-prone and spread across four scripts that each did part of the job.
+responsibilities:
+  - Analyzed each counterparty's templates, including the reliquidation credit note.
+  - Merged four earlier projects into an architecture with one package per company and the same internal structure.
+  - Built the graphical interface and the packaging for business users without Python installed.
+  - Wrote the regression suite and the pattern coverage audit.
+constraints:
+  - Non-technical business users with no Python on their machines.
+  - Third-party PDFs with encoding glitches and templates that change without notice.
+  - A real zero must be distinguishable from a concept the invoice does not include.
+decisions:
+  - title: One package per company with the same structure
+    rationale: Each counterparty has its own extractor, processing and export, and the interface picks the engine at runtime. Supporting a new format means adding a package.
+    alternatives:
+      - A single extractor full of per-company conditionals
+  - title: Extraction by page coordinates
+    rationale: In the tabular format, text is rebuilt by grouping lines by their vertical position, which keeps together the columns that a flat extraction mixes up.
+    alternatives:
+      - Extract plain text and split it with regular expressions only
+  - title: A golden corpus before touching any pattern
+    rationale: 73 real invoices frozen in a snapshot make the suite fail on any value change, and the snapshot is only regenerated after a manual check.
+    alternatives:
+      - Test with a handful of sample invoices
+  - title: Fields that were not extracted are data too
+    rationale: Every invoice carries the list of concepts its template did not include, so a new template shows up in the Excel file instead of turning into silent zeros.
+    alternatives:
+      - Fill anything not found with zero
+architecture:
+  summary: The graphical interface takes a PDF or a folder, picks the company engine and processes in the background. Each engine extracts, cleans and exports to Excel, and cross-checks the values against the corporate database.
+  layers:
+    - name: Input
+      nodes:
+        - { id: pdfs, label: 'PDF invoices', detail: 'A single invoice or a whole folder' }
+    - name: Interface
+      nodes:
+        - {
+            id: desktop-app,
+            label: 'Desktop application',
+            detail: 'CustomTkinter, processing on a separate thread',
+          }
+    - name: Engines
+      nodes:
+        - {
+            id: engine-a,
+            label: 'Company A engine',
+            detail: 'PDF to CSV and more than 40 patterns',
+          }
+        - { id: engine-b, label: 'Company B engine', detail: 'Page coordinates and line items' }
+    - name: Outputs and reference
+      nodes:
+        - { id: excel, label: 'Multi-sheet Excel', detail: 'Per invoice or consolidated per batch' }
+        - {
+            id: database,
+            label: 'Corporate PostgreSQL',
+            detail: 'Reference values for the cross-check',
+          }
+  flows:
+    - { from: pdfs, to: desktop-app, label: 'Picked by the user' }
+    - { from: desktop-app, to: engine-a, label: 'By invoice type' }
+    - { from: desktop-app, to: engine-b, label: 'By invoice type' }
+    - { from: database, to: engine-a, label: 'Values to compare' }
+    - { from: database, to: engine-b, label: 'Values to compare' }
+    - { from: engine-a, to: excel, label: 'Invoices, concepts and parameters' }
+    - { from: engine-b, to: excel, label: 'Master workbook with comparison' }
+outcomes:
+  - Reviewing a cycle went from keying in invoice after invoice to picking a folder and checking the differences flagged in the Excel file.
+  - Differences against the corporate database come out field by field in a comparison sheet.
+  - A Windows executable runs without installing Python or any dependency.
+lessons:
+  - I would separate the extraction core from the interface from the start, so it could also run from the command line or on a schedule on a server.
+  - I would build the golden corpus before merging the earlier projects; it would have made the merge faster and safer.
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

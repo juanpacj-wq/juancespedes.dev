@@ -20,13 +20,28 @@ const kindFields = (kind, locale) => {
     case 'case-study':
       return [
         `problem: ${quote(todo)}`,
+        'responsibilities: []',
         'constraints:',
         `  - ${quote(todo)}`,
         'decisions:',
         `  - title: ${quote(todo)}`,
         `    rationale: ${quote(todo)}`,
         '    alternatives: []',
-        'lessons: []',
+        'architecture:',
+        `  summary: ${quote(todo)}`,
+        '  layers:',
+        `    - name: ${quote(todo)}`,
+        '      nodes:',
+        `        - { id: source, label: ${quote(todo)} }`,
+        `    - name: ${quote(todo)}`,
+        '      nodes:',
+        `        - { id: service, label: ${quote(todo)} }`,
+        '  flows:',
+        `    - { from: source, to: service, label: ${quote(todo)} }`,
+        'outcomes:',
+        `  - ${quote(todo)}`,
+        'lessons:',
+        `  - ${quote(todo)}`,
       ];
     case 'report':
       return [
@@ -78,8 +93,8 @@ export const renderProjectFile = ({ kind, title, locale, start }) => {
     '---',
     '',
     locale === 'es'
-      ? 'Escribe aquí la narrativa del proyecto. Guía: docs/adding-a-project.md'
-      : 'Write the project narrative here. Guide: docs/adding-a-project.md',
+      ? '{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}'
+      : '{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}',
     '',
   ].join('\n');
 };

@@ -1,0 +1,24 @@
+---
+/**
+ * One block of a project page: a rule, a heading and its content. `wide` lets a block (the
+ * architecture diagram) use the full page width instead of the reading column.
+ */
+interface Props {
+  id: string;
+  title: string;
+  wide?: boolean;
+}
+
+const { id, title, wide = false } = Astro.props;
+---
+
+<section
+  id={id}
+  aria-labelledby={`${id}-title`}
+  class:list={['scroll-mt-24 border-t border-line pt-10', !wide && 'max-w-3xl']}
+>
+  <h2 id={`${id}-title`} class="mb-6 text-heading font-semibold text-balance">
+    {title}
+  </h2>
+  <slot />
+</section>

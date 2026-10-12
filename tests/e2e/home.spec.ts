@@ -50,14 +50,17 @@ test.describe('home sections', () => {
     await expect(page.getByRole('heading', { name: 'Trabajemos juntos' })).toBeInViewport();
   });
 
-  test('skill evidence links point at the project that proves them', async ({ page }) => {
+  test('skill evidence links open the project that proves them', async ({ page }) => {
     await page.goto('/');
     const evidence = page
       .locator('#capabilities')
       .getByRole('link', { name: /Telemetría/ })
       .first();
-    await expect(evidence).toHaveAttribute('href', '#project-plant-telemetry');
-    await expect(page.locator('#project-plant-telemetry')).toHaveCount(1);
+    await expect(evidence).toHaveAttribute('href', '/proyectos/plant-telemetry');
+    await evidence.click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Telemetría de generación eléctrica en tiempo real',
+    );
   });
 });
 
@@ -66,19 +69,21 @@ test.describe('project filter', () => {
     await page.goto('/#projects');
     const filter = page.getByRole('group', { name: 'Filtrar por capacidad' });
     const rows = page.locator('#projects li[data-capabilities]');
-    await expect(rows).toHaveCount(3);
+    await expect(rows).toHaveCount(7);
 
-    await filter.getByRole('button', { name: 'Frontend' }).click();
-    await expect(filter.getByRole('button', { name: 'Frontend' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    const legacy = filter.getByRole('button', { name: 'Sistemas heredados' });
+    await legacy.click();
+    await expect(legacy).toHaveAttribute('aria-pressed', 'true');
     await expect(rows.filter({ visible: true })).toHaveCount(1);
     await expect(page.locator('[data-filter-status]')).toHaveText('1 proyecto');
 
-    await filter.getByRole('button', { name: 'Todos' }).click();
+    await filter.getByRole('button', { name: 'Frontend' }).click();
     await expect(rows.filter({ visible: true })).toHaveCount(3);
     await expect(page.locator('[data-filter-status]')).toHaveText('3 proyectos');
+
+    await filter.getByRole('button', { name: 'Todos' }).click();
+    await expect(rows.filter({ visible: true })).toHaveCount(7);
+    await expect(page.locator('[data-filter-status]')).toHaveText('7 proyectos');
   });
 });
 

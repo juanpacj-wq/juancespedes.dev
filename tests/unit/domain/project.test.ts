@@ -7,8 +7,13 @@ import {
   isPublished,
   validateProjectContent,
 } from '../../../src/domain/project/project';
-import { compareProjects, sortProjects } from '../../../src/domain/project/project-ordering';
 import {
+  adjacentProjects,
+  compareProjects,
+  sortProjects,
+} from '../../../src/domain/project/project-ordering';
+import {
+  architecture,
   caseStudyContent,
   openSourceContent,
   project,
@@ -113,9 +118,16 @@ describe('validateProjectContent', () => {
 
   it('enforces case-study sections', () => {
     const issues = validateProjectContent(
-      caseStudyContent({ problem: ' ', constraints: [], decisions: [] }),
+      caseStudyContent({ problem: ' ', constraints: [], decisions: [], outcomes: [], lessons: [] }),
     );
-    expect(fields(issues)).toEqual(['constraints', 'decisions', 'problem']);
+    expect(fields(issues)).toEqual(['problem', 'constraints', 'decisions', 'outcomes', 'lessons']);
+  });
+
+  it('validates the case-study architecture and prefixes its fields', () => {
+    const issues = validateProjectContent(
+      caseStudyContent({ architecture: architecture({ layers: [], flows: [] }) }),
+    );
+    expect(fields(issues)).toEqual(['architecture.layers']);
   });
 
   it('enforces report sections', () => {
@@ -156,6 +168,14 @@ describe('ordering and publication', () => {
     const input = [finished, featured];
     sortProjects(input);
     expect(input.map((p) => p.slug)).toEqual(['finished', 'featured']);
+  });
+
+  it('finds the neighbours of a project in display order', () => {
+    const projects = [finished, ongoing, firstByOrder, featured];
+    expect(adjacentProjects(projects, 'first')).toEqual({ previous: featured, next: ongoing });
+    expect(adjacentProjects(projects, 'featured')).toEqual({ previous: null, next: firstByOrder });
+    expect(adjacentProjects(projects, 'finished')).toEqual({ previous: ongoing, next: null });
+    expect(adjacentProjects(projects, 'missing')).toEqual({ previous: null, next: null });
   });
 
   it('knows drafts from published projects', () => {

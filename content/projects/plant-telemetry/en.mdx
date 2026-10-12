@@ -1,7 +1,7 @@
 ---
 kind: case-study
 title: Real-time power generation telemetry
-summary: I built the service that reads five energy meters every 2 seconds, integrates energy per hourly period, compares it with the market dispatch, and feeds a live dashboard and a Power BI report.
+summary: I built the service that reads five energy meters every 2 seconds, integrates energy per hourly period, compares it against the market dispatch and feeds a live dashboard and a Power BI report.
 role: Data and backend engineer, sole developer
 period: { start: '2026-03', end: null }
 capabilities: [data-bi, backend, automation-ai, infrastructure]
@@ -20,10 +20,10 @@ stack:
   - systemd
 metrics:
   - value: '2 s'
-    label: polling interval for 5 meters over Modbus TCP, with p50 latency of 15 to 25 ms
+    label: read interval across 5 meters over Modbus TCP, with 15 to 25 ms p50 latency
     source: Service configuration and latency measurements, 2026
   - value: '300 MB to 5 MB'
-    label: deployment size reduction after replacing an automated browser with direct meter reads
+    label: smaller deployment after moving from an automated browser to reading the meters directly
     source: Project architecture decision log
   - value: '410+'
     label: automated test cases across Vitest and pytest
@@ -32,24 +32,76 @@ featured: true
 order: 2
 status: published
 confidentiality: anonymized
-problem: Operations needed to see, on one screen, the actual output of four generating units against what the market operator dispatched, and the existing readings depended on a centralized system that was a single point of failure.
+problem: Operations needed to see, on a single screen, the actual output of four generating units against the market operator's dispatch, and the existing readings depended on a centralized system that was a single point of failure.
+responsibilities:
+  - Designed direct meter reading, per-period energy integration and the comparison against market dispatch.
+  - Built the Node.js backend, the React dashboard and the Python service that feeds the data lakehouse.
+  - Statistically validated the backup meters and documented the sign convention of each metering point.
+  - Run two production instances, one per plant, from the same build.
 constraints:
-  - Readings every 2 seconds without losing the energy integration if the service restarts.
-  - Two plants with different sign conventions depending on the metering boundary.
-  - A failed meter must not pollute totals with false zeros.
+  - Readings every 2 seconds without losing integrated energy if the service restarts.
+  - Two plants with different sign conventions depending on the metering point.
+  - A failed meter must not pollute the totals with false zeros.
 decisions:
   - title: Read the meters directly over Modbus TCP
-    rationale: Removes the single point of failure and the automated browser from the deployment, and makes each read's latency measurable.
+    rationale: Removes the single point of failure and the automated browser from the deployment, and makes the latency of every reading measurable.
     alternatives:
       - Keep scraping the centralized system's web interface
   - title: Null means no reading, never zero
-    rationale: Telling missing data apart from a zero value makes a failed meter detectable instead of reporting zero output.
+    rationale: Telling missing data apart from a zero value makes a failed meter detectable instead of reporting zero generation. The rule lives in a domain module shared by the backend and the dashboard.
     alternatives:
       - Fill missing readings with zero
-  - title: Statistical validation before trusting the backup meters
-    rationale: A one-hour parallel capture with bias, p95 and integrated-energy criteria showed the backup meters are interchangeable.
+  - title: Statistical validation before using the backup meters
+    rationale: A one-hour parallel capture with bias, p95 and integrated energy criteria proved the backup meters are interchangeable.
     alternatives:
       - Assume the backup meters read the same
+  - title: One build for two plants, configured at load time
+    rationale: Each plant's branding and unit order are read from a configuration file at runtime, so a fix ships once and serves both.
+    alternatives:
+      - Compile a separate dashboard per plant
+architecture:
+  summary: A Node.js service reads the meters, integrates energy and compares it with the market operator's files and the redispatch emails; the dashboard receives everything over WebSockets. In parallel, a Python service writes the same telemetry to the lakehouse behind Power BI.
+  layers:
+    - name: Sources
+      nodes:
+        - { id: meters, label: 'Energy meters', detail: '5 meters, Modbus TCP every 2 s' }
+        - {
+            id: market-files,
+            label: 'Market operator files',
+            detail: 'Daily dispatch and redispatch every 5 min',
+          }
+        - { id: mailbox, label: 'Redispatch emails', detail: 'Read with Microsoft Graph' }
+    - name: Processing
+      nodes:
+        - { id: poller, label: 'Meter reader', detail: 'Failures isolated per unit' }
+        - { id: accumulator, label: 'Energy integrator', detail: 'MW to MWh per hourly period' }
+        - { id: sink, label: 'Python telemetry service', detail: 'Delta tables without Spark' }
+    - name: Storage
+      nodes:
+        - { id: sql-server, label: 'SQL Server', detail: 'Periods, dispatch and change history' }
+        - { id: lakehouse, label: 'Microsoft Fabric lakehouse', detail: 'Mirrored to PostgreSQL' }
+    - name: Consumers
+      nodes:
+        - { id: live-dashboard, label: 'Live dashboard', detail: 'React over WebSockets' }
+        - { id: power-bi, label: 'Power BI report', detail: null }
+  flows:
+    - { from: meters, to: poller, label: 'Readings every 2 s' }
+    - { from: poller, to: accumulator, label: 'Power per unit, null if a meter is missing' }
+    - { from: market-files, to: accumulator, label: 'Scheduled dispatch per period' }
+    - { from: mailbox, to: accumulator, label: 'Final dispatch for the period' }
+    - { from: accumulator, to: sql-server, label: 'Checkpoint every 30 s' }
+    - { from: accumulator, to: live-dashboard, label: 'Output, projection and deviation' }
+    - { from: meters, to: sink, label: 'Independent reading' }
+    - { from: sink, to: lakehouse, label: 'Write every 15 s' }
+    - { from: lakehouse, to: power-bi, label: 'Corporate report model' }
+outcomes:
+  - Operations sees on one screen the actual output of four units against dispatch, with a projection for the current period.
+  - The single point of failure is gone and read latency dropped from about 1.1 s to 15 to 25 ms (p50).
+  - After a restart, the service rebuilds closed periods from the database and loses no integrated energy.
+  - The same telemetry feeds a corporate Power BI report without touching the dashboard.
 lessons:
-  - Documenting the sign convention with parallel readings on migration day prevented weeks of arguments about numbers.
+  - I would measure latency and the rate of null readings from day one; those figures justified the protocol change and would have brought the decision forward.
+  - I would keep a single meter-reading service that publishes to both consumers, instead of maintaining the same topology in Node.js and in Python.
 ---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

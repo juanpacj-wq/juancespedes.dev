@@ -1,0 +1,330 @@
+---
+import type { Project } from '../../domain/project/project';
+import type { Dictionary } from '../i18n/dictionary';
+import { formatPeriod } from '../i18n/format';
+import { projectPath, projectsListPath } from '../i18n/routes';
+import Icon from '../icons/Icon.astro';
+import Badge from '../primitives/Badge.astro';
+import Card from '../primitives/Card.astro';
+import Container from '../primitives/Container.astro';
+import Stat from '../primitives/Stat.astro';
+import Tag from '../primitives/Tag.astro';
+import TextLink from '../primitives/TextLink.astro';
+import ArchitectureDiagram from './ArchitectureDiagram.astro';
+import DetailSection from './DetailSection.astro';
+
+/**
+ * A project page. Case studies follow the fixed template (problem, role, constraints, decisions,
+ * architecture, results, what I would do differently); the other kinds show their own fields.
+ * Every block comes from validated content, so a missing section is a content error, not a
+ * layout one.
+ */
+interface Props {
+  t: Dictionary;
+  project: Project;
+  previous: Project | null;
+  next: Project | null;
+}
+
+const { t, project, previous, next } = Astro.props;
+const { locale } = project;
+const two = (n: number) => String(n + 1).padStart(2, '0');
+---
+
+<article>
+  <Container as="header" class="flex flex-col gap-8 pt-10 pb-12 sm:pt-16 sm:pb-16">
+    <a
+      href={projectsListPath(locale)}
+      class="inline-flex w-fit items-center gap-2 text-small text-muted transition-colors hover:text-ink"
+    >
+      <Icon name="arrow-right" size={16} class="rotate-180" />
+      {t.project.back}
+    </a>
+
+    <div class="flex max-w-4xl flex-col gap-5">
+      <div class="flex flex-wrap items-center gap-2">
+        <Badge tone="accent">{t.kindLabels[project.kind]}</Badge>
+        {project.confidentiality === 'anonymized' && <Badge>{t.projects.anonymized}</Badge>}
+      </div>
+      <h1 class="text-heading font-semibold text-balance sm:text-display">{project.title}</h1>
+      <p class="max-w-3xl text-lead text-muted">{project.summary}</p>
+    </div>
+
+    <section aria-labelledby="facts-title" class="flex flex-col gap-4">
+      <h2 id="facts-title" class="sr-only">
+        {t.project.facts}
+      </h2>
+      <dl class="grid gap-6 border-y border-line py-6 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr]">
+        <div class="flex flex-col gap-1">
+          <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+            {t.project.role}
+          </dt>
+          <dd class="text-ink">{project.role}</dd>
+        </div>
+        <div class="flex flex-col gap-1">
+          <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+            {t.project.period}
+          </dt>
+          <dd class="text-ink">{formatPeriod(locale, project.period, t)}</dd>
+        </div>
+        <div class="flex flex-col gap-1">
+          <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+            {t.project.links}
+          </dt>
+          <dd class="flex flex-col gap-1">
+            {project.links.length > 0
+              ? project.links.map((link) => (
+                  <TextLink href={link.url} external externalLabel={t.a11y.external}>
+                    {link.label}
+                  </TextLink>
+                ))
+              : project.kind === 'open-source' && (
+                  <TextLink href={project.repository} external externalLabel={t.a11y.external}>
+                    {t.project.repository}
+                  </TextLink>
+                )}
+            {project.confidentiality === 'anonymized' && (
+              <span class="text-small text-muted">{t.project.anonymizedNote}</span>
+            )}
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    {project.metrics.length > 0 && (
+      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label={t.project.results}>
+        {project.metrics.map((metric) => (
+          <li>
+            <Card class="h-full">
+              <Stat
+                value={metric.value}
+                label={metric.label}
+                source={metric.source}
+                sourceLabel={t.metric.source}
+              />
+            </Card>
+          </li>
+        ))}
+      </ul>
+    )}
+  </Container>
+
+  <Container class="flex flex-col gap-16 pb-16 sm:gap-20 sm:pb-24">
+    {project.kind === 'case-study' && (
+      <>
+        <DetailSection id="problem" title={t.project.problem}>
+          <p class="text-lead text-muted">{project.problem}</p>
+        </DetailSection>
+
+        <DetailSection id="role" title={t.project.responsibilities}>
+          {project.responsibilities.length > 0 && (
+            <ul class="flex flex-col gap-3">
+              {project.responsibilities.map((item) => (
+                <li class="flex gap-3 text-muted">
+                  <span
+                    class="mt-2.5 size-1.5 shrink-0 rounded-chip bg-accent"
+                    aria-hidden="true"
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          )}
+        </DetailSection>
+
+        <DetailSection id="constraints" title={t.project.constraints}>
+          <ul class="flex flex-col gap-3">
+            {project.constraints.map((item) => (
+              <li class="flex gap-3 text-muted">
+                <span class="mt-2.5 size-1.5 shrink-0 rounded-chip bg-accent" aria-hidden="true" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </DetailSection>
+
+        <DetailSection id="decisions" title={t.project.decisions} wide>
+          <ol class="grid gap-4 lg:grid-cols-2">
+            {project.decisions.map((decision, index) => (
+              <li>
+                <Card class="flex h-full flex-col gap-3">
+                  <span class="font-mono text-eyebrow text-accent-ink">{two(index)}</span>
+                  <h3 class="text-title font-medium text-balance">{decision.title}</h3>
+                  <p class="text-muted">{decision.rationale}</p>
+                  {decision.alternatives.length > 0 && (
+                    <div class="mt-auto flex flex-col gap-1 border-t border-line pt-3">
+                      <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+                        {t.project.discarded}
+                      </p>
+                      <ul class="flex flex-col gap-1">
+                        {decision.alternatives.map((alternative) => (
+                          <li class="text-small text-muted">{alternative}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </Card>
+              </li>
+            ))}
+          </ol>
+        </DetailSection>
+
+        <DetailSection id="architecture" title={t.project.architecture} wide>
+          <ArchitectureDiagram t={t} architecture={project.architecture} />
+        </DetailSection>
+
+        <DetailSection id="results" title={t.project.results}>
+          <ul class="flex flex-col gap-3">
+            {project.outcomes.map((item) => (
+              <li class="flex gap-3 text-muted">
+                <span class="mt-2.5 size-1.5 shrink-0 rounded-chip bg-success" aria-hidden="true" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </DetailSection>
+
+        <DetailSection id="lessons" title={t.project.lessons}>
+          <ul class="flex flex-col gap-3">
+            {project.lessons.map((item) => (
+              <li class="flex gap-3 text-muted">
+                <span
+                  class="mt-2.5 size-1.5 shrink-0 rounded-chip bg-line-strong"
+                  aria-hidden="true"
+                />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </DetailSection>
+      </>
+    )}
+
+    {project.kind === 'report' && (
+      <DetailSection id="report" title={t.project.businessQuestions}>
+        <ul class="mb-8 flex flex-col gap-3 text-muted">
+          {project.businessQuestions.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+        <dl class="grid gap-6 sm:grid-cols-2">
+          <div>
+            <dt class="mb-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+              {t.project.dataSources}
+            </dt>
+            {project.dataSources.map((item) => (
+              <dd class="text-muted">{item}</dd>
+            ))}
+          </div>
+          <div>
+            <dt class="mb-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+              {t.project.tool}
+            </dt>
+            <dd class="text-muted">{project.tool}</dd>
+          </div>
+          {project.highlightedMeasures.length > 0 && (
+            <div>
+              <dt class="mb-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+                {t.project.highlightedMeasures}
+              </dt>
+              {project.highlightedMeasures.map((item) => (
+                <dd class="text-muted">{item}</dd>
+              ))}
+            </div>
+          )}
+        </dl>
+      </DetailSection>
+    )}
+
+    {project.kind === 'open-source' && (
+      <DetailSection id="repository" title={t.project.repository}>
+        <dl class="grid gap-6 sm:grid-cols-2">
+          <div>
+            <dt class="mb-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+              {t.project.repository}
+            </dt>
+            <dd>
+              <TextLink href={project.repository} external externalLabel={t.a11y.external}>
+                {project.repository.replace('https://', '')}
+              </TextLink>
+            </dd>
+          </div>
+          <div>
+            <dt class="mb-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+              {t.project.license}
+            </dt>
+            <dd class="text-muted">{project.license}</dd>
+          </div>
+          {project.install && (
+            <div class="sm:col-span-2">
+              <dt class="mb-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+                {t.project.install}
+              </dt>
+              <dd>
+                <code class="block overflow-x-auto rounded-control bg-surface-raised px-4 py-3 font-mono text-small text-ink">
+                  {project.install}
+                </code>
+              </dd>
+            </div>
+          )}
+        </dl>
+      </DetailSection>
+    )}
+
+    {project.kind === 'tool' && (
+      <DetailSection id="tool" title={t.project.automates}>
+        <p class="mb-6 text-lead text-muted">{project.automates}</p>
+        <p class="font-mono text-small text-subtle">
+          {t.project.platform}: {project.platform}
+        </p>
+      </DetailSection>
+    )}
+
+    <DetailSection id="stack" title={t.project.stack}>
+      <ul class="flex flex-wrap gap-2">
+        {project.stack.map((name) => (
+          <li>
+            <Tag>{name}</Tag>
+          </li>
+        ))}
+      </ul>
+    </DetailSection>
+
+    {(previous ?? next) && (
+      <nav aria-label={t.project.more} class="border-t border-line pt-10">
+        <ul class="grid gap-4 sm:grid-cols-2">
+          {previous && (
+            <li>
+              <Card interactive class="h-full">
+                <a
+                  href={projectPath(locale, previous.slug)}
+                  class="flex flex-col gap-2 after:absolute after:inset-0 after:rounded-card"
+                >
+                  <span class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+                    {t.project.previous}
+                  </span>
+                  <span class="text-title font-medium text-balance">{previous.title}</span>
+                </a>
+              </Card>
+            </li>
+          )}
+          {next && (
+            <li class="sm:col-start-2">
+              <Card interactive class="h-full sm:text-right">
+                <a
+                  href={projectPath(locale, next.slug)}
+                  class="flex flex-col gap-2 after:absolute after:inset-0 after:rounded-card"
+                >
+                  <span class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+                    {t.project.next}
+                  </span>
+                  <span class="text-title font-medium text-balance">{next.title}</span>
+                </a>
+              </Card>
+            </li>
+          )}
+        </ul>
+      </nav>
+    )}
+  </Container>
+</article>

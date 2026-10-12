@@ -32,7 +32,12 @@ featured: true
 order: 1
 status: published
 confidentiality: anonymized
-problem: El personal de operación de dos plantas térmicas llevaba sus bitácoras de turno en libros de Excel. La información quedaba dispersa, el cierre de turno no tenía garantías y los reportes oficiales se armaban a mano.
+problem: El personal de operación de dos plantas térmicas llevaba sus bitácoras de turno en libros de Excel. La información quedaba repartida entre archivos, el cierre de turno dependía de la disciplina de cada persona y los reportes oficiales del día se armaban a mano copiando celdas.
+responsibilities:
+  - Levanté los requisitos con jefes de turno, ingenieros de operación y químicos, y los convertí en un modelo de dominio con turnos, bitácoras y permisos por cargo.
+  - Diseñé y construí el frontend, el backend, la base de datos y la integración con el inicio de sesión corporativo.
+  - Desplegué y opero el sistema en un servidor Linux de la empresa, con nginx, systemd y un script de actualización con verificaciones.
+  - Documenté 71 decisiones de arquitectura y llevé una auditoría de seguridad propia hasta cerrar 38 de 39 hallazgos.
 constraints:
   - Usuarios en turnos de 24 horas cuyo día operativo cruza la medianoche.
   - Inicio de sesión corporativo obligatorio con roles por cargo.
@@ -48,9 +53,76 @@ decisions:
     alternatives:
       - Consultar al servidor cada pocos segundos
   - title: Lector y escritor de .xlsx propios sobre zlib
-    rationale: El reporte oficial debía salir idéntico a la plantilla de Excel sin sumar librerías grandes al backend.
+    rationale: El reporte oficial debía salir idéntico a la plantilla de Excel sin sumar librerías grandes al backend, que tiene solo 6 dependencias de producción.
     alternatives:
       - Usar una librería de hojas de cálculo de terceros
+  - title: Contrato de datos probado con el tablero de generación
+    rationale: Otro sistema en producción consume los eventos de la bitácora. Una prueba de contrato falla si cualquiera de los dos lados cambia la forma de los datos, y cada sistema escribe solo en su propio esquema.
+    alternatives:
+      - Dejar que el tablero lea directamente las tablas de la bitácora
+architecture:
+  summary: El navegador de cada operador habla con una API en Node.js por HTTPS y por WebSockets. La API guarda todo en SQL Server, corre procesos programados que cierran turnos e ingieren datos de planta, y expone un contrato de datos al tablero de generación.
+  layers:
+    - name: Usuarios
+      nodes:
+        - {
+            id: operator-app,
+            label: 'Aplicación web de operación',
+            detail: 'React, vistas por cargo y por planta',
+          }
+    - name: Servicios
+      nodes:
+        - { id: api, label: 'API de bitácoras', detail: 'Express, 19 módulos de dominio' }
+        - {
+            id: realtime,
+            label: 'Canal en tiempo real',
+            detail: 'WebSockets con validación de origen',
+          }
+        - {
+            id: jobs,
+            label: 'Procesos programados',
+            detail: 'Cierre de turno, ingesta horaria y despacho',
+          }
+    - name: Datos
+      nodes:
+        - {
+            id: database,
+            label: 'SQL Server',
+            detail: 'Catálogos y transacciones en esquemas separados',
+          }
+        - {
+            id: excel-report,
+            label: 'Reporte oficial en Excel',
+            detail: 'Generado desde los datos',
+          }
+    - name: Integraciones
+      nodes:
+        - {
+            id: identity,
+            label: 'Microsoft Entra ID',
+            detail: 'Inicio de sesión y roles por cargo',
+          }
+        - {
+            id: plant-historian,
+            label: 'Historiador de planta',
+            detail: 'Consumo de combustible por hora',
+          }
+        - { id: dashboard, label: 'Tablero de generación', detail: 'Consume eventos por contrato' }
+  flows:
+    - { from: operator-app, to: api, label: 'Registra eventos y cierra turnos' }
+    - { from: realtime, to: operator-app, label: 'Avisa cambios de turno y usuarios activos' }
+    - { from: api, to: database, label: 'Guarda cada asiento con su turno' }
+    - { from: api, to: identity, label: 'Valida la sesión y los permisos' }
+    - { from: plant-historian, to: jobs, label: 'Entrega el consumo de cada hora' }
+    - { from: api, to: excel-report, label: 'Arma el libro del día' }
+    - { from: dashboard, to: api, label: 'Consulta eventos por periodo' }
+outcomes:
+  - Las dos plantas registran sus turnos en la aplicación, con el historial de cada turno congelado al cerrarlo.
+  - El reporte oficial del día sale de los datos con el formato de la plantilla, sin copiar celdas a mano.
+  - El tablero de generación consume los eventos de la bitácora por un contrato con pruebas, sin acceder a sus tablas.
 lessons:
-  - Los tests que protegen invariantes peligrosas (nunca borrar datos de una planta real) valen más que la cobertura por sí sola.
+  - Priorizaría desde el primer día las pruebas que protegen invariantes peligrosas, como no borrar nunca datos de una planta real, por encima de la cobertura total.
+  - Sacaría antes los procesos programados a un servicio aparte, para poder reiniciar la API sin pausar la ingesta de datos de planta.
 ---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

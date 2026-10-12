@@ -5,6 +5,7 @@ import type { ProjectRepository } from '../../../src/application/ports/project-r
 import type { TechnologyCatalog } from '../../../src/application/ports/technology-catalog';
 import { makeBuildSkillEvidenceMatrix } from '../../../src/application/use-cases/build-skill-evidence-matrix';
 import { makeGetProject } from '../../../src/application/use-cases/get-project';
+import { makeGetProjectPage } from '../../../src/application/use-cases/get-project-page';
 import { makeListFeaturedProjects } from '../../../src/application/use-cases/list-featured-projects';
 import { makeListHeadlineMetrics } from '../../../src/application/use-cases/list-headline-metrics';
 import { makeListProjects } from '../../../src/application/use-cases/list-projects';
@@ -99,6 +100,29 @@ describe('getProject', () => {
       error: { kind: 'project-not-found', slug: 'draft-tool' },
     });
     expect((await getProject('en', 'nope')).ok).toBe(false);
+  });
+});
+
+describe('getProjectPage', () => {
+  const getProjectPage = makeGetProjectPage(listProjects);
+
+  it('returns the project with its neighbours in display order', async () => {
+    expect(await getProjectPage('en', 'telemetry')).toEqual({
+      ok: true,
+      value: { project: telemetry, previous: logbook, next: report },
+    });
+  });
+
+  it('has no neighbour past either end', async () => {
+    const result = await getProjectPage('es', 'logbook');
+    expect(result.ok && [result.value.previous, result.value.next]).toEqual([null, null]);
+  });
+
+  it('treats drafts and unknown slugs as not found', async () => {
+    expect(await getProjectPage('en', 'draft-tool')).toEqual({
+      ok: false,
+      error: { kind: 'project-not-found', slug: 'draft-tool' },
+    });
   });
 });
 

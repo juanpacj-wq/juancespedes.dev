@@ -1,5 +1,5 @@
 ---
-kind: open-source
+kind: case-study
 title: linkedin-pilot, servidor MCP para LinkedIn
 summary: Servidor MCP y CLI en TypeScript que permite a un asistente de IA actualizar un perfil, interactuar y postular a ofertas con la sesión real del usuario, con confirmación explícita antes de cada acción visible para terceros.
 role: Autor y mantenedor
@@ -16,10 +16,85 @@ metrics:
     label: herramientas MCP documentadas para perfil, interacciones y postulaciones
     source: README del repositorio, octubre de 2026
 featured: false
-order: 10
+order: 7
 status: published
 confidentiality: public
-repository: https://github.com/juanpacj-wq/linkedin-mcp
-license: Código público, sin licencia declarada
-install: npm install && npm run build
+links:
+  - label: Código en GitHub
+    url: https://github.com/juanpacj-wq/linkedin-mcp
+problem: La API oficial de LinkedIn no permite escribir en el perfil ni postular a ofertas, porque el acceso real exige un programa de socios y ni siquiera los socios pueden editar la experiencia. Quería que un asistente de IA hiciera ese trabajo con mi propia sesión, sin guardar mi contraseña y sin acciones sorpresa.
+responsibilities:
+  - Diseñé la separación entre lectura y escritura y el motor de formularios.
+  - Implementé el servidor MCP, la CLI y el banco de respuestas reutilizables.
+  - Lo publiqué con documentación de instalación, diagnóstico y una salida de emergencia para terminar a mano cualquier flujo.
+constraints:
+  - No hay API oficial para escribir, así que la única vía es la interfaz real.
+  - La interfaz cambia de estructura y de clases CSS sin aviso, y se sirve en el idioma de la cuenta.
+  - Ninguna acción visible para otras personas puede ocurrir sin confirmación explícita.
+  - El inicio de sesión no se automatiza, porque dispara bloqueos y obligaría a guardar la contraseña.
+decisions:
+  - title: Leer por la API interna y escribir por la interfaz
+    rationale: La API interna que usa la propia página devuelve el perfil y las ofertas estructurados en una sola llamada, con la sesión del mismo navegador. Para escribir no hay endpoint, así que se usa la interfaz, y si una vía falla se cae a la otra.
+    alternatives:
+      - Raspar el HTML tanto para leer como para escribir
+  - title: Campos identificados por su etiqueta visible
+    rationale: El motor de formularios lee el nombre accesible de cada control y lo empareja con un glosario bilingüe, así resiste los cambios de HTML y funciona con la cuenta en español o en inglés.
+    alternatives:
+      - Selectores por clases CSS
+  - title: Un solo motor para el perfil y las postulaciones
+    rationale: Editar una sección del perfil y completar una solicitud son el mismo problema, un formulario con campos. Una sola pieza resuelve ambos y una sección nueva queda soportada sin tocar código.
+    alternatives:
+      - Un flujo escrito a mano para cada formulario
+  - title: Simulación por defecto y confirmación explícita
+    rationale: Las acciones visibles para otras personas exigen confirmación, y las postulaciones corren primero en modo simulación para revisar las preguntas pendientes antes de enviar.
+    alternatives:
+      - Ejecutar directamente lo que pida el asistente
+architecture:
+  summary: Un asistente de IA llama herramientas del servidor MCP. El servidor conduce un navegador con la sesión persistente del usuario, lee por la API interna de la página y escribe por la interfaz con un motor de formularios genérico.
+  layers:
+    - name: Clientes
+      nodes:
+        - { id: assistant, label: 'Asistente de IA', detail: 'Cualquier cliente MCP' }
+        - { id: cli, label: 'CLI', detail: 'Los mismos comandos desde la terminal' }
+    - name: Servidor
+      nodes:
+        - {
+            id: mcp-server,
+            label: 'Servidor MCP',
+            detail: 'Más de 35 herramientas con confirmación',
+          }
+        - {
+            id: form-engine,
+            label: 'Motor de formularios',
+            detail: 'Etiquetas visibles y glosario bilingüe',
+          }
+        - { id: answers, label: 'Banco de respuestas', detail: 'Respuestas reutilizables' }
+    - name: Navegador
+      nodes:
+        - {
+            id: browser,
+            label: 'Navegador persistente',
+            detail: 'Playwright con la sesión del usuario',
+          }
+    - name: LinkedIn
+      nodes:
+        - { id: internal-api, label: 'API interna', detail: 'Lectura de perfil y ofertas' }
+        - { id: web-ui, label: 'Interfaz web', detail: 'Escritura en perfil y solicitudes' }
+  flows:
+    - { from: assistant, to: mcp-server, label: 'Llamadas a herramientas' }
+    - { from: cli, to: mcp-server, label: 'Mismo núcleo' }
+    - { from: mcp-server, to: browser, label: 'Lecturas y acciones' }
+    - { from: mcp-server, to: form-engine, label: 'Escrituras' }
+    - { from: answers, to: form-engine, label: 'Respuestas guardadas' }
+    - { from: browser, to: internal-api, label: 'Lectura con la sesión del navegador' }
+    - { from: form-engine, to: web-ui, label: 'Llena y envía formularios' }
+outcomes:
+  - Un asistente puede actualizar el perfil completo, interactuar con otras personas y completar solicitudes con la sesión real del usuario.
+  - Unas herramientas de navegador directas permiten terminar a mano cualquier flujo que falle, sin editar el proyecto.
+  - El código es público, con documentación de instalación y diagnóstico.
+lessons:
+  - Pondría límites diarios conservadores y pausas entre acciones desde el primer día, porque las plataformas detectan patrones de automatización aunque la sesión sea real.
+  - Agregaría pruebas con páginas reales guardadas para detectar los cambios de la interfaz antes de que fallen en uso.
 ---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

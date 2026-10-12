@@ -11,6 +11,7 @@
 - { id: wordpress, name: WordPress, capability: frontend }
 - { id: vite, name: Vite, capability: frontend }
 - { id: accessibility, name: WCAG 2.2, capability: frontend }
+- { id: customtkinter, name: CustomTkinter, capability: frontend }
 
 # Backend
 - { id: nodejs, name: Node.js, capability: backend }
@@ -20,6 +21,8 @@
 - { id: python, name: Python, capability: backend }
 - { id: rest-apis, name: REST APIs, capability: backend }
 - { id: entra-id, name: Microsoft Entra ID, capability: backend }
+- { id: directus, name: Directus, capability: backend }
+- { id: pytest, name: pytest, capability: backend }
 
 # Data and BI
 - { id: sql-server, name: SQL Server, capability: data-bi }
@@ -31,6 +34,9 @@
 - { id: microsoft-fabric, name: Microsoft Fabric, capability: data-bi }
 - { id: excel, name: Excel, capability: data-bi }
 - { id: modbus-tcp, name: Modbus TCP, capability: data-bi }
+- { id: mariadb, name: MariaDB, capability: data-bi }
+- { id: pandas, name: pandas, capability: data-bi }
+- { id: pdfminer, name: pdfminer.six, capability: data-bi }
 
 # Automation and AI
 - { id: mcp, name: Model Context Protocol, capability: automation-ai }
@@ -48,6 +54,8 @@
 - { id: github-actions, name: GitHub Actions, capability: infrastructure }
 - { id: cloudflare-workers, name: Cloudflare Workers, capability: infrastructure }
 - { id: azure, name: Azure, capability: infrastructure }
+- { id: bash, name: Bash, capability: infrastructure }
+- { id: pyinstaller, name: PyInstaller, capability: infrastructure }
 
 # Legacy systems
 - { id: legacy-rescue, name: Legacy code rescue, capability: legacy-systems }
