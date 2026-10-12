@@ -6,7 +6,9 @@
   label:
     es: sistemas web en producción para operación, compras y finanzas
     en: web systems in production for operations, procurement and finance
-  source: Internal repository audit, September 2026
+  source:
+    es: Auditoría interna de repositorios, septiembre de 2026
+    en: Internal repository audit, September 2026
 
 - id: automated-tests
   order: 2
@@ -14,7 +16,9 @@
   label:
     es: pruebas automatizadas en la bitácora de operación
     en: automated tests in the operations logbook
-  source: Operations logbook repository, test suites (node:test and Vitest), September 2026
+  source:
+    es: Suites de pruebas de la bitácora (node:test y Vitest), septiembre de 2026
+    en: Operations logbook test suites (node:test and Vitest), September 2026
 
 - id: meter-polling
   order: 3
@@ -22,7 +26,9 @@
   label:
     es: intervalo de lectura de 5 medidores de energía por Modbus TCP
     en: polling interval for 5 energy meters over Modbus TCP
-  source: Plant telemetry service configuration and latency measurements (p50 15 to 25 ms)
+  source:
+    es: Configuración y mediciones de latencia del servicio de telemetría (p50 de 15 a 25 ms)
+    en: Telemetry service configuration and latency measurements (p50 15 to 25 ms)
 
 - id: bilingual-pages
   order: 4
@@ -30,7 +36,9 @@
   label:
     es: páginas bilingües con accesibilidad WCAG 2.2 AA en el portal corporativo
     en: bilingual pages meeting WCAG 2.2 AA on the corporate website
-  source: Corporate website release, 2026
+  source:
+    es: Publicación del portal corporativo, 2026
+    en: Corporate website release, 2026
 
 - id: monorepo-commits
   order: 5
@@ -38,4 +46,6 @@
   label:
     es: commits en el monorepo del portal corporativo, en 6 meses
     en: commits to the corporate website monorepo in 6 months
-  source: Corporate website repository history, April to September 2026
+  source:
+    es: Historial del repositorio del portal, abril a septiembre de 2026
+    en: Corporate website repository history, April to September 2026

@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
 
-const PAGES = ['/', '/design-system'] as const;
+const PAGES = ['/', '/design-system', '/privacidad'] as const;
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
 const useTheme = async (page: Page, theme: 'light' | 'dark') => {

@@ -106,7 +106,7 @@ describe('catalog and headline metric schemas', () => {
       order: 1,
       value: { es: '6', en: '6' },
       label: { es: 'sistemas', en: 'systems' },
-      source: 'audit',
+      source: { es: 'auditoría', en: 'audit' },
     };
     expect(headlineMetricSchema.safeParse(metric).success).toBe(true);
     expect(headlineMetricSchema.safeParse({ ...metric, label: { es: 'sistemas' } }).success).toBe(

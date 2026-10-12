@@ -3,6 +3,7 @@ import { file, glob } from 'astro/loaders';
 
 import {
   headlineMetricSchema,
+  profileSchema,
   projectFrontmatterSchema,
   technologySchema,
 } from './infrastructure/content/schemas';
@@ -19,6 +20,10 @@ export const collections = {
   headlineMetrics: defineCollection({
     loader: file('./content/headline-metrics.yaml'),
     schema: headlineMetricSchema,
+  }),
+  profile: defineCollection({
+    loader: glob({ pattern: '{es,en}.yaml', base: './content/profile' }),
+    schema: profileSchema,
   }),
   technologies: defineCollection({
     loader: file('./content/technologies.yaml'),

@@ -1,0 +1,68 @@
+---
+/*
+ * Privacy notice for the contact form, under Colombian Law 1581 of 2012 and Decree 1377 of 2013.
+ * Spanish first; the English version arrives with the /en routes in phase F5.
+ */
+import BaseLayout from '../ui/layouts/BaseLayout.astro';
+import Container from '../ui/primitives/Container.astro';
+import TextLink from '../ui/primitives/TextLink.astro';
+
+const EMAIL = 'juanpablocespedesj@gmail.com';
+const UPDATED = '12 de octubre de 2026';
+---
+
+<BaseLayout
+  title="Aviso de privacidad | Juan Céspedes"
+  description="Cómo trato los datos que envías por el formulario de contacto de juancespedes.dev."
+  locale="es"
+>
+  <Container class="max-w-3xl py-16 sm:py-24">
+    <article class="flex flex-col gap-6 text-muted [&_h2]:mt-6 [&_h2]:text-title [&_h2]:font-medium [&_h2]:text-ink">
+      <header class="flex flex-col gap-3">
+        <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">Privacidad</p>
+        <h1 class="text-heading font-semibold text-ink">Aviso de privacidad</h1>
+        <p class="font-mono text-small text-subtle">Última actualización: {UPDATED}</p>
+      </header>
+
+      <h2>Responsable</h2>
+      <p>
+        Juan Pablo Céspedes, ingeniero de sistemas, Barranquilla, Colombia. Correo:{' '}
+        <TextLink href={`mailto:${EMAIL}`}>{EMAIL}</TextLink>.
+      </p>
+
+      <h2>Qué datos recojo y para qué</h2>
+      <p>
+        Por el formulario de contacto recibo tu nombre, tu correo y el mensaje que escribes. Los uso
+        únicamente para responder tu solicitud y, si llegamos a un acuerdo, para preparar la
+        propuesta. No los vendo, no los cedo a terceros y no los uso para publicidad.
+      </p>
+
+      <h2>Cómo se tratan</h2>
+      <p>
+        El mensaje se entrega a mi correo y no se guarda en ninguna base de datos del sitio. Para
+        evitar spam, el formulario usa Cloudflare Turnstile, que verifica que quien envía es una
+        persona sin usar cookies de seguimiento publicitario. El sitio usa analítica sin cookies y
+        no recoge datos personales de quienes solo lo visitan.
+      </p>
+
+      <h2>Tus derechos</h2>
+      <p>
+        De acuerdo con la Ley 1581 de 2012, puedes conocer, actualizar y rectificar tus datos, pedir
+        prueba de la autorización, revocarla, pedir que se supriman y presentar quejas ante la
+        Superintendencia de Industria y Comercio. Para ejercer cualquiera de estos derechos,
+        escríbeme a <TextLink href={`mailto:${EMAIL}`}>{EMAIL}</TextLink>. Respondo consultas en un
+        máximo de 10 días hábiles y reclamos en un máximo de 15 días hábiles.
+      </p>
+
+      <h2>Conservación</h2>
+      <p>
+        Conservo los correos de contacto mientras sean necesarios para atender tu solicitud o la
+        relación que se derive de ella. Puedes pedir su eliminación en cualquier momento.
+      </p>
+
+      <p>
+        <TextLink href="/#contact">Volver al formulario de contacto</TextLink>
+      </p>
+    </article>
+  </Container>
+</BaseLayout>

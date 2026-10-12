@@ -83,7 +83,7 @@ export const headlineMetricSchema = z.strictObject({
   order: z.number().int().min(0),
   value: localized,
   label: localized,
-  source: text,
+  source: localized,
 });
 
 export type HeadlineMetricEntry = z.output<typeof headlineMetricSchema>;
@@ -95,3 +95,38 @@ export const technologySchema = z.strictObject({
 });
 
 export type TechnologyEntry = z.output<typeof technologySchema>;
+
+const period = z
+  .strictObject({ start: yearMonth, end: yearMonth.nullable() })
+  .refine(({ start, end }) => end === null || start <= end, 'start must not be after end');
+
+export const profileSchema = z.strictObject({
+  experience: z
+    .array(
+      z.strictObject({
+        organization: text,
+        role: text,
+        location: text,
+        period,
+        summary: text,
+        highlights: z.array(text).min(1),
+      }),
+    )
+    .min(1),
+  education: z.array(z.strictObject({ institution: text, degree: text, period })).min(1),
+  credentials: z.array(
+    z.strictObject({
+      name: text,
+      issuer: text,
+      issued: yearMonth,
+      url: z.url({ protocol: /^https$/ }).nullable(),
+    }),
+  ),
+  services: z
+    .array(z.strictObject({ title: text, summary: text, deliverables: z.array(text).min(1) }))
+    .min(1),
+  process: z.array(z.strictObject({ title: text, description: text })).min(1),
+  pricing: text,
+});
+
+export type ProfileEntry = z.output<typeof profileSchema>;

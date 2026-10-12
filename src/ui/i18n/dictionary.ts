@@ -1,16 +1,19 @@
+import type { ContactField, ContactIssueCode } from '../../domain/contact/contact-request';
+import type { Capability } from '../../domain/project/capability';
+import type { ProjectKind } from '../../domain/project/project';
 import type { Locale } from '../../domain/shared/locale';
 
 /*
- * Interface strings. Content (projects, metrics) lives in content/; this file only holds the
- * words of the interface itself. English is typed against Spanish, so a missing or extra key in
- * either language is a compile error.
+ * Interface strings. Content (projects, profile, metrics) lives in content/; this file only holds
+ * the words of the interface itself. English is typed against Spanish, so a missing or extra key
+ * in either language is a compile error.
  */
 
 const es = {
   meta: {
     siteName: 'Juan Céspedes',
     defaultDescription:
-      'Ingeniero de sistemas en Barranquilla: desarrollo full-stack, datos y automatización.',
+      'Ingeniero de sistemas en Barranquilla: desarrollo full-stack, datos y automatización. Seis sistemas en producción, casos de estudio y servicios.',
   },
   a11y: {
     skipToContent: 'Saltar al contenido',
@@ -40,15 +43,127 @@ const es = {
     builtInPublic: 'Construido en público.',
     sourceCode: 'Código fuente',
     rights: 'Contenido © Juan Pablo Céspedes. Código con licencia MIT.',
+    privacy: 'Aviso de privacidad',
   },
   metric: {
     source: 'Fuente',
   },
-  home: {
-    buildingInPublic:
-      'Este sitio se está construyendo en público: el código, las decisiones de arquitectura y las pruebas están en el repositorio.',
+  period: {
+    present: 'hoy',
+    to: 'a',
   },
-} as const;
+  hero: {
+    pitch:
+      'Diseño, construyo y opero software en producción: aplicaciones web, datos y automatizaciones que hoy usan operación, compras y finanzas de una generadora de energía.',
+    primaryCta: 'Ver proyectos',
+    secondaryCta: 'Cuéntame tu proyecto',
+    elsewhere: 'También en',
+  },
+  metrics: {
+    eyebrow: 'En cifras',
+    title: 'Resultados que se pueden verificar',
+  },
+  projects: {
+    eyebrow: 'Proyectos',
+    title: 'Sistemas en producción y código abierto',
+    description:
+      'Casos reales. El código de los sistemas internos es privado, así que cada caso cuenta el problema, las decisiones y los resultados.',
+    filterLabel: 'Filtrar por capacidad',
+    filterAll: 'Todos',
+    count: '{count} proyectos',
+    countOne: '1 proyecto',
+    empty: 'Todavía no hay proyectos publicados con esa capacidad.',
+    stack: 'Tecnologías',
+    anonymized: 'Anonimizado',
+  },
+  capabilities: {
+    eyebrow: 'Capacidades',
+    title: 'Cada habilidad, con el proyecto que la demuestra',
+    description: 'Sin porcentajes ni barras: cada tecnología enlaza al trabajo donde la usé.',
+    provenBy: 'Demostrado en',
+  },
+  experience: {
+    eyebrow: 'Trayectoria',
+    title: 'Experiencia y formación',
+    work: 'Experiencia',
+    education: 'Formación',
+  },
+  services: {
+    eyebrow: 'Servicios',
+    title: 'Trabajemos juntos',
+    description:
+      'Proyectos a precio fijo por entregable, para empresas y equipos que necesitan resultados en producción.',
+    deliverables: 'Recibes',
+    processTitle: 'Cómo trabajamos',
+    cta: 'Cuéntame tu proyecto',
+  },
+  credentials: {
+    eyebrow: 'Credenciales',
+    title: 'Formación y certificaciones',
+    verify: 'Verificar',
+  },
+  contact: {
+    eyebrow: 'Contacto',
+    title: 'Cuéntame qué necesitas',
+    description:
+      'Escríbeme por el formulario o directamente al correo. Respondo en menos de 24 horas hábiles.',
+    emailLabel: 'Correo directo',
+  },
+  form: {
+    name: 'Nombre',
+    email: 'Correo electrónico',
+    message: '¿En qué te puedo ayudar?',
+    messageHint: 'Cuéntame el problema, el plazo y cualquier restricción que conozcas.',
+    consent: 'Acepto el tratamiento de mis datos para responder esta solicitud, según el',
+    consentLink: 'aviso de privacidad',
+    submit: 'Enviar mensaje',
+    sending: 'Enviando...',
+    sent: '¡Gracias! Tu mensaje llegó. Te respondo pronto a tu correo.',
+    noScript:
+      'Para enviar el formulario se necesita JavaScript (verificación anti-spam). También puedes escribirme directamente al correo.',
+    errors: {
+      invalid: 'Revisa los campos marcados.',
+      'rate-limited': 'Enviaste varios mensajes seguidos. Espera un minuto e inténtalo de nuevo.',
+      'verification-failed':
+        'No pudimos verificar que eres una persona. Recarga la página e inténtalo de nuevo.',
+      'delivery-failed':
+        'No se pudo entregar el mensaje. Inténtalo de nuevo o escríbeme directamente al correo.',
+      network: 'No hay conexión. Revisa tu internet e inténtalo de nuevo.',
+    },
+    fieldErrors: {
+      'name.required': 'Escribe tu nombre.',
+      'name.too-short': 'El nombre es muy corto.',
+      'name.too-long': 'El nombre es muy largo.',
+      'email.required': 'Escribe tu correo.',
+      'email.invalid-email': 'Escribe un correo válido, por ejemplo nombre@empresa.com.',
+      'email.too-long': 'El correo es muy largo.',
+      'message.required': 'Cuéntame en qué te puedo ayudar.',
+      'message.too-short': 'Dame un poco más de contexto (mínimo 20 caracteres).',
+      'message.too-long': 'El mensaje supera los 5.000 caracteres.',
+      'consent.consent-required': 'Necesito tu autorización para responderte.',
+    },
+  },
+  capabilityLabels: {
+    frontend: 'Frontend',
+    backend: 'Backend',
+    'data-bi': 'Datos y BI',
+    'automation-ai': 'Automatización e IA',
+    infrastructure: 'Infraestructura',
+    'legacy-systems': 'Sistemas heredados',
+  },
+  kindLabels: {
+    'case-study': 'Caso de estudio',
+    report: 'Informe',
+    'open-source': 'Código abierto',
+    tool: 'Herramienta',
+  },
+} as const satisfies Record<string, unknown> & {
+  capabilityLabels: Record<Capability, string>;
+  kindLabels: Record<ProjectKind, string>;
+  form: Record<string, unknown> & {
+    fieldErrors: Partial<Record<`${ContactField}.${ContactIssueCode}`, string>>;
+  };
+};
 
 type Widen<T> = { readonly [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
 export type Dictionary = Widen<typeof es>;
@@ -57,7 +172,7 @@ const en: Dictionary = {
   meta: {
     siteName: 'Juan Céspedes',
     defaultDescription:
-      'Systems engineer in Barranquilla, Colombia: full-stack development, data and automation.',
+      'Systems engineer in Barranquilla, Colombia: full-stack development, data and automation. Six systems in production, case studies and services.',
   },
   a11y: {
     skipToContent: 'Skip to content',
@@ -87,13 +202,118 @@ const en: Dictionary = {
     builtInPublic: 'Built in public.',
     sourceCode: 'Source code',
     rights: 'Content © Juan Pablo Céspedes. Code under the MIT license.',
+    privacy: 'Privacy notice',
   },
   metric: {
     source: 'Source',
   },
-  home: {
-    buildingInPublic:
-      'This site is being built in public: the code, the architecture decisions and the tests are in the repository.',
+  period: {
+    present: 'present',
+    to: 'to',
+  },
+  hero: {
+    pitch:
+      'I design, build and run software in production: web applications, data and automations used today by the operations, procurement and finance teams of a power generation company.',
+    primaryCta: 'See projects',
+    secondaryCta: 'Tell me about your project',
+    elsewhere: 'Also on',
+  },
+  metrics: {
+    eyebrow: 'By the numbers',
+    title: 'Results you can verify',
+  },
+  projects: {
+    eyebrow: 'Projects',
+    title: 'Systems in production and open source',
+    description:
+      'Real cases. Internal systems are closed source, so each case explains the problem, the decisions and the results.',
+    filterLabel: 'Filter by capability',
+    filterAll: 'All',
+    count: '{count} projects',
+    countOne: '1 project',
+    empty: 'No published projects with that capability yet.',
+    stack: 'Technologies',
+    anonymized: 'Anonymized',
+  },
+  capabilities: {
+    eyebrow: 'Capabilities',
+    title: 'Every skill, with the project that proves it',
+    description: 'No percentages or bars: each technology links to the work where I used it.',
+    provenBy: 'Proven in',
+  },
+  experience: {
+    eyebrow: 'Background',
+    title: 'Experience and education',
+    work: 'Experience',
+    education: 'Education',
+  },
+  services: {
+    eyebrow: 'Services',
+    title: "Let's work together",
+    description:
+      'Fixed-price projects per deliverable, for companies and teams that need results in production.',
+    deliverables: 'You get',
+    processTitle: 'How we work',
+    cta: 'Tell me about your project',
+  },
+  credentials: {
+    eyebrow: 'Credentials',
+    title: 'Education and certifications',
+    verify: 'Verify',
+  },
+  contact: {
+    eyebrow: 'Contact',
+    title: 'Tell me what you need',
+    description: 'Use the form or write to me directly. I reply within one business day.',
+    emailLabel: 'Direct email',
+  },
+  form: {
+    name: 'Name',
+    email: 'Email',
+    message: 'How can I help?',
+    messageHint: 'Tell me the problem, the timeline and any constraints you know of.',
+    consent: 'I agree to the processing of my data to answer this request, under the',
+    consentLink: 'privacy notice',
+    submit: 'Send message',
+    sending: 'Sending...',
+    sent: 'Thank you! Your message arrived. I will reply to your email soon.',
+    noScript:
+      'The form needs JavaScript for spam protection. You can also write to me directly by email.',
+    errors: {
+      invalid: 'Please check the highlighted fields.',
+      'rate-limited': 'You sent several messages in a row. Wait a minute and try again.',
+      'verification-failed':
+        'We could not verify that you are a person. Reload the page and try again.',
+      'delivery-failed':
+        'The message could not be delivered. Try again or write to me directly by email.',
+      network: 'No connection. Check your internet and try again.',
+    },
+    fieldErrors: {
+      'name.required': 'Please enter your name.',
+      'name.too-short': 'The name is too short.',
+      'name.too-long': 'The name is too long.',
+      'email.required': 'Please enter your email.',
+      'email.invalid-email': 'Enter a valid email, for example name@company.com.',
+      'email.too-long': 'The email is too long.',
+      'message.required': 'Tell me how I can help.',
+      'message.too-short': 'Give me a bit more context (at least 20 characters).',
+      'message.too-long': 'The message is longer than 5,000 characters.',
+      'consent.consent-required': 'I need your consent to reply.',
+    },
+  },
+  capabilityLabels: {
+    frontend: 'Frontend',
+    backend: 'Backend',
+    'data-bi': 'Data and BI',
+    'automation-ai': 'Automation and AI',
+    infrastructure: 'Infrastructure',
+    'legacy-systems': 'Legacy systems',
+  },
+  kindLabels: {
+    'case-study': 'Case study',
+    report: 'Report',
+    'open-source': 'Open source',
+    tool: 'Tool',
   },
 };
 

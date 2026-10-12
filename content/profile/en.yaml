@@ -1,0 +1,85 @@
+experience:
+  - organization: Gecelca S.A. E.S.P.
+    role: Information Technology Contractor
+    location: Barranquilla, Colombia
+    period: { start: '2024-07', end: null }
+    summary: Development, operation and security of a power generation company's information systems, plus integration and analysis of its operational and financial data.
+    highlights:
+      - Put 6 web systems of my own into production, used by operations, procurement, communications and finance.
+      - Rebuilt the bilingual corporate website (134 pages) to WCAG 2.2 AA, with automatic-rollback deployments.
+      - Built the digital operations logbook for two thermal power plants and real-time generation telemetry.
+      - Rescued a legacy e-invoicing ETL pipeline without stopping operations.
+      - My work passed an external penetration test with only 3 low-severity findings.
+
+education:
+  - institution: Universidad del Norte
+    degree: Systems Engineering
+    period: { start: '2020-01', end: '2024-11' }
+
+credentials:
+  - name: Professional engineering license
+    issuer: COPNIA (Colombia)
+    issued: '2025-05'
+    url: null
+  - name: Python for data analysis
+    issuer: Desafío Latam
+    issued: '2024-09'
+    url: null
+  - name: Advanced Power BI and Excel Business Intelligence
+    issuer: LinkedIn Learning
+    issued: '2024-11'
+    url: null
+  - name: Junior Cybersecurity Analyst
+    issuer: Cisco Networking Academy
+    issued: '2024-04'
+    url: null
+  - name: English C2 (EF SET 81/100)
+    issuer: EF SET
+    issued: '2024-04'
+    url: https://cert.efset.org/VHYazK
+  - name: 'Microsoft Certified: Azure Data Fundamentals'
+    issuer: Microsoft
+    issued: '2022-11'
+    url: null
+  - name: 'Microsoft Certified: Azure Fundamentals'
+    issuer: Microsoft
+    issued: '2022-11'
+    url: null
+
+services:
+  - title: Custom web applications
+    summary: Portals, internal platforms and systems with corporate sign-in, from the database to deployment.
+    deliverables:
+      - Application in production with automated tests
+      - Source code and architecture documentation
+      - Reproducible deployment and an operations guide
+  - title: Data, dashboards and reports
+    summary: Data models, ETL and Power BI dashboards that answer concrete business questions.
+    deliverables:
+      - Documented data model and SQL queries
+      - Dashboard or report with agreed indicators
+      - Automatic refresh process
+  - title: Automation and AI integration
+    summary: Bots, document data extraction, integrations between systems and MCP servers for AI assistants.
+    deliverables:
+      - Automation running on your systems
+      - Execution log and error handling
+      - User and maintenance guide
+  - title: Legacy system rescue
+    summary: Diagnosis, tests and modernization of software nobody dares to touch, without stopping operations.
+    deliverables:
+      - Diagnosis report with prioritized risks
+      - Test suite that protects what already works
+      - Improvements delivered in stages
+
+process:
+  - title: Conversation
+    description: You tell me the problem and the result you need. I reply within one business day.
+  - title: Proposal
+    description: Scope, deliverables, timeline and a fixed price per deliverable, in writing.
+  - title: Staged delivery
+    description: Progress you can see and test, with a demo at every stage.
+  - title: Handover and support
+    description: Code, documentation and support so the system keeps running.
+
+pricing: Quoted from your requirements, with a fixed price per deliverable.

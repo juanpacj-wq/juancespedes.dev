@@ -1,45 +1,63 @@
 ---
+import { container } from '../composition/container';
 import { DEFAULT_LOCALE } from '../domain/shared/locale';
 import { dictionaryFor } from '../ui/i18n/dictionary';
 import BaseLayout from '../ui/layouts/BaseLayout.astro';
-import Badge from '../ui/primitives/Badge.astro';
-import Button from '../ui/primitives/Button.astro';
-import Container from '../ui/primitives/Container.astro';
-import Portrait from '../ui/primitives/Portrait.astro';
+import CapabilitiesSection from '../ui/sections/CapabilitiesSection.astro';
+import ContactSection from '../ui/sections/ContactSection.astro';
+import CredentialsSection from '../ui/sections/CredentialsSection.astro';
+import ExperienceSection from '../ui/sections/ExperienceSection.astro';
+import HeroSection from '../ui/sections/HeroSection.astro';
+import MetricsSection from '../ui/sections/MetricsSection.astro';
+import ProjectsSection from '../ui/sections/ProjectsSection.astro';
+import ServicesSection from '../ui/sections/ServicesSection.astro';
 
 const locale = DEFAULT_LOCALE;
 const t = dictionaryFor(locale);
+const EMAIL = 'juanpablocespedesj@gmail.com';
+
+const [metrics, projects, matrix, profile] = await Promise.all([
+  container.listHeadlineMetrics(locale),
+  container.listProjects(locale),
+  container.buildSkillEvidenceMatrix(locale),
+  container.getProfile(locale),
+]);
+
+const navItems = [
+  { href: '#projects', label: t.nav.projects },
+  { href: '#capabilities', label: t.nav.skills },
+  { href: '#services', label: t.nav.services },
+  { href: '#contact', label: t.nav.contact },
+];
 ---
 
 <BaseLayout
   title={`${t.profile.name} | ${t.profile.role}`}
   description={t.meta.defaultDescription}
   locale={locale}
+  navItems={navItems}
 >
-  <Container class="grid gap-12 py-16 sm:py-24 lg:grid-cols-[1fr_22rem] lg:items-end lg:gap-16">
-    <div class="flex flex-col gap-6">
-      <Badge tone="success" status>
-        {t.availability.available}
-      </Badge>
-      <h1 class="text-display font-semibold text-balance">{t.profile.name}</h1>
-      <p class="max-w-2xl font-mono text-title text-muted">{t.profile.role}</p>
-      <p class="max-w-prose text-lead text-muted">{t.home.buildingInPublic}</p>
-      <div class="flex flex-wrap gap-3">
-        <Button href="mailto:juanpablocespedesj@gmail.com" icon="mail" size="lg">
-          juanpablocespedesj@gmail.com
-        </Button>
-        <Button
-          href="https://github.com/juanpacj-wq"
-          variant="secondary"
-          icon="github"
-          size="lg"
-          external
-          externalLabel={t.a11y.external}
-        >
-          GitHub
-        </Button>
-      </div>
-    </div>
-    <Portrait alt={t.profile.portraitAlt} initials="JC" priority class="max-w-sm" />
-  </Container>
+  <HeroSection
+    t={t}
+    email={EMAIL}
+    githubUrl="https://github.com/juanpacj-wq"
+    linkedinUrl="https://www.linkedin.com/in/juan-cespedesjc"
+  />
+  <MetricsSection t={t} metrics={metrics} />
+  <ProjectsSection t={t} projects={projects} />
+  <CapabilitiesSection t={t} matrix={matrix} />
+  <ExperienceSection
+    t={t}
+    locale={locale}
+    experience={profile.experience}
+    education={profile.education}
+  />
+  <ServicesSection
+    t={t}
+    services={profile.services}
+    process={profile.process}
+    pricing={profile.pricing}
+  />
+  <CredentialsSection t={t} locale={locale} credentials={profile.credentials} />
+  <ContactSection t={t} locale={locale} email={EMAIL} privacyHref="/privacidad" />
 </BaseLayout>
