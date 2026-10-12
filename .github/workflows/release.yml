@@ -25,13 +25,21 @@ jobs:
       # A pull request opened or updated with GITHUB_TOKEN triggers no workflows, so the release
       # PR would never get its required checks. workflow_dispatch is the documented exception:
       # run the same gates on the release branch so the PR is merged like any other (ADR 0013).
+      # The PR is looked up directly: release-please leaves its `pr` output empty when the PR
+      # did not change, and then the checks already exist for that commit.
       - name: Run the required checks on the release pull request
-        if: steps.release.outputs.pr
+        if: steps.release.outputs.pr != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
-          TITLE: ${{ fromJSON(steps.release.outputs.pr).title }}
         run: |
-          gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
-          gh workflow run codeql.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
-          gh workflow run pr-title.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH" -f title="$TITLE"
+          pr=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --label 'autorelease: pending' \
+            --json headRefName,title --jq '.[0] // empty')
+          if [ -z "$pr" ]; then
+            echo "No open release pull request."
+            exit 0
+          fi
+          branch=$(jq -r '.headRefName' <<< "$pr")
+          title=$(jq -r '.title' <<< "$pr")
+          gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$branch"
+          gh workflow run codeql.yml --repo "$GITHUB_REPOSITORY" --ref "$branch"
+          gh workflow run pr-title.yml --repo "$GITHUB_REPOSITORY" --ref "$branch" -f title="$title"
