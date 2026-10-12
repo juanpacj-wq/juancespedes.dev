@@ -72,6 +72,11 @@ test.describe('layout', () => {
     await expect(page.getByRole('img', { name: 'Retrato de Juan Céspedes' })).toBeVisible();
   });
 
+  test('pages are served at clean URLs without a redirect', async ({ request }) => {
+    const response = await request.get('/design-system', { maxRedirects: 0 });
+    expect(response.status()).toBe(200);
+  });
+
   test('the design system reference is not indexed', async ({ page }) => {
     await page.goto('/design-system');
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');

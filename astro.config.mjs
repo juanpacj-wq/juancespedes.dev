@@ -8,6 +8,9 @@ import { defineConfig, envField } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://juancespedes.dev',
+  // Clean URLs: /design-system is served directly, no redirect to /design-system/.
+  trailingSlash: 'never',
+  build: { format: 'file' },
   integrations: [react(), mdx()],
   // Images are optimized at build time (sharp); no Cloudflare Images binding needed.
   adapter: cloudflare({ imageService: 'compile' }),
