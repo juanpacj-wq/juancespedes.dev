@@ -1,4 +1,5 @@
 ---
+import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
 import Container from '../primitives/Container.astro';
 import ThemeToggle from './ThemeToggle.astro';
@@ -12,9 +13,11 @@ interface Props {
   t: Dictionary;
   homeHref: string;
   navItems?: readonly NavItem[] | undefined;
+  /** The same page in the other language; absent on pages that exist in one language only. */
+  switchTo?: { readonly href: string; readonly locale: Locale } | null;
 }
 
-const { t, homeHref, navItems = [] } = Astro.props;
+const { t, homeHref, navItems = [], switchTo = null } = Astro.props;
 ---
 
 <header class="sticky top-0 z-40 border-b border-line/60 bg-canvas/80 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70">
@@ -38,6 +41,17 @@ const { t, homeHref, navItems = [] } = Astro.props;
             ))}
           </ul>
         </nav>
+      )}
+      {switchTo && (
+        <a
+          href={switchTo.href}
+          hreflang={switchTo.locale}
+          lang={switchTo.locale}
+          class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-control font-mono text-small text-muted transition-colors hover:text-ink"
+        >
+          <span>{t.language.short}</span>
+          <span class="sr-only">: {t.language.switchTo}</span>
+        </a>
       )}
       <ThemeToggle toLightLabel={t.theme.toLight} toDarkLabel={t.theme.toDark} />
     </div>

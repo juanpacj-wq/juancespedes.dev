@@ -1,0 +1,14 @@
+---
+import { container } from '../../../composition/container';
+import ProjectView from '../../_views/ProjectView.astro';
+
+/** One page per published project, generated at build time. Spanish: /proyectos/<slug>. */
+export async function getStaticPaths() {
+  const projects = await container.listProjects('en');
+  return projects.map((project) => ({ params: { slug: project.slug } }));
+}
+
+const { slug } = Astro.params;
+---
+
+<ProjectView locale="en" slug={slug} />

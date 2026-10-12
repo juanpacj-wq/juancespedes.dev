@@ -1,13 +1,15 @@
 ---
 /*
  * Privacy notice for the contact form, under Colombian Law 1581 of 2012 and Decree 1377 of 2013.
- * Spanish first; the English version arrives with the /en routes in phase F5.
+ * English version: src/pages/en/privacy.astro. Both must say the same thing.
  */
 import BaseLayout from '../ui/layouts/BaseLayout.astro';
 import Container from '../ui/primitives/Container.astro';
+import { homeSectionPath } from '../ui/i18n/routes';
 import TextLink from '../ui/primitives/TextLink.astro';
+import { SITE } from '../ui/site';
 
-const EMAIL = 'juanpablocespedesj@gmail.com';
+const EMAIL = SITE.email;
 const UPDATED = '12 de octubre de 2026';
 ---
 
@@ -15,6 +17,7 @@ const UPDATED = '12 de octubre de 2026';
   title="Aviso de privacidad | Juan Céspedes"
   description="Cómo trato los datos que envías por el formulario de contacto de juancespedes.dev."
   locale="es"
+  route={{ page: 'privacy' }}
 >
   <Container class="max-w-3xl py-16 sm:py-24">
     <article class="flex flex-col gap-6 text-muted [&_h2]:mt-6 [&_h2]:text-title [&_h2]:font-medium [&_h2]:text-ink">
@@ -61,7 +64,9 @@ const UPDATED = '12 de octubre de 2026';
       </p>
 
       <p>
-        <TextLink href="/#contact">Volver al formulario de contacto</TextLink>
+        <TextLink href={homeSectionPath('es', 'contact')}>
+          Volver al formulario de contacto
+        </TextLink>
       </p>
     </article>
   </Container>

@@ -16,5 +16,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0009](0009-theming-and-design-tokens.md)  | Theming with light-dark() tokens, enforced in CI                        | Accepted |
 | [0010](0010-contact-form-delivery.md)      | Contact form: Email Routing, Turnstile and a rate limit, nothing stored | Accepted |
 | [0011](0011-case-study-pages.md)           | Case study pages: fixed template, diagrams as data, private denylist    | Accepted |
+| [0012](0012-bilingual-routes-and-seo.md)   | Bilingual routes and SEO: Spanish at the root, English under /en        | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.

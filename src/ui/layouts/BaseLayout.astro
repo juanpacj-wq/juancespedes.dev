@@ -3,8 +3,11 @@ import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
 import '../styles/global.css';
 
-import type { Locale } from '../../domain/shared/locale';
+import { SUPPORTED_LOCALES, type Locale } from '../../domain/shared/locale';
 import { dictionaryFor } from '../i18n/dictionary';
+import { alternatesFor, ogImagePath, privacyPath, type PageRoute } from '../i18n/routes';
+import { toJsonLd, type JsonLd } from '../seo/structured-data';
+import { absoluteUrl, SITE } from '../site';
 import SiteFooter from '../chrome/SiteFooter.astro';
 import SiteHeader, { type NavItem } from '../chrome/SiteHeader.astro';
 
@@ -12,15 +15,36 @@ interface Props {
   title: string;
   description: string;
   locale: Locale;
+  /**
+   * The page's place in the route table. Pages with a route get a canonical URL, hreflang
+   * alternates, a language switch and their own Open Graph card. Pages without one (the design
+   * system, the 404) are not part of the bilingual site map.
+   */
+  route?: PageRoute;
   navItems?: readonly NavItem[];
   /** Pages that must not appear in search results (e.g. the design system reference). */
   noindex?: boolean;
+  ogType?: 'website' | 'article';
+  jsonLd?: JsonLd;
 }
 
-const { title, description, locale, navItems, noindex = false } = Astro.props;
+const {
+  title,
+  description,
+  locale,
+  route,
+  navItems,
+  noindex = false,
+  ogType = 'website',
+  jsonLd,
+} = Astro.props;
 const t = dictionaryFor(locale);
-const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
-const REPOSITORY_URL = 'https://github.com/juanpacj-wq/juancespedes.dev';
+const alternates = route ? alternatesFor(route) : null;
+const canonical = alternates ? absoluteUrl(alternates[locale]) : absoluteUrl(Astro.url.pathname);
+const ogImage = absoluteUrl(ogImagePath(locale, route ?? { page: 'home' }));
+const OG_LOCALE: Readonly<Record<Locale, string>> = { es: 'es_CO', en: 'en_US' };
+const otherLocale = SUPPORTED_LOCALES.find((candidate) => candidate !== locale) ?? locale;
+const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLocale } : null;
 ---
 
 <!doctype html>
@@ -31,12 +55,35 @@ const REPOSITORY_URL = 'https://github.com/juanpacj-wq/juancespedes.dev';
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {alternates &&
+      SUPPORTED_LOCALES.map((candidate) => (
+        <link rel="alternate" hreflang={candidate} href={absoluteUrl(alternates[candidate])} />
+      ))}
+    {alternates && <link rel="alternate" hreflang="x-default" href={absoluteUrl(alternates.es)} />}
     {noindex && <meta name="robots" content="noindex" />}
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={t.meta.siteName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={OG_LOCALE[locale]} />
+    {alternates && <meta property="og:locale:alternate" content={OG_LOCALE[otherLocale]} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={title} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="author" content={t.profile.name} />
+    {jsonLd && <script type="application/ld+json" set:html={toJsonLd(jsonLd)} />}
+
     <meta name="color-scheme" content="dark light" />
     <!-- tokens-allow: meta tags need a literal color; keep in sync with the dark --canvas token -->
     <meta name="theme-color" content="#0b0b0d" />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap.xml" />
     <!-- Applies a stored theme before first paint, so there is no flash of the wrong theme. -->
     <script is:inline>
       try {
@@ -53,10 +100,15 @@ const REPOSITORY_URL = 'https://github.com/juanpacj-wq/juancespedes.dev';
     >
       {t.a11y.skipToContent}
     </a>
-    <SiteHeader t={t} homeHref="/" navItems={navItems} />
+    <SiteHeader
+      t={t}
+      homeHref={alternates ? alternates[locale] : '/'}
+      navItems={navItems}
+      switchTo={switchTo}
+    />
     <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
       <slot />
     </main>
-    <SiteFooter t={t} repositoryUrl={REPOSITORY_URL} privacyHref="/privacidad" />
+    <SiteFooter t={t} repositoryUrl={SITE.repositoryUrl} privacyHref={privacyPath(locale)} />
   </body>
 </html>
