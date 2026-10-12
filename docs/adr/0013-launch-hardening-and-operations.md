@@ -44,8 +44,8 @@ the required checks.
 - **Releases through release-please, with the same gates as any change.** Actions may open pull
   requests. After creating or updating the release PR, the release workflow dispatches CI, CodeQL
   and the title check on the release branch (`workflow_dispatch` is the event `GITHUB_TOKEN` is
-  allowed to trigger). No personal access token is stored. Version 1.0.0 is pinned with
-  `release-as` for the launch and the pin is removed afterwards.
+  allowed to trigger). No personal access token is stored. Version 1.0.0 was pinned with
+  `release-as` for the launch and the pin was removed right after the release.
 
 ## Consequences
 
