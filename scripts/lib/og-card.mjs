@@ -38,6 +38,13 @@ export const textWidth = (text, fontSize) =>
   [...text].reduce((total, char) => total + charWidth(char), 0) * fontSize;
 
 /**
+ * Exact width in px of `text` in Geist Mono, where every character advances 0.6 em.
+ * @param {string} text
+ * @param {number} fontSize
+ */
+export const monoWidth = (text, fontSize) => [...text].length * 0.6 * fontSize;
+
+/**
  * Greedy word wrap. Returns at most `maxLines` lines; if the text does not fit, the last line ends
  * with an ellipsis. A single word longer than the line is kept whole rather than split.
  * @param {string} text
@@ -150,10 +157,10 @@ export const cardSvg = ({
 
   const highlightSvg = highlight
     ? `<text x="${PAD}" y="528" font-family="Geist Mono" font-weight="500" font-size="44" fill="${COLORS.accent}">${escapeXml(highlight.value)}</text>` +
-      `<text x="${PAD + textWidth(highlight.value, 44) * 0.98 + 24}" y="526" font-family="Geist" font-size="24" fill="${COLORS.muted}">${escapeXml(
+      `<text x="${PAD + monoWidth(highlight.value, 44) + 24}" y="526" font-family="Geist" font-size="24" fill="${COLORS.muted}">${escapeXml(
         wrapText(highlight.label, {
           fontSize: 24,
-          maxWidth: CONTENT_WIDTH - textWidth(highlight.value, 44) - 24,
+          maxWidth: CONTENT_WIDTH - monoWidth(highlight.value, 44) - 24,
           maxLines: 1,
         })[0] ?? '',
       )}</text>`

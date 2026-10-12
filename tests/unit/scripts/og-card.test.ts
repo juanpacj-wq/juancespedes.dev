@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { cardSvg, escapeXml, fitText, textWidth, wrapText } from '../../../scripts/lib/og-card.mjs';
+import {
+  cardSvg,
+  escapeXml,
+  fitText,
+  monoWidth,
+  textWidth,
+  wrapText,
+} from '../../../scripts/lib/og-card.mjs';
 
 describe('Open Graph card layout', () => {
   it('wraps on word boundaries within the width', () => {
@@ -27,6 +34,17 @@ describe('Open Graph card layout', () => {
     const fitted = fitText(long, { sizes: [76, 60, 48], maxWidth: 1056, maxLines: 3 });
     expect(fitted.lines.join(' ')).toBe(long);
     expect(fitted.fontSize).toBeLessThan(76);
+  });
+
+  it('starts the highlight label after the monospace value, spaces included', () => {
+    const svg = cardSvg({
+      eyebrow: 'Case study',
+      title: 'Telemetry',
+      highlight: { value: '2 s', label: 'read interval' },
+      footer: 'Juan',
+    });
+    const labelX = Number(/<text x="([\d.]+)"[^>]*font-size="24"/.exec(svg)?.[1]);
+    expect(labelX).toBeGreaterThanOrEqual(72 + monoWidth('2 s', 44));
   });
 
   it('draws escaped text into a 1200 x 630 SVG', () => {
