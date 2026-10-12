@@ -10,7 +10,6 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "cf:types": "wrangler types",
     "new:project": "node scripts/new-project.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -23,8 +22,9 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "lighthouse": "lhci autorun",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm arch:check && pnpm test:coverage && pnpm build",
-    "prepare": "git config core.hooksPath .githooks || true"
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm arch:check && pnpm test:coverage && pnpm build && pnpm bundle:check",
+    "prepare": "git config core.hooksPath .githooks || true",
+    "bundle:check": "node scripts/check-bundle.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.3.4",
