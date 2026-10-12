@@ -36,7 +36,7 @@ jobs:
       - name: Upload preview version
         if: github.event_name == 'pull_request'
         id: preview
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -50,7 +50,7 @@ jobs:
             Preview: ${{ steps.preview.outputs.deployment-url }}
       - name: Deploy to production
         if: github.event_name == 'push'
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

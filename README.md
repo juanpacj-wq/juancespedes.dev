@@ -2,13 +2,17 @@
 
 [![CI](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/codeql.yml/badge.svg)](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/codeql.yml)
+[![Deploy](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/deploy.yml/badge.svg)](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/deploy.yml)
 [![License: MIT (code)](<https://img.shields.io/badge/license-MIT%20(code)-blue.svg>)](LICENSE)
+
+**Live: [juancespedes.dev](https://juancespedes.dev)** ·
+health check: [`/api/health`](https://juancespedes.dev/api/health) (reports the deployed commit)
 
 Portfolio of **Juan Céspedes**, systems engineer in Barranquilla, Colombia: full-stack development,
 data and automation. Built in public: the repository is part of the portfolio, so the architecture,
 decisions and quality checks are meant to be read.
 
-> Status: **phase F0 (foundations)**. The site currently shows a placeholder page while the design
+> Status: **phase F0 (foundations), deployed**. The site shows a placeholder page while the design
 > system and content are built. Roadmap below.
 
 ## Architecture at a glance
