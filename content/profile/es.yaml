@@ -1,0 +1,85 @@
+experience:
+  - organization: Gecelca S.A. E.S.P.
+    role: Contratista de Tecnologías de la Información
+    location: Barranquilla, Colombia
+    period: { start: '2024-07', end: null }
+    summary: Desarrollo, operación y seguridad de los sistemas de información de una generadora de energía, e integración y análisis de sus datos operativos y financieros.
+    highlights:
+      - Puse en producción 6 sistemas web propios que usan operación, compras, comunicaciones y finanzas.
+      - Reconstruí el portal corporativo bilingüe (134 páginas) con accesibilidad WCAG 2.2 AA y despliegue con rollback automático.
+      - Construí la bitácora digital de operación de dos plantas térmicas y la telemetría de generación en tiempo real.
+      - Rescaté un pipeline ETL heredado de facturación electrónica sin detener la operación.
+      - Mi trabajo pasó un pentest externo con solo 3 hallazgos de severidad baja.
+
+education:
+  - institution: Universidad del Norte
+    degree: Ingeniería de Sistemas
+    period: { start: '2020-01', end: '2024-11' }
+
+credentials:
+  - name: Matrícula profesional de ingeniería
+    issuer: COPNIA
+    issued: '2025-05'
+    url: null
+  - name: Python para análisis de datos
+    issuer: Desafío Latam
+    issued: '2024-09'
+    url: null
+  - name: Power BI avanzado y Excel Business Intelligence
+    issuer: LinkedIn Learning
+    issued: '2024-11'
+    url: null
+  - name: Junior Cybersecurity Analyst
+    issuer: Cisco Networking Academy
+    issued: '2024-04'
+    url: null
+  - name: Inglés C2 (EF SET 81/100)
+    issuer: EF SET
+    issued: '2024-04'
+    url: https://cert.efset.org/VHYazK
+  - name: 'Microsoft Certified: Azure Data Fundamentals'
+    issuer: Microsoft
+    issued: '2022-11'
+    url: null
+  - name: 'Microsoft Certified: Azure Fundamentals'
+    issuer: Microsoft
+    issued: '2022-11'
+    url: null
+
+services:
+  - title: Aplicaciones web a la medida
+    summary: Portales, plataformas internas y sistemas con inicio de sesión corporativo, de la base de datos al despliegue.
+    deliverables:
+      - Aplicación en producción con pruebas automatizadas
+      - Código fuente y documentación de arquitectura
+      - Despliegue reproducible y guía de operación
+  - title: Datos, dashboards y reportes
+    summary: Modelos de datos, ETL y tableros de Power BI que responden preguntas concretas del negocio.
+    deliverables:
+      - Modelo de datos y consultas SQL documentadas
+      - Tablero o reporte con indicadores acordados
+      - Proceso de actualización automática
+  - title: Automatización e integración con IA
+    summary: Bots, extracción de datos de documentos, integraciones entre sistemas y servidores MCP para asistentes de IA.
+    deliverables:
+      - Automatización funcionando sobre tus sistemas
+      - Registro de ejecuciones y manejo de errores
+      - Manual de uso y de mantenimiento
+  - title: Rescate de sistemas heredados
+    summary: Diagnóstico, pruebas y modernización de software que nadie se atreve a tocar, sin detener la operación.
+    deliverables:
+      - Informe de diagnóstico con riesgos priorizados
+      - Suite de pruebas que protege lo que ya funciona
+      - Mejoras entregadas por etapas
+
+process:
+  - title: Conversación
+    description: Me cuentas el problema y el resultado que necesitas. Respondo en menos de 24 horas hábiles.
+  - title: Propuesta
+    description: Alcance, entregables, plazos y un precio fijo por entregable, por escrito.
+  - title: Entregas por etapas
+    description: Avances que puedes ver y probar, con demostraciones en cada etapa.
+  - title: Cierre y soporte
+    description: Código, documentación y acompañamiento para que el sistema siga funcionando.
+
+pricing: Cotización a partir del requerimiento, con precio fijo por entregable.

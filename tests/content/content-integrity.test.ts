@@ -6,8 +6,10 @@ import { describe, expect, it } from 'vitest';
 
 import { SUPPORTED_LOCALES } from '../../src/domain/shared/locale';
 import { normalizeTechnologyName } from '../../src/domain/project/technology';
+import { toProfile } from '../../src/infrastructure/content/profile-mapper';
 import {
   headlineMetricSchema,
+  profileSchema,
   projectFrontmatterSchema,
   technologySchema,
   type ProjectFrontmatter,
@@ -146,4 +148,33 @@ describe('anonymization and style policy', () => {
       expect(hits).toEqual([]);
     },
   );
+});
+
+describe('profile', () => {
+  const profileOf = (locale: string) =>
+    profileSchema.parse(readYaml(join(CONTENT, 'profile', `${locale}.yaml`)));
+
+  it.each(SUPPORTED_LOCALES)(
+    'the %s profile passes the schema and maps to the domain',
+    (locale) => {
+      const profile = toProfile(profileOf(locale));
+      expect(profile.experience.length).toBeGreaterThan(0);
+      expect(profile.experience[0]?.period.start).toMatch(/^\d{4}-\d{2}$/);
+    },
+  );
+
+  it('keeps dates, counts and links identical across locales', () => {
+    const shape = (locale: string) => {
+      const profile = profileOf(locale);
+      return {
+        experience: profile.experience.map((job) => [job.period, job.highlights.length]),
+        education: profile.education.map((item) => item.period),
+        credentials: profile.credentials.map((item) => [item.issued, item.url]),
+        services: profile.services.map((service) => service.deliverables.length),
+        process: profile.process.length,
+      };
+    };
+    const [reference, ...others] = SUPPORTED_LOCALES.map(shape);
+    for (const other of others) expect(other).toEqual(reference);
+  });
 });
