@@ -8,6 +8,11 @@
     "directory": "./dist",
     "binding": "ASSETS",
   },
+  // The custom domain is declared here, not clicked in the dashboard, so it is versioned.
+  "routes": [{ "pattern": "juancespedes.dev", "custom_domain": true }],
+  // Pull requests get a unique preview URL per uploaded version.
+  "workers_dev": true,
+  "preview_urls": true,
   "observability": {
     "enabled": true,
   },
