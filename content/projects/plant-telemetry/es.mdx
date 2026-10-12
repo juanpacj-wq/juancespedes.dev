@@ -33,6 +33,11 @@ order: 2
 status: published
 confidentiality: anonymized
 problem: La operación necesitaba ver en una sola pantalla la generación real de cuatro unidades frente a lo despachado por el operador del mercado, y la lectura existente dependía de un sistema centralizado que era un punto único de falla.
+responsibilities:
+  - Diseñé la lectura directa de los medidores, la integración de energía por periodo y el cruce con el despacho del mercado.
+  - Construí el backend en Node.js, el tablero en React y el servicio en Python que alimenta el lakehouse de datos.
+  - Validé estadísticamente los medidores de respaldo y documenté la convención de signos de cada frontera de medición.
+  - Opero dos instancias en producción, una por planta, con el mismo build.
 constraints:
   - Lecturas cada 2 segundos sin perder la integración de energía si el servicio se reinicia.
   - Dos plantas con convenciones de signo distintas según la frontera de medición.
@@ -43,13 +48,72 @@ decisions:
     alternatives:
       - Seguir raspando la interfaz web del sistema centralizado
   - title: Nulo significa sin lectura, nunca cero
-    rationale: Distinguir la ausencia de dato del valor cero permite detectar un medidor caído en lugar de reportar generación nula.
+    rationale: Distinguir la ausencia de dato del valor cero permite detectar un medidor caído en lugar de reportar generación nula. La regla vive en un módulo de dominio que comparten el backend y el tablero.
     alternatives:
       - Rellenar con cero las lecturas faltantes
   - title: Validación estadística antes de usar los medidores de respaldo
     rationale: Una captura en paralelo de una hora con criterios de sesgo, p95 y energía integrada demostró que los medidores de respaldo son intercambiables.
     alternatives:
       - Asumir que los medidores de respaldo leen igual
+  - title: Un solo build para dos plantas, configurado al cargar
+    rationale: La identidad visual y el orden de las unidades de cada planta se leen de un archivo de configuración en tiempo de ejecución, así una corrección se despliega una vez y sirve a ambas.
+    alternatives:
+      - Compilar una versión del tablero por planta
+architecture:
+  summary: Un servicio en Node.js lee los medidores, integra la energía y la compara con los archivos del operador del mercado y con los correos de redespacho; el tablero recibe todo por WebSockets. En paralelo, un servicio en Python escribe la misma telemetría al lakehouse que usa Power BI.
+  layers:
+    - name: Fuentes
+      nodes:
+        - { id: meters, label: 'Medidores de energía', detail: '5 medidores, Modbus TCP cada 2 s' }
+        - {
+            id: market-files,
+            label: 'Archivos del operador del mercado',
+            detail: 'Despacho diario y redespacho cada 5 min',
+          }
+        - { id: mailbox, label: 'Correos de redespacho', detail: 'Leídos con Microsoft Graph' }
+    - name: Procesamiento
+      nodes:
+        - { id: poller, label: 'Lector de medidores', detail: 'Aislamiento de fallas por unidad' }
+        - {
+            id: accumulator,
+            label: 'Integrador de energía',
+            detail: 'MW a MWh por periodo horario',
+          }
+        - { id: sink, label: 'Servicio de telemetría en Python', detail: 'Tablas Delta sin Spark' }
+    - name: Almacenamiento
+      nodes:
+        - {
+            id: sql-server,
+            label: 'SQL Server',
+            detail: 'Periodos, despacho e historial de cambios',
+          }
+        - {
+            id: lakehouse,
+            label: 'Lakehouse en Microsoft Fabric',
+            detail: 'Con espejo en PostgreSQL',
+          }
+    - name: Consumo
+      nodes:
+        - { id: live-dashboard, label: 'Tablero en vivo', detail: 'React por WebSockets' }
+        - { id: power-bi, label: 'Reporte de Power BI', detail: null }
+  flows:
+    - { from: meters, to: poller, label: 'Lecturas cada 2 s' }
+    - { from: poller, to: accumulator, label: 'Potencia por unidad, nula si falta un medidor' }
+    - { from: market-files, to: accumulator, label: 'Despacho programado por periodo' }
+    - { from: mailbox, to: accumulator, label: 'Despacho final del periodo' }
+    - { from: accumulator, to: sql-server, label: 'Punto de control cada 30 s' }
+    - { from: accumulator, to: live-dashboard, label: 'Generación, proyección y desviación' }
+    - { from: meters, to: sink, label: 'Lectura independiente' }
+    - { from: sink, to: lakehouse, label: 'Escritura cada 15 s' }
+    - { from: lakehouse, to: power-bi, label: 'Modelo del reporte corporativo' }
+outcomes:
+  - La operación ve en una sola pantalla la generación real de cuatro unidades frente a lo despachado, con la proyección del periodo en curso.
+  - Desapareció el punto único de falla y la latencia de lectura bajó de cerca de 1,1 s a entre 15 y 25 ms (p50).
+  - Tras un reinicio, el servicio recupera los periodos cerrados desde la base de datos y no pierde energía integrada.
+  - La misma telemetría alimenta un reporte corporativo de Power BI sin tocar el tablero.
 lessons:
-  - Documentar la convención de signos con lecturas en paralelo el día de la migración evitó semanas de discusiones sobre cifras.
+  - Mediría la latencia y la tasa de lecturas nulas desde el primer día; esas cifras justificaron el cambio de protocolo y habrían adelantado la decisión.
+  - Dejaría un único servicio de lectura de medidores que publique para ambos consumidores, en lugar de mantener la misma topología en Node.js y en Python.
 ---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

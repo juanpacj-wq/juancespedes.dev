@@ -24,6 +24,9 @@ reports/
 .dev.vars
 .dev.vars.*
 
+# Internal names checked by the content tests (CI gets them from a secret)
+.content-denylist
+
 # OS / editor
 .DS_Store
 Thumbs.db

@@ -1,6 +1,8 @@
 ---
 import type { Capability } from '../../domain/project/capability';
+import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
+import { projectPath } from '../i18n/routes';
 import Card from '../primitives/Card.astro';
 import Section from '../primitives/Section.astro';
 
@@ -15,10 +17,11 @@ export interface CapabilityEvidenceView {
 
 interface Props {
   t: Dictionary;
+  locale: Locale;
   matrix: readonly CapabilityEvidenceView[];
 }
 
-const { t, matrix } = Astro.props;
+const { t, locale, matrix } = Astro.props;
 const rows = matrix.filter((row) => row.technologies.length > 0);
 ---
 
@@ -42,7 +45,7 @@ const rows = matrix.filter((row) => row.technologies.length > 0);
                       <>
                         {index > 0 && ', '}
                         <a
-                          href={`#project-${project.slug}`}
+                          href={projectPath(locale, project.slug)}
                           class="underline decoration-line-strong underline-offset-4 hover:text-accent-ink hover:decoration-accent-ink"
                         >
                           {project.title}

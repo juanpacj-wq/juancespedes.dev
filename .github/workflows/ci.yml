@@ -41,6 +41,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:coverage
+        env:
+          # Internal names the content must never mention (tests/content). Kept as a secret so
+          # the public repository does not list them; forks run without it and skip that check.
+          CONTENT_DENYLIST: ${{ secrets.CONTENT_DENYLIST }}
       - name: Coverage summary
         run: |
           echo '### Coverage (domain + application)' >> "$GITHUB_STEP_SUMMARY"

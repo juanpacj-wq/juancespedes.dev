@@ -3,6 +3,8 @@ import { CAPABILITIES, type Capability } from '../../domain/project/capability';
 import type { Project } from '../../domain/project/project';
 import type { Dictionary } from '../i18n/dictionary';
 import { formatYears } from '../i18n/format';
+import { projectPath } from '../i18n/routes';
+import Icon from '../icons/Icon.astro';
 import Badge from '../primitives/Badge.astro';
 import Section from '../primitives/Section.astro';
 import Tag from '../primitives/Tag.astro';
@@ -70,12 +72,25 @@ const countText = (count: number) =>
             <li
               id={`project-${project.slug}`}
               data-capabilities={project.capabilities.join(' ')}
-              class="grid scroll-mt-24 gap-4 border-b border-line py-8 md:grid-cols-[8rem_1fr_14rem] md:gap-8"
+              class="group relative grid scroll-mt-24 gap-4 border-b border-line py-8 transition-colors duration-150 hover:bg-surface md:grid-cols-[8rem_1fr_14rem] md:gap-8"
             >
               <p class="font-mono text-small text-subtle">{formatYears(project.period, t)}</p>
               <div class="flex flex-col gap-3">
                 <div class="flex flex-wrap items-center gap-2">
-                  <h3 class="text-title font-medium text-balance">{project.title}</h3>
+                  <h3 class="text-title font-medium text-balance">
+                    {/* The whole row is clickable through this link's ::after; the link keeps the accessible name. */}
+                    <a
+                      href={projectPath(project.locale, project.slug)}
+                      class="inline-flex items-center gap-2 after:absolute after:inset-0 group-hover:text-accent-ink"
+                    >
+                      {project.title}
+                      <Icon
+                        name="arrow-right"
+                        size={18}
+                        class="transition-transform duration-150 group-hover:translate-x-1"
+                      />
+                    </a>
+                  </h3>
                   <Badge tone="accent">{t.kindLabels[project.kind]}</Badge>
                   {project.confidentiality === 'anonymized' && (
                     <Badge>{t.projects.anonymized}</Badge>

@@ -15,3 +15,16 @@ export const compareProjects = (a: Project, b: Project): number => {
 
 export const sortProjects = (projects: readonly Project[]): readonly Project[] =>
   [...projects].sort(compareProjects);
+
+export interface AdjacentProjects {
+  readonly previous: Project | null;
+  readonly next: Project | null;
+}
+
+/** Neighbours in display order, for "previous / next" links on a project page. */
+export const adjacentProjects = (projects: readonly Project[], slug: string): AdjacentProjects => {
+  const ordered = sortProjects(projects);
+  const index = ordered.findIndex((project) => project.slug === slug);
+  if (index === -1) return { previous: null, next: null };
+  return { previous: ordered[index - 1] ?? null, next: ordered[index + 1] ?? null };
+};

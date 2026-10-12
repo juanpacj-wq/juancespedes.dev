@@ -1,7 +1,7 @@
 ---
-kind: open-source
+kind: case-study
 title: linkedin-pilot, an MCP server for LinkedIn
-summary: MCP server and CLI in TypeScript that lets an AI assistant update a profile, interact and apply to jobs with the user's real session, with explicit confirmation before every action visible to others.
+summary: A TypeScript MCP server and CLI that lets an AI assistant update a profile, engage with people and apply to jobs using the user's real session, with explicit confirmation before every action other people can see.
 role: Author and maintainer
 period: { start: '2026-09', end: null }
 capabilities: [automation-ai, backend]
@@ -13,13 +13,80 @@ stack:
   - REST APIs
 metrics:
   - value: '35+'
-    label: documented MCP tools for profile, interactions and job applications
+    label: documented MCP tools for profile, engagement and job applications
     source: Repository README, October 2026
 featured: false
-order: 10
+order: 7
 status: published
 confidentiality: public
-repository: https://github.com/juanpacj-wq/linkedin-mcp
-license: Public source, no license declared
-install: npm install && npm run build
+links:
+  - label: Code on GitHub
+    url: https://github.com/juanpacj-wq/linkedin-mcp
+problem: The official LinkedIn API cannot write to a profile or apply to jobs, because real access requires a partner program and not even partners can edit work experience. I wanted an AI assistant to do that work with my own session, without storing my password and without surprise actions.
+responsibilities:
+  - Designed the split between reading and writing and the form engine.
+  - Implemented the MCP server, the CLI and the reusable answer bank.
+  - Published it with installation and diagnostics docs, plus an emergency exit to finish any flow by hand.
+constraints:
+  - There is no official write API, so the only way in is the real interface.
+  - The interface changes its structure and CSS classes without notice, and is served in the account's language.
+  - No action visible to other people can happen without explicit confirmation.
+  - Sign-in is not automated, because that triggers blocks and would require storing the password.
+decisions:
+  - title: Read through the internal API, write through the interface
+    rationale: The internal API the page itself uses returns the profile and job postings as structured data in a single call, with the same browser session. There is no endpoint for writing, so the interface is used, and if one path fails the other takes over.
+    alternatives:
+      - Scrape the HTML for both reading and writing
+  - title: Fields identified by their visible label
+    rationale: The form engine reads each control's accessible name and matches it against a bilingual glossary, so it survives HTML changes and works whether the account is in Spanish or English.
+    alternatives:
+      - CSS class selectors
+  - title: One engine for the profile and for applications
+    rationale: Editing a profile section and filling in an application are the same problem, a form with fields. A single piece solves both, and a new section is supported without code changes.
+    alternatives:
+      - A hand-written flow for every form
+  - title: Dry run by default and explicit confirmation
+    rationale: Actions other people can see require confirmation, and applications first run as a dry run to review pending questions before submitting.
+    alternatives:
+      - Execute whatever the assistant asks for directly
+architecture:
+  summary: An AI assistant calls tools on the MCP server. The server drives a browser with the user's persistent session, reads through the page's internal API and writes through the interface with a generic form engine.
+  layers:
+    - name: Clients
+      nodes:
+        - { id: assistant, label: 'AI assistant', detail: 'Any MCP client' }
+        - { id: cli, label: 'CLI', detail: 'The same commands from the terminal' }
+    - name: Server
+      nodes:
+        - { id: mcp-server, label: 'MCP server', detail: 'More than 35 tools with confirmation' }
+        - {
+            id: form-engine,
+            label: 'Form engine',
+            detail: 'Visible labels and a bilingual glossary',
+          }
+        - { id: answers, label: 'Answer bank', detail: 'Reusable answers' }
+    - name: Browser
+      nodes:
+        - { id: browser, label: 'Persistent browser', detail: 'Playwright with the user session' }
+    - name: LinkedIn
+      nodes:
+        - { id: internal-api, label: 'Internal API', detail: 'Reads profiles and job postings' }
+        - { id: web-ui, label: 'Web interface', detail: 'Writes to the profile and applications' }
+  flows:
+    - { from: assistant, to: mcp-server, label: 'Tool calls' }
+    - { from: cli, to: mcp-server, label: 'Same core' }
+    - { from: mcp-server, to: browser, label: 'Reads and actions' }
+    - { from: mcp-server, to: form-engine, label: 'Writes' }
+    - { from: answers, to: form-engine, label: 'Saved answers' }
+    - { from: browser, to: internal-api, label: 'Reads with the browser session' }
+    - { from: form-engine, to: web-ui, label: 'Fills in and submits forms' }
+outcomes:
+  - An assistant can update the whole profile, engage with other people and complete applications with the user's real session.
+  - Direct browser tools make it possible to finish any failing flow by hand, without editing the project.
+  - The code is public, with installation and diagnostics documentation.
+lessons:
+  - I would set conservative daily limits and pauses between actions from day one, because platforms detect automation patterns even when the session is real.
+  - I would add tests against saved real pages to catch interface changes before they break in use.
 ---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

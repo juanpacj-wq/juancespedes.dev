@@ -6,7 +6,8 @@
       "url": [
         "http://localhost:4331/",
         "http://localhost:4331/design-system",
-        "http://localhost:4331/privacidad"
+        "http://localhost:4331/privacidad",
+        "http://localhost:4331/proyectos/plant-telemetry"
       ],
       "numberOfRuns": 3,
       "settings": {}

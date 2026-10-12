@@ -1,0 +1,117 @@
+---
+kind: case-study
+title: Rescate de un ETL de facturación electrónica que fallaba en silencio
+summary: Recibí un pipeline heredado que perdía facturas reportando éxito. Lo audité contra producción y lo puse bajo pruebas, CI y despliegue por etiqueta; hoy falla en rojo, avisa solo y se audita factura por factura.
+role: Ingeniero de datos a cargo del rescate y la operación del sistema
+period: { start: '2026-08', end: null }
+capabilities: [legacy-systems, data-bi, automation-ai]
+stack:
+  - Python
+  - Apache Airflow
+  - Selenium
+  - Oracle
+  - MongoDB
+  - Docker
+  - pytest
+  - GitHub Actions
+  - Model Context Protocol
+  - Legacy code rescue
+  - Incident forensics
+metrics:
+  - value: '74'
+    label: hallazgos de auditoría, cada uno con evidencia medida contra producción
+    source: Auditoría técnica del sistema, agosto de 2026
+  - value: '0 a 151'
+    label: pruebas automatizadas, en un código que llegó sin ninguna
+    source: Suite de pytest del repositorio, septiembre de 2026
+  - value: '532'
+    label: filas del portal cruzadas contra tres bases de datos para cuantificar un incidente el mismo día
+    source: Expediente del incidente de cambio de mes, septiembre de 2026
+featured: true
+order: 4
+status: published
+confidentiality: anonymized
+problem: Un pipeline construido por un tercero descargaba las facturas electrónicas de proveedores desde el portal del operador de facturación, las convertía y las cargaba en el ERP financiero de dos empresas, tres veces al día. Llegó sin control de versiones, sin pruebas y con un defecto grave, porque podía perder facturas y aun así terminar en verde.
+responsibilities:
+  - Audité el sistema de punta a punta y documenté 74 hallazgos, con un resumen en el lenguaje del área usuaria.
+  - Lo puse bajo git, pruebas, CI con protección de rama y despliegue por etiqueta, sin detener las corridas diarias.
+  - Corregí las fallas que perdían facturas y migré la llave primaria de las tablas de destino, con ensayo previo en desarrollo.
+  - Opero el sistema, con incidentes, conciliaciones, despliegues y comunicación con el área financiera.
+constraints:
+  - El proceso no podía detenerse, porque de él dependen las cuentas por pagar de dos empresas.
+  - El portal de origen es de un tercero y cambia sin aviso, y descargar altera el estado del proceso real.
+  - Las bases de datos de destino son compartidas con otros sistemas, y cada cambio se coordina con su administrador.
+  - El orquestador lo comparten otros seis flujos de trabajo.
+decisions:
+  - title: Auditar y medir antes de corregir
+    rationale: Una línea base medida contra producción permitió priorizar por impacto de negocio y demostrar cada mejora con cifras, en lugar de reescribir por intuición.
+    alternatives:
+      - Reescribir el pipeline desde cero
+  - title: Extraer un dominio puro y probado del código de scraping
+    rationale: Las reglas de calendario, paginación y clasificación salieron a módulos sin red ni secretos, con doctests como contrato. Se prueban en menos de un segundo sin tocar el portal.
+    alternatives:
+      - Probar solo de punta a punta contra el portal real
+  - title: Una corrida que no hizo nada termina en rojo
+    rationale: El defecto de origen era reportar éxito sin haber cargado nada. Ahora cada tarea verifica su resultado y, si el conteo no cuadra, falla y avisa por correo.
+    alternatives:
+      - Agregar más reintentos y dejar el estado en verde
+  - title: Un servidor MCP para diagnosticar el orquestador
+    rationale: Expone corridas, fallos agrupados por firma y análisis de causa raíz de los logs como herramientas para un agente de IA. Las dos herramientas que escriben simulan por defecto y exigen confirmación explícita.
+    alternatives:
+      - Revisar los logs a mano en la interfaz del orquestador
+architecture:
+  summary: Un flujo de tres tareas en Apache Airflow descarga las facturas del portal con Selenium, las convierte de XML a documentos en MongoDB y las inserta en la base Oracle de cada empresa, de donde las toma el ERP. Un conciliador cruza los cuatro almacenes y un servidor MCP expone el orquestador para diagnóstico.
+  layers:
+    - name: Origen
+      nodes:
+        - {
+            id: billing-portal,
+            label: 'Portal del operador de facturación',
+            detail: 'PDF y XML de cada factura',
+          }
+    - name: Orquestación
+      nodes:
+        - {
+            id: download,
+            label: 'Descarga',
+            detail: 'Selenium Grid, calendario y rejilla paginada',
+          }
+        - { id: convert, label: 'Conversión', detail: 'XML UBL a documento' }
+        - { id: load, label: 'Carga', detail: 'Según la empresa receptora' }
+    - name: Almacenes
+      nodes:
+        - { id: shared-disk, label: 'Disco compartido', detail: 'Archivos originales' }
+        - { id: mongodb, label: 'MongoDB', detail: 'Trazabilidad de cada documento' }
+        - { id: oracle, label: 'Oracle por empresa', detail: 'Tablas que lee el ERP' }
+    - name: Consumo
+      nodes:
+        - { id: erp, label: 'ERP financiero', detail: 'Cuentas por pagar de dos empresas' }
+    - name: Operación
+      nodes:
+        - { id: reconciler, label: 'Conciliador', detail: 'Cruza portal, disco, MongoDB y Oracle' }
+        - {
+            id: mcp-server,
+            label: 'Servidor MCP de diagnóstico',
+            detail: 'Causa raíz y reproceso con simulación',
+          }
+  flows:
+    - { from: billing-portal, to: download, label: 'Tres veces al día' }
+    - { from: download, to: shared-disk, label: 'PDF y XML' }
+    - { from: shared-disk, to: convert, label: 'Archivos del periodo' }
+    - { from: convert, to: mongodb, label: 'Un documento por factura' }
+    - { from: mongodb, to: load, label: 'Pendientes por cargar' }
+    - { from: load, to: oracle, label: 'Facturas por empresa' }
+    - { from: oracle, to: erp, label: 'Recepción en el ERP' }
+    - { from: reconciler, to: oracle, label: 'Verifica factura por factura' }
+    - { from: mcp-server, to: download, label: 'Lee corridas y logs por la API del orquestador' }
+outcomes:
+  - El proceso que reportaba éxito habiendo perdido facturas hoy falla en rojo y avisa por correo.
+  - Un incidente de cambio de mes se cuantificó el mismo día, con 63 facturas pendientes exactas, respuesta al área usuaria antes del mediodía y corrección de fondo probada en vivo.
+  - Se verificaron una a una cerca de 1.050 facturas de un mes contra la base de destino.
+  - Cada log de producción se asocia a su commit, porque el despliegue es por etiqueta y cada corrida imprime la versión.
+lessons:
+  - Construiría el conciliador entre almacenes antes que cualquier corrección; es la herramienta que convierte una sospecha en un número.
+  - Negociaría desde el inicio un entorno de pruebas del portal de origen, porque buena parte del riesgo vino de no poder ensayar descargas sin tocar el proceso real.
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

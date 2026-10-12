@@ -1,0 +1,125 @@
+---
+kind: case-study
+title: Portal corporativo bilingüe con seguridad y accesibilidad medidas
+summary: Reconstruí desde cero el portal de una generadora de energía, con 134 páginas en español e inglés sobre WordPress a medida, despliegue con reversión automática y un ethical hacking externo que cerró con 3 hallazgos de severidad baja.
+role: Desarrollador full-stack y responsable técnico, de la extracción del diseño al paso a producción
+period: { start: '2026-07', end: '2026-09' }
+capabilities: [frontend, backend, infrastructure]
+stack:
+  - WordPress
+  - PHP
+  - Python
+  - Bash
+  - MariaDB
+  - Directus
+  - WCAG 2.2
+  - Playwright
+  - nginx
+  - Linux
+metrics:
+  - value: '134'
+    label: páginas publicadas, 67 en español y 67 en inglés generadas desde una sola fuente
+    source: Acta de paso a producción, septiembre de 2026
+  - value: '3 bajos'
+    label: hallazgos del ethical hacking externo, sin críticos, altos ni medios
+    source: Informe de la firma auditora externa, septiembre de 2026
+  - value: '96 de 99'
+    label: controles de endurecimiento del servidor en verde; los 3 restantes dependían de terceros
+    source: Arnés de endurecimiento del proyecto, 2026
+  - value: '2.211'
+    label: commits del portal en unas 8 semanas de trabajo
+    source: Historial de git, julio a septiembre de 2026
+featured: true
+order: 3
+status: published
+confidentiality: public
+links:
+  - label: Portal en línea
+    url: https://www.gecelca.com.co/es/
+problem: El portal anterior eran cuatro instalaciones de WordPress independientes, una por idioma y dominio, alojadas en un tercero. El contenido estaba desactualizado, la versión en inglés no se mantenía y el sitio no cubría las obligaciones colombianas de transparencia (Ley 1712 de 2014) ni de accesibilidad (Resolución 1519 de 2020).
+responsibilities:
+  - Extraje el diseño de Figma y el contenido del sitio anterior con herramientas propias, y lo repliqué página por página.
+  - Construí el tema de bloques, dos plugins y el motor que genera las páginas en inglés.
+  - Escribí la provisión del servidor, el despliegue y el arnés de endurecimiento, y coordiné con infraestructura los certificados, el DNS y el firewall de aplicaciones.
+  - Llevé una auditoría de seguridad interna con más de 100 hallazgos hasta su cierre y acompañé el ethical hacking externo.
+  - Preparé el acta de paso a producción, con 9 casos de prueba y 35 evidencias, generada por código.
+constraints:
+  - El equipo de Comunicaciones edita el contenido sin un desarrollador y sin poder romper el diseño.
+  - Cumplimiento obligatorio de transparencia y de accesibilidad WCAG 2.2 AA para un sitio público.
+  - Infraestructura propia de la empresa, detrás de un firewall de aplicaciones corporativo.
+  - Fuentes y recursos autoalojados, sin servicios de terceros que recojan datos de los visitantes.
+  - Cero enlaces rotos en la migración, porque las direcciones antiguas tenían que seguir funcionando.
+decisions:
+  - title: Git como única fuente de verdad
+    rationale: El administrador de WordPress solo edita contenido. La estructura de los bloques está bloqueada, y el menú y la tabla de rutas viven en el repositorio y se siembran con scripts idempotentes.
+    alternatives:
+      - Configurar el sitio desde el panel de administración
+  - title: Motor propio para la versión en inglés
+    rationale: Las 67 páginas en inglés se generan desde las españolas con un catálogo de traducción por página, así la estructura es idéntica y una guarda impide publicar una traducción a medias.
+    alternatives:
+      - Un plugin de multilenguaje con páginas duplicadas a mano
+  - title: Despliegue reproducible con reversión automática
+    rationale: Cada despliegue empaqueta un commit exacto con su checksum, corre validaciones, respalda la base de datos, cambia de versión de forma atómica y revierte solo si falla la verificación. Revirtió 4 veces en producción sin caída del servicio.
+    alternatives:
+      - Subir archivos por FTP o editar en el servidor
+  - title: Política de seguridad de contenido medida con navegador
+    rationale: La CSP se construyó recorriendo 137 rutas en dos anchos con un navegador real hasta llegar a cero violaciones, en lugar de adivinar qué recursos usa cada página.
+    alternatives:
+      - Copiar una CSP genérica y relajarla cada vez que algo fallara
+architecture:
+  summary: Comunicaciones edita contenido en WordPress; todo lo demás llega desde el repositorio por un despliegue verificado. El servidor arma las tablas de datos comerciales desde un CMS headless y enlaza documentos de un almacén compatible con S3.
+  layers:
+    - name: Fuentes
+      nodes:
+        - { id: figma, label: 'Diseño en Figma', detail: 'Extraído por API, frame por frame' }
+        - { id: repository, label: 'Repositorio git', detail: 'Tema, plugins, rutas y menú' }
+        - { id: editors, label: 'Equipo de Comunicaciones', detail: 'Edita solo contenido' }
+    - name: Entrega
+      nodes:
+        - {
+            id: pipeline,
+            label: 'Despliegue verificado',
+            detail: 'Checksum, validaciones, respaldo y reversión',
+          }
+    - name: Servidor
+      nodes:
+        - {
+            id: wordpress,
+            label: 'WordPress con tema de bloques propio',
+            detail: 'PHP, 67 páginas por idioma',
+          }
+        - { id: english-engine, label: 'Motor de inglés', detail: 'Genera las páginas en inglés' }
+        - { id: mariadb, label: 'MariaDB', detail: 'Accesible solo desde el servidor' }
+    - name: Servicios
+      nodes:
+        - {
+            id: headless-cms,
+            label: 'CMS headless',
+            detail: 'Tablas de comercialización, consultadas en el servidor',
+          }
+        - { id: object-storage, label: 'Almacén de documentos', detail: 'Compatible con S3' }
+    - name: Visitantes
+      nodes:
+        - { id: visitors, label: 'Público del portal', detail: 'Español e inglés, WCAG 2.2 AA' }
+  flows:
+    - { from: figma, to: repository, label: 'Diseño y tokens replicados' }
+    - { from: repository, to: pipeline, label: 'Commit exacto' }
+    - { from: pipeline, to: wordpress, label: 'Cambio atómico de versión' }
+    - { from: editors, to: wordpress, label: 'Contenido' }
+    - { from: wordpress, to: mariadb, label: 'Contenido y configuración' }
+    - { from: headless-cms, to: wordpress, label: 'Datos con caché y respaldo' }
+    - { from: wordpress, to: english-engine, label: 'HTML en español' }
+    - { from: english-engine, to: visitors, label: 'Páginas en inglés' }
+    - { from: wordpress, to: visitors, label: 'Páginas en español' }
+    - { from: object-storage, to: visitors, label: 'Documentos normativos' }
+outcomes:
+  - El portal pasó a producción con acta firmada por las áreas funcionales y de tecnología, después de 9 casos de prueba ejecutados contra producción.
+  - Las 76 direcciones heredadas redirigen con 301 y no quedó ningún enlace roto.
+  - Comunicaciones publica y actualiza contenido sin depender de un desarrollador.
+  - El sitio se verificó en 27 anchos de pantalla, de 360 a 1.920 px, y los incumplimientos de accesibilidad quedaron en un registro con mediciones y su corrección.
+lessons:
+  - Montaría el arnés de seguridad y la medición de la CSP desde la primera semana; buena parte del trabajo de cierre salió de controles que se podían automatizar antes.
+  - Pediría desde el inicio un entorno de pruebas con la misma red y el mismo firewall que producción, para no descubrir esas diferencias en la recta final.
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

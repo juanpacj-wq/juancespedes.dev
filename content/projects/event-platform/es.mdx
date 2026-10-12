@@ -1,0 +1,117 @@
+---
+kind: case-study
+title: Plataforma de un foro corporativo, del registro al certificado
+summary: Diseñé, construí y operé en solitario la plataforma de un foro del sector energético, con agenda, credencial digital con QR, encuestas, 156 certificados PDF auditados y memorias del evento, todo con inicio de sesión corporativo.
+role: Desarrollador full-stack y operador único, del diseño a la guardia el día del evento
+period: { start: '2026-07', end: '2026-09' }
+capabilities: [frontend, backend, infrastructure]
+stack:
+  - React
+  - TypeScript
+  - Vite
+  - Node.js
+  - Express
+  - Microsoft Entra ID
+  - Microsoft Graph
+  - SQLite
+  - Python
+  - Playwright
+  - nginx
+  - systemd
+metrics:
+  - value: '163'
+    label: invitados recibieron su QR personal por correo, verificado uno a uno antes del envío
+    source: Registro del envío masivo, agosto de 2026
+  - value: '156'
+    label: certificados PDF generados y revisados por dos auditores automáticos independientes
+    source: Scripts de generación y auditoría de certificados, agosto de 2026
+  - value: '9 días'
+    label: entre el primer commit y el día del foro, con el sistema operando en vivo
+    source: Historial de git, julio y agosto de 2026
+featured: false
+order: 5
+status: published
+confidentiality: anonymized
+problem: El área de comunicaciones de una generadora organizaba su primer foro corporativo y necesitaba resolver todo el ciclo del evento en una sola herramienta, desde difundir la agenda y los ponentes hasta registrar y acreditar a los invitados, medir la satisfacción y entregar certificados y memorias.
+responsibilities:
+  - Diseñé la experiencia a partir de las piezas gráficas oficiales, midiendo colores y medidas directamente de los PDF.
+  - Construí la SPA, el servidor, la autenticación corporativa y los envíos de correo.
+  - Desplegué en Linux con nginx y systemd endurecido, y estuve de guardia el día del foro.
+  - Después del evento generé los certificados, publiqué la galería y agregué un módulo de tarjetas de presentación digitales.
+constraints:
+  - Nueve días entre el primer commit y el día del foro.
+  - Cientos de asistentes entrando a la vez desde la misma red corporativa.
+  - Datos personales mínimos, porque el servidor no debía conocer nombres ni documentos de identidad.
+  - Una sola persona a cargo del desarrollo, el despliegue y la operación.
+decisions:
+  - title: Inicio de sesión corporativo con OIDC y PKCE
+    rationale: Los invitados ya tenían cuenta en el directorio de la empresa. Microsoft Entra ID resolvió identidad y roles sin crear contraseñas nuevas, y Microsoft Graph envió los correos desde el buzón institucional.
+    alternatives:
+      - Un registro propio con correo y contraseña
+  - title: El servidor solo conoce identificadores opacos
+    rationale: Certificados y descargas se sirven con manifiestos de identificador a archivo, generados fuera del servidor. Nadie puede pedir el certificado de otra persona porque la ruta no recibe parámetros.
+    alternatives:
+      - Guardar nombres y documentos en la base de datos del servidor
+  - title: La encuesta se libera con el reloj del servidor
+    rationale: La dirección de la encuesta de satisfacción solo llega al navegador cuando el reloj del servidor pasa la hora de cierre, así nadie la responde antes de que termine el foro.
+    alternatives:
+      - Ocultarla con un temporizador en el navegador
+  - title: Operaciones peligrosas con dos llaves
+    rationale: El envío masivo tiene modo simulacro, tope de destinatarios y reanudación, y abrirlo a todos los invitados exige cambiar dos variables a la vez.
+    alternatives:
+      - Un script que envía directamente a toda la lista
+architecture:
+  summary: Una SPA en React habla con un servidor Express que concentra la seguridad HTTP, la autenticación con Microsoft Entra ID y los envíos con Microsoft Graph. Certificados y memorias se generan en la estación de trabajo y llegan al servidor como artefactos verificados.
+  layers:
+    - name: Asistentes
+      nodes:
+        - {
+            id: attendee-app,
+            label: 'SPA del foro',
+            detail: 'Agenda, credencial con QR, encuestas y certificados',
+          }
+    - name: Borde
+      nodes:
+        - { id: edge, label: 'nginx', detail: 'TLS y límite de peticiones por zona' }
+    - name: Servidor
+      nodes:
+        - {
+            id: server,
+            label: 'Servidor Express',
+            detail: 'CSP, CSRF, sesiones y rutas sin parámetros libres',
+          }
+        - {
+            id: survey-gate,
+            label: 'Compuerta de encuestas',
+            detail: 'Decide con el reloj del servidor',
+          }
+        - { id: cards, label: 'Tarjetas de presentación', detail: 'SQLite' }
+    - name: Microsoft 365
+      nodes:
+        - { id: entra, label: 'Microsoft Entra ID', detail: 'OIDC con PKCE y roles' }
+        - { id: graph, label: 'Microsoft Graph', detail: 'Correos de inscripción y QR' }
+    - name: Estación de trabajo
+      nodes:
+        - {
+            id: generators,
+            label: 'Generadores en Python',
+            detail: 'Certificados PDF y memorias, con auditoría',
+          }
+  flows:
+    - { from: attendee-app, to: edge, label: 'HTTPS' }
+    - { from: edge, to: server, label: 'Navegaciones y API' }
+    - { from: server, to: entra, label: 'Inicio de sesión' }
+    - { from: server, to: graph, label: 'Correo transaccional' }
+    - { from: survey-gate, to: attendee-app, label: 'Encuesta solo después del cierre' }
+    - { from: generators, to: server, label: 'Artefactos por manifiesto' }
+outcomes:
+  - El sistema operó en vivo el día del foro sin guardar datos personales en el servidor.
+  - Cada uno de los 163 códigos QR se decodificó antes de enviarlo, y el envío se hizo una sola vez.
+  - Se publicaron 156 certificados y 77 fotos, con descargas de memorias en streaming (el paquete más grande pesaba 1,33 GB).
+  - Los incidentes de producción quedaron resueltos y documentados con su causa.
+lessons:
+  - Ensayaría la carga del día del evento con tráfico simulado desde una sola IP, en lugar de dimensionar solo con cálculos.
+  - Separaría desde el inicio lo que debía seguir vivo después del evento, como las tarjetas de presentación, de lo que era efímero.
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

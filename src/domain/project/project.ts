@@ -2,6 +2,7 @@ import type { Locale } from '../shared/locale';
 import { err, ok, type Result } from '../shared/result';
 import { parseSlug, type Slug } from '../shared/slug';
 import { compareYearMonth, parseYearMonth, type Period } from '../shared/year-month';
+import { validateArchitecture, type Architecture } from './architecture';
 import type { Capability } from './capability';
 import { validateMetric, type Metric } from './metric';
 import { normalizeTechnologyName } from './technology';
@@ -41,11 +42,21 @@ interface CommonContent {
   readonly confidentiality: Confidentiality;
 }
 
+/**
+ * The long-form template: summary, problem, role, constraints, decisions with what was ruled
+ * out, architecture, results, what I would do differently, stack and public links.
+ */
 export interface CaseStudyContent extends CommonContent {
   readonly kind: 'case-study';
   readonly problem: string;
+  /** What the role meant in practice; `role` is the one-line version. */
+  readonly responsibilities: readonly string[];
   readonly constraints: readonly string[];
   readonly decisions: readonly Decision[];
+  readonly architecture: Architecture;
+  /** Results in words; `metrics` holds the figures. */
+  readonly outcomes: readonly string[];
+  /** "What I would do differently": hindsight, not a list of achievements. */
   readonly lessons: readonly string[];
 }
 
@@ -118,11 +129,17 @@ const kindIssues = (content: ProjectContent): ProjectIssue[] => {
   switch (content.kind) {
     case 'case-study':
       return [
-        ...requireNonEmpty('constraints', content.constraints),
-        ...requireNonEmpty('decisions', content.decisions),
         ...(content.problem.trim() === ''
           ? [{ field: 'problem', message: 'problem must not be blank' }]
           : []),
+        ...requireNonEmpty('constraints', content.constraints),
+        ...requireNonEmpty('decisions', content.decisions),
+        ...validateArchitecture(content.architecture).map((issue) => ({
+          field: `architecture.${issue.field}`,
+          message: issue.message,
+        })),
+        ...requireNonEmpty('outcomes', content.outcomes),
+        ...requireNonEmpty('lessons', content.lessons),
       ];
     case 'report':
       return [

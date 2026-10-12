@@ -15,5 +15,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0008](0008-content-validation-layers.md)  | Content validation in three layers, technology catalog, drafts          | Accepted |
 | [0009](0009-theming-and-design-tokens.md)  | Theming with light-dark() tokens, enforced in CI                        | Accepted |
 | [0010](0010-contact-form-delivery.md)      | Contact form: Email Routing, Turnstile and a rate limit, nothing stored | Accepted |
+| [0011](0011-case-study-pages.md)           | Case study pages: fixed template, diagrams as data, private denylist    | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.

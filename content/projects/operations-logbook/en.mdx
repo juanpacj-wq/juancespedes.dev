@@ -1,8 +1,8 @@
 ---
 kind: case-study
 title: Digital operations logbook for two thermal power plants
-summary: I replaced the shift teams' Excel logbooks with a real-time web application, with shifts as a business entity, official reports generated from the data, and more than 1,400 automated tests.
-role: Full-stack engineer and sole developer (design, backend, frontend, database, deployment)
+summary: I replaced the Excel shift logbooks with a real-time web application, with shifts as a business entity, official reports generated from the data and more than 1,400 automated tests.
+role: Full-stack engineer, sole developer (design, backend, frontend, database, deployment)
 period: { start: '2026-03', end: null }
 capabilities: [backend, frontend, data-bi, infrastructure]
 stack:
@@ -26,31 +26,91 @@ metrics:
     label: commits over 6 months of continuous development
     source: Git history, March to September 2026
   - value: '38 of 39'
-    label: findings closed from a self-run security audit
+    label: findings closed from an in-house security audit
     source: Internal security audit report, 2026
 featured: true
 order: 1
 status: published
 confidentiality: anonymized
-problem: Operations staff at two thermal power plants kept their shift logbooks in Excel workbooks. Information was scattered, closing a shift had no guarantees, and official reports were assembled by hand.
+problem: Operations staff at two thermal power plants kept their shift logs in Excel workbooks. Information was scattered across files, closing a shift depended on each person's discipline, and the official daily reports were assembled by hand by copying cells.
+responsibilities:
+  - Gathered requirements with shift supervisors, operations engineers and chemists, and turned them into a domain model of shifts, logbooks and role-based permissions.
+  - Designed and built the frontend, the backend, the database and the corporate sign-in integration.
+  - Deployed and run the system on a company Linux server, with nginx, systemd and an update script with built-in checks.
+  - Documented 71 architecture decisions and drove an in-house security audit until 38 of 39 findings were closed.
 constraints:
   - Users on 24-hour shifts whose operating day crosses midnight.
-  - Mandatory corporate single sign-on with role-based permissions.
-  - Self-hosted on the corporate network, behind a firewall with TLS inspection.
+  - Mandatory corporate sign-in with role-based access.
+  - Self-hosted server on the corporate network, behind a firewall that inspects TLS.
   - Minimal third-party dependencies to keep auditing and maintenance simple.
 decisions:
   - title: Shifts as a business entity, closed atomically
-    rationale: Closing a shift freezes the team roster into an immutable snapshot, so history does not change when staffing changes later.
+    rationale: Closing a shift freezes the team roster into an immutable snapshot, so history does not change when staff changes later.
     alternatives:
-      - Log loose events and rebuild shifts at query time
+      - Store loose events and rebuild shifts at query time
   - title: Real time over WebSockets with origin validation
-    rationale: Several people work on the same shift at once; changes arrive instantly, and origin validation prevents connection hijacking.
+    rationale: Several people work on the same shift at once; changes arrive instantly and origin validation prevents connection hijacking.
     alternatives:
       - Poll the server every few seconds
   - title: In-house .xlsx reader and writer on top of zlib
-    rationale: The official report had to match the Excel template exactly without adding large libraries to the backend.
+    rationale: The official report had to match the Excel template exactly without adding large libraries to a backend that has only 6 production dependencies.
     alternatives:
       - Use a third-party spreadsheet library
+  - title: A tested data contract with the generation dashboard
+    rationale: Another production system consumes the logbook events. A contract test fails if either side changes the shape of the data, and each system writes only to its own schema.
+    alternatives:
+      - Let the dashboard read the logbook tables directly
+architecture:
+  summary: Each operator's browser talks to a Node.js API over HTTPS and WebSockets. The API stores everything in SQL Server, runs scheduled jobs that close shifts and ingest plant data, and exposes a data contract to the generation dashboard.
+  layers:
+    - name: Users
+      nodes:
+        - {
+            id: operator-app,
+            label: 'Operations web app',
+            detail: 'React, views per role and per plant',
+          }
+    - name: Services
+      nodes:
+        - { id: api, label: 'Logbook API', detail: 'Express, 19 domain modules' }
+        - { id: realtime, label: 'Real-time channel', detail: 'WebSockets with origin validation' }
+        - {
+            id: jobs,
+            label: 'Scheduled jobs',
+            detail: 'Shift closing, hourly ingestion and dispatch',
+          }
+    - name: Data
+      nodes:
+        - {
+            id: database,
+            label: 'SQL Server',
+            detail: 'Catalogs and transactions in separate schemas',
+          }
+        - { id: excel-report, label: 'Official Excel report', detail: 'Generated from the data' }
+    - name: Integrations
+      nodes:
+        - { id: identity, label: 'Microsoft Entra ID', detail: 'Sign-in and role-based access' }
+        - { id: plant-historian, label: 'Plant historian', detail: 'Hourly fuel consumption' }
+        - {
+            id: dashboard,
+            label: 'Generation dashboard',
+            detail: 'Consumes events through the contract',
+          }
+  flows:
+    - { from: operator-app, to: api, label: 'Logs events and closes shifts' }
+    - { from: realtime, to: operator-app, label: 'Pushes shift changes and active users' }
+    - { from: api, to: database, label: 'Stores every entry with its shift' }
+    - { from: api, to: identity, label: 'Validates the session and permissions' }
+    - { from: plant-historian, to: jobs, label: 'Delivers each hour of consumption' }
+    - { from: api, to: excel-report, label: 'Builds the daily workbook' }
+    - { from: dashboard, to: api, label: 'Queries events by period' }
+outcomes:
+  - Both plants log their shifts in the application, with each shift's history frozen when it closes.
+  - The official daily report comes out of the data in the template's format, with no cells copied by hand.
+  - The generation dashboard consumes logbook events through a tested contract, without touching its tables.
 lessons:
-  - Tests that guard dangerous invariants (never delete a real plant's data) are worth more than coverage on its own.
+  - From day one I would prioritize the tests that protect dangerous invariants, such as never deleting data from a real plant, over overall coverage.
+  - I would move the scheduled jobs into a separate service earlier, so the API can restart without pausing plant data ingestion.
 ---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

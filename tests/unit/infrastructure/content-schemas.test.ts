@@ -22,6 +22,15 @@ const minimalCaseStudy = {
   problem: 'Excel logbooks.',
   constraints: ['Shifts cross midnight'],
   decisions: [{ title: 'Shifts as entities', rationale: 'History is immutable' }],
+  architecture: {
+    summary: 'Browsers call an API backed by SQL Server.',
+    layers: [
+      { name: 'Clients', nodes: [{ id: 'browser', label: 'Browser' }] },
+      { name: 'Services', nodes: [{ id: 'api', label: 'API' }] },
+    ],
+  },
+  outcomes: ['Shift handover moved to the app.'],
+  lessons: ['Model the shift first.'],
 };
 
 describe('projectFrontmatterSchema', () => {
@@ -33,7 +42,8 @@ describe('projectFrontmatterSchema', () => {
       order: 100,
       metrics: [],
       links: [],
-      lessons: [],
+      responsibilities: [],
+      architecture: { flows: [] },
     });
   });
 
@@ -61,6 +71,19 @@ describe('projectFrontmatterSchema', () => {
     expect(result.error?.issues.map((issue) => issue.message)).toContain(
       'start must not be after end',
     );
+  });
+
+  it('reports architecture issues at their full path', () => {
+    const result = projectFrontmatterSchema.safeParse({
+      ...minimalCaseStudy,
+      architecture: {
+        ...minimalCaseStudy.architecture,
+        flows: [{ from: 'browser', to: 'database', label: 'SQL' }],
+      },
+    });
+    expect(result.error?.issues.map((issue) => issue.path.join('.'))).toEqual([
+      'architecture.flows[0].to',
+    ]);
   });
 
   it('rejects non-https links', () => {

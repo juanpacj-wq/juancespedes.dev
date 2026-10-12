@@ -1,0 +1,117 @@
+---
+kind: case-study
+title: Rescuing an e-invoicing ETL that failed silently
+summary: I inherited a pipeline that lost invoices while reporting success. I audited it against production and put it under tests, CI and tag-based deployment; today it fails loudly, alerts on its own and can be audited invoice by invoice.
+role: Data engineer in charge of the rescue and of running the system
+period: { start: '2026-08', end: null }
+capabilities: [legacy-systems, data-bi, automation-ai]
+stack:
+  - Python
+  - Apache Airflow
+  - Selenium
+  - Oracle
+  - MongoDB
+  - Docker
+  - pytest
+  - GitHub Actions
+  - Model Context Protocol
+  - Legacy code rescue
+  - Incident forensics
+metrics:
+  - value: '74'
+    label: audit findings, each one backed by evidence measured against production
+    source: Technical audit of the system, August 2026
+  - value: '0 to 151'
+    label: automated tests, in a codebase that arrived with none
+    source: Repository pytest suite, September 2026
+  - value: '532'
+    label: portal rows cross-checked against three databases to size an incident the same day
+    source: Month-change incident record, September 2026
+featured: true
+order: 4
+status: published
+confidentiality: anonymized
+problem: A pipeline built by a third party downloaded supplier e-invoices from the invoicing operator's portal, converted them and loaded them into the financial ERP of two companies, three times a day. It arrived with no version control, no tests and a serious defect, because it could lose invoices and still finish green.
+responsibilities:
+  - Audited the system end to end and documented 74 findings, with a summary written in the business team's language.
+  - Put it under git, tests, CI with branch protection and tag-based deployment, without stopping the daily runs.
+  - Fixed the failures that lost invoices and migrated the primary key of the target tables, rehearsed first in development.
+  - Run the system, including incidents, reconciliations, deployments and communication with the finance team.
+constraints:
+  - The process could not stop, because the accounts payable of two companies depend on it.
+  - The source portal belongs to a third party and changes without notice, and downloading changes the state of the real process.
+  - The target databases are shared with other systems, and every change is coordinated with their administrator.
+  - The orchestrator is shared with six other workflows.
+decisions:
+  - title: Audit and measure before fixing
+    rationale: A baseline measured against production made it possible to prioritize by business impact and prove each improvement with numbers, instead of rewriting on instinct.
+    alternatives:
+      - Rewrite the pipeline from scratch
+  - title: Extract a pure, tested domain from the scraping code
+    rationale: Calendar, pagination and classification rules moved into modules with no network or secrets, with doctests as the contract. They run in under a second without touching the portal.
+    alternatives:
+      - Test only end to end against the real portal
+  - title: A run that did nothing finishes red
+    rationale: The original defect was reporting success without loading anything. Now every task verifies its result and, if the count does not add up, fails and sends an email alert.
+    alternatives:
+      - Add more retries and leave the status green
+  - title: An MCP server to diagnose the orchestrator
+    rationale: It exposes runs, failures grouped by signature and root-cause analysis of logs as tools for an AI agent. The two tools that write simulate by default and require explicit confirmation.
+    alternatives:
+      - Read the logs by hand in the orchestrator UI
+architecture:
+  summary: A three-task Apache Airflow flow downloads invoices from the portal with Selenium, converts the XML into MongoDB documents and inserts them into each company's Oracle database, where the ERP picks them up. A reconciler cross-checks the four stores and an MCP server exposes the orchestrator for diagnosis.
+  layers:
+    - name: Source
+      nodes:
+        - {
+            id: billing-portal,
+            label: 'Invoicing operator portal',
+            detail: 'PDF and XML for every invoice',
+          }
+    - name: Orchestration
+      nodes:
+        - { id: download, label: 'Download', detail: 'Selenium Grid, calendar and paginated grid' }
+        - { id: convert, label: 'Conversion', detail: 'UBL XML to document' }
+        - { id: load, label: 'Load', detail: 'Routed by receiving company' }
+    - name: Stores
+      nodes:
+        - { id: shared-disk, label: 'Shared disk', detail: 'Original files' }
+        - { id: mongodb, label: 'MongoDB', detail: 'Traceability for every document' }
+        - { id: oracle, label: 'Oracle per company', detail: 'Tables the ERP reads' }
+    - name: Consumer
+      nodes:
+        - { id: erp, label: 'Financial ERP', detail: 'Accounts payable for two companies' }
+    - name: Operations
+      nodes:
+        - {
+            id: reconciler,
+            label: 'Reconciler',
+            detail: 'Cross-checks portal, disk, MongoDB and Oracle',
+          }
+        - {
+            id: mcp-server,
+            label: 'Diagnostic MCP server',
+            detail: 'Root cause and simulated reprocessing',
+          }
+  flows:
+    - { from: billing-portal, to: download, label: 'Three times a day' }
+    - { from: download, to: shared-disk, label: 'PDF and XML' }
+    - { from: shared-disk, to: convert, label: 'Files for the period' }
+    - { from: convert, to: mongodb, label: 'One document per invoice' }
+    - { from: mongodb, to: load, label: 'Pending invoices' }
+    - { from: load, to: oracle, label: 'Invoices per company' }
+    - { from: oracle, to: erp, label: 'Received in the ERP' }
+    - { from: reconciler, to: oracle, label: 'Verifies invoice by invoice' }
+    - { from: mcp-server, to: download, label: 'Reads runs and logs through the orchestrator API' }
+outcomes:
+  - The process that reported success while losing invoices now fails red and sends an alert.
+  - A month-change incident was sized the same day, with exactly 63 pending invoices, a reply to the business team before noon and a root fix tested live.
+  - About 1,050 invoices from one month were verified one by one against the target database.
+  - Every production log maps to its commit, because deployment is tag-based and each run prints its version.
+lessons:
+  - I would build the cross-store reconciler before any fix; it is the tool that turns a suspicion into a number.
+  - I would negotiate a test environment for the source portal from the start, because much of the risk came from not being able to rehearse downloads without touching the real process.
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

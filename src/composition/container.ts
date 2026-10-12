@@ -4,6 +4,7 @@ import { makeBuildSkillEvidenceMatrix } from '../application/use-cases/build-ski
 import { makeGetHealthStatus } from '../application/use-cases/get-health-status';
 import { makeGetProfile } from '../application/use-cases/get-profile';
 import { makeGetProject } from '../application/use-cases/get-project';
+import { makeGetProjectPage } from '../application/use-cases/get-project-page';
 import { makeListFeaturedProjects } from '../application/use-cases/list-featured-projects';
 import { makeListHeadlineMetrics } from '../application/use-cases/list-headline-metrics';
 import { makeListProjects } from '../application/use-cases/list-projects';
@@ -30,6 +31,7 @@ export const container = {
   listProjects,
   listFeaturedProjects: makeListFeaturedProjects(listProjects),
   getProject: makeGetProject(listProjects),
+  getProjectPage: makeGetProjectPage(listProjects),
   buildSkillEvidenceMatrix: makeBuildSkillEvidenceMatrix({
     listProjects,
     catalog: astroTechnologyCatalog,

@@ -1,0 +1,28 @@
+---
+import { DEFAULT_LOCALE } from '../domain/shared/locale';
+import { dictionaryFor } from '../ui/i18n/dictionary';
+import { homePath } from '../ui/i18n/routes';
+import BaseLayout from '../ui/layouts/BaseLayout.astro';
+import Button from '../ui/primitives/Button.astro';
+import Container from '../ui/primitives/Container.astro';
+
+const t = dictionaryFor(DEFAULT_LOCALE);
+---
+
+<BaseLayout
+  title={`${t.notFound.title} | ${t.meta.siteName}`}
+  description={t.notFound.description}
+  locale={DEFAULT_LOCALE}
+  noindex
+>
+  <Container class="flex max-w-3xl flex-col gap-6 py-24 sm:py-32">
+    <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
+      {t.notFound.eyebrow}
+    </p>
+    <h1 class="text-heading font-semibold text-balance">{t.notFound.title}</h1>
+    <p class="text-lead text-muted">{t.notFound.description}</p>
+    <Button href={homePath(DEFAULT_LOCALE)} icon="arrow-right" size="lg" class="w-fit">
+      {t.notFound.back}
+    </Button>
+  </Container>
+</BaseLayout>
