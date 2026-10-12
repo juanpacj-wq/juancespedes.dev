@@ -13,6 +13,7 @@ MDX content collections, Cloudflare Workers via `@astrojs/cloudflare`. pnpm, Nod
 - `pnpm dev`: local server. `pnpm build` then `pnpm preview`: production build on workerd.
 - `pnpm verify`: format, lint, types, architecture, unit coverage, build (run before finishing).
 - `pnpm test:e2e`: Playwright on the production build, with axe. `pnpm lighthouse`: budgets.
+- `pnpm new:project`: scaffold a project as content (guide: `docs/adding-a-project.md`).
 
 ## Rules
 

@@ -4,25 +4,48 @@ subgraph src["src"]
   subgraph src_application["application"]
     subgraph src_application_ports["ports"]
       src_application_ports_clock_ts["clock.ts"]
+      src_application_ports_headline_metric_repository_ts["headline-metric-repository.ts"]
+      src_application_ports_project_repository_ts["project-repository.ts"]
+      src_application_ports_technology_catalog_ts["technology-catalog.ts"]
     end
     subgraph src_application_use_cases["use-cases"]
+      src_application_use_cases_build_skill_evidence_matrix_ts["build-skill-evidence-matrix.ts"]
+      src_application_use_cases_list_projects_ts["list-projects.ts"]
       src_application_use_cases_get_health_status_ts["get-health-status.ts"]
+      src_application_use_cases_get_project_ts["get-project.ts"]
+      src_application_use_cases_list_featured_projects_ts["list-featured-projects.ts"]
+      src_application_use_cases_list_headline_metrics_ts["list-headline-metrics.ts"]
+    end
+  end
+  subgraph src_domain["domain"]
+    subgraph src_domain_project["project"]
+      src_domain_project_metric_ts["metric.ts"]
+      src_domain_project_project_ts["project.ts"]
+      src_domain_project_capability_ts["capability.ts"]
+      src_domain_project_technology_ts["technology.ts"]
+      src_domain_project_project_ordering_ts["project-ordering.ts"]
+    end
+    subgraph src_domain_shared["shared"]
+      src_domain_shared_locale_ts["locale.ts"]
+      src_domain_shared_result_ts["result.ts"]
+      src_domain_shared_slug_ts["slug.ts"]
+      src_domain_shared_year_month_ts["year-month.ts"]
     end
   end
   subgraph src_composition["composition"]
     src_composition_container_ts["container.ts"]
   end
   subgraph src_infrastructure["infrastructure"]
+    subgraph src_infrastructure_content["content"]
+      src_infrastructure_content_astro_content_repositories_ts["astro-content-repositories.ts"]
+      src_infrastructure_content_project_mapper_ts["project-mapper.ts"]
+      src_infrastructure_content_schemas_ts["schemas.ts"]
+    end
     subgraph src_infrastructure_system["system"]
       src_infrastructure_system_system_clock_ts["system-clock.ts"]
     end
   end
-  subgraph src_domain["domain"]
-    subgraph src_domain_shared["shared"]
-      src_domain_shared_locale_ts["locale.ts"]
-      src_domain_shared_result_ts["result.ts"]
-    end
-  end
+  src_content_config_ts["content.config.ts"]
   subgraph src_pages["pages"]
     subgraph src_pages_api["api"]
       src_pages_api_health_ts["health.ts"]
@@ -32,12 +55,19 @@ end
 subgraph astro:env["astro:env"]
   astro:env_server["server"]
 end
+astro:content["astro:content"]
 subgraph node_modules["node_modules"]
   subgraph node_modules__pnpm[".pnpm"]
     subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae["astro@7.3.8_@types+node@26._d6314243a930c10c84b1626d555854ae"]
       subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules["node_modules"]
         subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro["astro"]
           subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist["dist"]
+            node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_zod_js["zod.js"]
+            subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_content["content"]
+              subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_content_loaders["loaders"]
+                node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_content_loaders_index_js["index.js"]
+              end
+            end
             node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js["index.js"]
           end
         end
@@ -45,11 +75,69 @@ subgraph node_modules["node_modules"]
     end
   end
 end
+src_application_ports_headline_metric_repository_ts-->src_domain_project_metric_ts
+src_application_ports_headline_metric_repository_ts-->src_domain_shared_locale_ts
+src_domain_shared_locale_ts-->src_domain_shared_result_ts
+src_application_ports_project_repository_ts-->src_domain_project_project_ts
+src_application_ports_project_repository_ts-->src_domain_shared_locale_ts
+src_domain_project_project_ts-->src_domain_shared_locale_ts
+src_domain_project_project_ts-->src_domain_shared_result_ts
+src_domain_project_project_ts-->src_domain_shared_slug_ts
+src_domain_project_project_ts-->src_domain_shared_year_month_ts
+src_domain_project_project_ts-->src_domain_project_capability_ts
+src_domain_project_project_ts-->src_domain_project_metric_ts
+src_domain_project_project_ts-->src_domain_project_technology_ts
+src_domain_shared_slug_ts-->src_domain_shared_result_ts
+src_domain_shared_year_month_ts-->src_domain_shared_result_ts
+src_domain_project_technology_ts-->src_domain_project_capability_ts
+src_application_ports_technology_catalog_ts-->src_domain_project_technology_ts
+src_application_use_cases_build_skill_evidence_matrix_ts-->src_domain_project_capability_ts
+src_application_use_cases_build_skill_evidence_matrix_ts-->src_domain_project_project_ts
+src_application_use_cases_build_skill_evidence_matrix_ts-->src_domain_project_technology_ts
+src_application_use_cases_build_skill_evidence_matrix_ts-->src_domain_shared_locale_ts
+src_application_use_cases_build_skill_evidence_matrix_ts-->src_application_ports_technology_catalog_ts
+src_application_use_cases_build_skill_evidence_matrix_ts-->src_application_use_cases_list_projects_ts
+src_application_use_cases_list_projects_ts-->src_domain_project_capability_ts
+src_application_use_cases_list_projects_ts-->src_domain_project_project_ts
+src_application_use_cases_list_projects_ts-->src_domain_project_project_ordering_ts
+src_application_use_cases_list_projects_ts-->src_domain_shared_locale_ts
+src_application_use_cases_list_projects_ts-->src_application_ports_project_repository_ts
+src_domain_project_project_ordering_ts-->src_domain_shared_year_month_ts
+src_domain_project_project_ordering_ts-->src_domain_project_project_ts
 src_application_use_cases_get_health_status_ts-->src_application_ports_clock_ts
+src_application_use_cases_get_project_ts-->src_domain_project_project_ts
+src_application_use_cases_get_project_ts-->src_domain_shared_locale_ts
+src_application_use_cases_get_project_ts-->src_domain_shared_result_ts
+src_application_use_cases_get_project_ts-->src_application_use_cases_list_projects_ts
+src_application_use_cases_list_featured_projects_ts-->src_domain_project_project_ts
+src_application_use_cases_list_featured_projects_ts-->src_domain_shared_locale_ts
+src_application_use_cases_list_featured_projects_ts-->src_application_use_cases_list_projects_ts
+src_application_use_cases_list_headline_metrics_ts-->src_domain_project_metric_ts
+src_application_use_cases_list_headline_metrics_ts-->src_domain_shared_locale_ts
+src_application_use_cases_list_headline_metrics_ts-->src_application_ports_headline_metric_repository_ts
+src_composition_container_ts-->src_application_use_cases_build_skill_evidence_matrix_ts
 src_composition_container_ts-->src_application_use_cases_get_health_status_ts
+src_composition_container_ts-->src_application_use_cases_get_project_ts
+src_composition_container_ts-->src_application_use_cases_list_featured_projects_ts
+src_composition_container_ts-->src_application_use_cases_list_headline_metrics_ts
+src_composition_container_ts-->src_application_use_cases_list_projects_ts
+src_composition_container_ts-->src_infrastructure_content_astro_content_repositories_ts
 src_composition_container_ts-->src_infrastructure_system_system_clock_ts
 src_composition_container_ts-->astro:env_server
+src_infrastructure_content_astro_content_repositories_ts-->src_application_ports_headline_metric_repository_ts
+src_infrastructure_content_astro_content_repositories_ts-->src_application_ports_project_repository_ts
+src_infrastructure_content_astro_content_repositories_ts-->src_application_ports_technology_catalog_ts
+src_infrastructure_content_astro_content_repositories_ts-->src_infrastructure_content_project_mapper_ts
+src_infrastructure_content_astro_content_repositories_ts-->astro:content
+src_infrastructure_content_project_mapper_ts-->src_domain_project_project_ts
+src_infrastructure_content_project_mapper_ts-->src_domain_shared_locale_ts
+src_infrastructure_content_project_mapper_ts-->src_infrastructure_content_schemas_ts
+src_infrastructure_content_schemas_ts-->src_domain_project_capability_ts
+src_infrastructure_content_schemas_ts-->src_domain_project_project_ts
+src_infrastructure_content_schemas_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_zod_js
 src_infrastructure_system_system_clock_ts-->src_application_ports_clock_ts
-src_domain_shared_locale_ts-->src_domain_shared_result_ts
+src_content_config_ts-->src_infrastructure_content_schemas_ts
+src_content_config_ts-->astro:content
+src_content_config_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_content_loaders_index_js
 src_pages_api_health_ts-->src_composition_container_ts
 src_pages_api_health_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js

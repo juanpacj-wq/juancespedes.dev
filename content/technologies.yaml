@@ -1,0 +1,54 @@
+# Technology catalog. Projects reference these names in `stack`; a name that is not here
+# fails the content tests, which keeps spelling consistent across the site.
+# capability: frontend | backend | data-bi | automation-ai | infrastructure | legacy-systems
+
+# Frontend
+- { id: react, name: React, capability: frontend }
+- { id: nextjs, name: Next.js, capability: frontend }
+- { id: astro, name: Astro, capability: frontend }
+- { id: typescript, name: TypeScript, capability: frontend }
+- { id: tailwind-css, name: Tailwind CSS, capability: frontend }
+- { id: wordpress, name: WordPress, capability: frontend }
+- { id: vite, name: Vite, capability: frontend }
+- { id: accessibility, name: WCAG 2.2, capability: frontend }
+
+# Backend
+- { id: nodejs, name: Node.js, capability: backend }
+- { id: express, name: Express, capability: backend }
+- { id: websockets, name: WebSockets, capability: backend }
+- { id: php, name: PHP, capability: backend }
+- { id: python, name: Python, capability: backend }
+- { id: rest-apis, name: REST APIs, capability: backend }
+- { id: entra-id, name: Microsoft Entra ID, capability: backend }
+
+# Data and BI
+- { id: sql-server, name: SQL Server, capability: data-bi }
+- { id: postgresql, name: PostgreSQL, capability: data-bi }
+- { id: oracle, name: Oracle, capability: data-bi }
+- { id: mongodb, name: MongoDB, capability: data-bi }
+- { id: sqlite, name: SQLite, capability: data-bi }
+- { id: power-bi, name: Power BI, capability: data-bi }
+- { id: microsoft-fabric, name: Microsoft Fabric, capability: data-bi }
+- { id: excel, name: Excel, capability: data-bi }
+- { id: modbus-tcp, name: Modbus TCP, capability: data-bi }
+
+# Automation and AI
+- { id: mcp, name: Model Context Protocol, capability: automation-ai }
+- { id: playwright, name: Playwright, capability: automation-ai }
+- { id: airflow, name: Apache Airflow, capability: automation-ai }
+- { id: selenium, name: Selenium, capability: automation-ai }
+- { id: microsoft-graph, name: Microsoft Graph, capability: automation-ai }
+- { id: llm-integration, name: LLM integration, capability: automation-ai }
+
+# Infrastructure
+- { id: linux, name: Linux, capability: infrastructure }
+- { id: nginx, name: nginx, capability: infrastructure }
+- { id: systemd, name: systemd, capability: infrastructure }
+- { id: docker, name: Docker, capability: infrastructure }
+- { id: github-actions, name: GitHub Actions, capability: infrastructure }
+- { id: cloudflare-workers, name: Cloudflare Workers, capability: infrastructure }
+- { id: azure, name: Azure, capability: infrastructure }
+
+# Legacy systems
+- { id: legacy-rescue, name: Legacy code rescue, capability: legacy-systems }
+- { id: incident-forensics, name: Incident forensics, capability: legacy-systems }
