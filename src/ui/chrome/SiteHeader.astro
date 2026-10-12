@@ -1,0 +1,45 @@
+---
+import type { Dictionary } from '../i18n/dictionary';
+import Container from '../primitives/Container.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+export interface NavItem {
+  readonly href: string;
+  readonly label: string;
+}
+
+interface Props {
+  t: Dictionary;
+  homeHref: string;
+  navItems?: readonly NavItem[] | undefined;
+}
+
+const { t, homeHref, navItems = [] } = Astro.props;
+---
+
+<header class="sticky top-0 z-40 border-b border-line/60 bg-canvas/80 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70">
+  <Container class="flex h-16 items-center justify-between gap-4">
+    <a
+      href={homeHref}
+      class="font-mono text-small font-medium tracking-tight text-ink transition-colors hover:text-accent-ink"
+    >
+      juancespedes<span class="text-accent-ink">.dev</span>
+    </a>
+    <div class="flex items-center gap-1 sm:gap-4">
+      {navItems.length > 0 && (
+        <nav aria-label={t.a11y.mainNavigation} class="hidden md:block">
+          <ul class="flex items-center gap-6 text-small text-muted">
+            {navItems.map((item) => (
+              <li>
+                <a href={item.href} class="transition-colors hover:text-ink">
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+      <ThemeToggle toLightLabel={t.theme.toLight} toDarkLabel={t.theme.toDark} />
+    </div>
+  </Container>
+</header>

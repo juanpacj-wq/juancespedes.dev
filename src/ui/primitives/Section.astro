@@ -1,0 +1,44 @@
+---
+import Container from './Container.astro';
+
+/**
+ * A titled page section. The eyebrow is a short mono label ("01 / Proyectos") and the heading
+ * level is configurable so the page outline stays correct wherever the section is used.
+ */
+interface Props {
+  id: string;
+  eyebrow?: string;
+  title: string;
+  level?: 2 | 3;
+  class?: string;
+}
+
+const { id, eyebrow, title, level = 2, class: className } = Astro.props;
+const Heading = `h${String(level)}` as 'h2' | 'h3';
+const headingId = `${id}-title`;
+---
+
+<section
+  id={id}
+  aria-labelledby={headingId}
+  class:list={['scroll-mt-24 py-16 sm:py-24', className]}
+>
+  <Container>
+    <header class="mb-10 max-w-3xl">
+      {eyebrow && (
+        <p class="mb-3 font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
+          {eyebrow}
+        </p>
+      )}
+      <Heading id={headingId} class="text-heading font-semibold text-balance">
+        {title}
+      </Heading>
+      {Astro.slots.has('description') && (
+        <div class="text-lead mt-4 text-muted">
+          <slot name="description" />
+        </div>
+      )}
+    </header>
+    <slot />
+  </Container>
+</section>

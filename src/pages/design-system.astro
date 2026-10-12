@@ -1,0 +1,176 @@
+---
+/*
+ * Living reference of the design system: every token and primitive, rendered with the real
+ * components in the current theme. Not indexed by search engines; linked from the README.
+ * The e2e suite runs axe on this page in both themes.
+ */
+import Icon from '../ui/icons/Icon.astro';
+import { ICONS, type IconName } from '../ui/icons/icons';
+import BaseLayout from '../ui/layouts/BaseLayout.astro';
+import Badge from '../ui/primitives/Badge.astro';
+import Button from '../ui/primitives/Button.astro';
+import Card from '../ui/primitives/Card.astro';
+import Portrait from '../ui/primitives/Portrait.astro';
+import Section from '../ui/primitives/Section.astro';
+import Stat from '../ui/primitives/Stat.astro';
+import Tag from '../ui/primitives/Tag.astro';
+import TextLink from '../ui/primitives/TextLink.astro';
+
+const surfaces = ['canvas', 'surface', 'surface-raised', 'line', 'line-strong'] as const;
+const inks = ['ink', 'muted', 'subtle', 'accent-ink', 'accent', 'success'] as const;
+
+const swatchClass: Record<(typeof surfaces)[number] | (typeof inks)[number], string> = {
+  canvas: 'bg-canvas',
+  surface: 'bg-surface',
+  'surface-raised': 'bg-surface-raised',
+  line: 'bg-line',
+  'line-strong': 'bg-line-strong',
+  ink: 'bg-ink',
+  muted: 'bg-muted',
+  subtle: 'bg-subtle',
+  'accent-ink': 'bg-accent-ink',
+  accent: 'bg-accent',
+  success: 'bg-success',
+};
+
+const typeScale = [
+  ['text-display', 'Display', 'text-display font-semibold'],
+  ['text-heading', 'Heading', 'text-heading font-semibold'],
+  ['text-title', 'Title', 'text-title font-medium'],
+  ['text-lead', 'Lead paragraph', 'text-lead'],
+  ['text-body', 'Body text for long reading', 'text-body'],
+  ['text-small', 'Small text and controls', 'text-small'],
+  ['text-eyebrow', 'EYEBROW LABEL', 'text-eyebrow font-mono uppercase tracking-widest'],
+] as const;
+
+const iconNames = Object.keys(ICONS) as IconName[];
+---
+
+<BaseLayout
+  title="Design system | juancespedes.dev"
+  description="Tokens and components of juancespedes.dev, rendered live in the current theme."
+  locale="en"
+  noindex
+>
+  <Section id="intro" eyebrow="Reference" title="Design system">
+    <p slot="description">
+      Tokens live in <code class="font-mono text-ink">src/ui/styles/global.css</code>; components in{' '}
+      <code class="font-mono text-ink">src/ui/primitives</code>. Switch the theme in the header to
+      see both. Contrast pairs are verified by an automated test.
+    </p>
+  </Section>
+
+  <Section id="color" eyebrow="01 / Color" title="Color tokens" level={2}>
+    <div class="grid gap-8 md:grid-cols-2">
+      {[
+        ['Surfaces and lines', surfaces],
+        ['Text and accents', inks],
+      ].map(([heading, names]) => (
+        <div>
+          <h3 class="mb-4 text-title font-medium">{heading as string}</h3>
+          <ul class="grid gap-3">
+            {(names as readonly (keyof typeof swatchClass)[]).map((name) => (
+              <li class="flex items-center gap-4">
+                <span
+                  class:list={[
+                    'size-12 shrink-0 rounded-control border border-line',
+                    swatchClass[name],
+                  ]}
+                />
+                <code class="font-mono text-small text-muted">--color-{name}</code>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </Section>
+
+  <Section id="type" eyebrow="02 / Type" title="Type scale">
+    <ul class="grid gap-6">
+      {typeScale.map(([token, sample, classes]) => (
+        <li class="grid gap-2 border-b border-line pb-6 md:grid-cols-[10rem_1fr] md:items-baseline">
+          <code class="font-mono text-small text-subtle">{token}</code>
+          <span class:list={[classes, 'text-balance']}>{sample}</span>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section id="actions" eyebrow="03 / Actions" title="Buttons and links">
+    <div class="flex flex-wrap items-center gap-3">
+      <Button icon="arrow-right">Primary</Button>
+      <Button variant="secondary" icon="download">
+        Secondary
+      </Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button size="lg" icon="mail">
+        Large
+      </Button>
+      <Button disabled>Disabled</Button>
+    </div>
+    <p class="mt-6 max-w-prose text-muted">
+      Inline links look like <TextLink href="#actions">this internal link</TextLink> or like{' '}
+      <TextLink href="https://github.com/juanpacj-wq" external>
+        an external one
+      </TextLink>
+      .
+    </p>
+  </Section>
+
+  <Section id="labels" eyebrow="04 / Labels" title="Badges and tags">
+    <div class="flex flex-wrap items-center gap-3">
+      <Badge tone="success" status>
+        Available for projects
+      </Badge>
+      <Badge tone="accent">Case study</Badge>
+      <Badge>Draft</Badge>
+      <Tag>TypeScript</Tag>
+      <Tag>SQL Server</Tag>
+      <Tag>Power BI</Tag>
+    </div>
+  </Section>
+
+  <Section id="surfaces" eyebrow="05 / Surfaces" title="Cards and figures">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Card>
+        <Stat
+          value="1,400+"
+          label="automated tests in one system"
+          source="test suites"
+          sourceLabel="Source"
+        />
+      </Card>
+      <Card>
+        <Stat
+          value="2 s"
+          label="meter polling interval over Modbus TCP"
+          source="service config"
+          sourceLabel="Source"
+        />
+      </Card>
+      <Card interactive>
+        <h3 class="text-title font-medium">
+          <a href="#surfaces" class="after:absolute after:inset-0">
+            Interactive card
+          </a>
+        </h3>
+        <p class="mt-2 text-small text-muted">The whole card is the link target; hover lifts it.</p>
+      </Card>
+    </div>
+  </Section>
+
+  <Section id="media" eyebrow="06 / Media" title="Portrait and icons">
+    <div class="grid gap-10 md:grid-cols-[18rem_1fr]">
+      <Portrait alt="Portrait placeholder" initials="JC" />
+      <ul class="flex flex-wrap content-start gap-4">
+        {iconNames.map((name) => (
+          <li class="flex w-32 flex-col items-center gap-2 rounded-control border border-line p-3 text-center">
+            <Icon name={name} size={22} />
+            <code class="font-mono text-eyebrow text-subtle">{name}</code>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Section>
+</BaseLayout>

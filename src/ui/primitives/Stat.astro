@@ -1,0 +1,25 @@
+---
+/**
+ * A headline figure. The source is always printed: every number on the site can be traced.
+ * Values are passed already localized (e.g. "1.400+" in Spanish, "1,400+" in English).
+ */
+interface Props {
+  value: string;
+  label: string;
+  source: string;
+  sourceLabel: string;
+  class?: string;
+}
+
+const { value, label, source, sourceLabel, class: className } = Astro.props;
+---
+
+<figure class:list={['flex h-full flex-col gap-3', className]}>
+  <p class="font-mono text-heading font-medium tracking-tight text-ink">{value}</p>
+  <figcaption class="flex flex-1 flex-col justify-between gap-4">
+    <span class="text-small text-muted">{label}</span>
+    <span class="font-mono text-eyebrow text-subtle">
+      {sourceLabel}: {source}
+    </span>
+  </figcaption>
+</figure>

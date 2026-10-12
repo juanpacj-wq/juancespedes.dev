@@ -1,0 +1,36 @@
+---
+import Icon from '../icons/Icon.astro';
+
+/** Inline link with a visible underline. External links get an arrow and a screen-reader note. */
+interface Props {
+  href: string;
+  external?: boolean;
+  externalLabel?: string;
+  class?: string;
+}
+
+const {
+  href,
+  external = false,
+  externalLabel = '(opens in a new tab)',
+  class: className,
+} = Astro.props;
+---
+
+<a
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+  class:list={[
+    'inline-flex items-center gap-1 underline decoration-line-strong underline-offset-4 transition-colors duration-150 hover:text-accent-ink hover:decoration-accent-ink',
+    className,
+  ]}
+>
+  <slot />
+  {external && (
+    <>
+      <Icon name="arrow-up-right" size={14} />
+      <span class="sr-only">{externalLabel}</span>
+    </>
+  )}
+</a>

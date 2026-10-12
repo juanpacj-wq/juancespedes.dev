@@ -1,0 +1,17 @@
+---
+/** Technology chip. Always text, never an icon alone: reviewers must read the name. */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span
+  class:list={[
+    'inline-flex items-center rounded-chip bg-surface-raised px-2.5 py-0.5 font-mono text-eyebrow text-muted',
+    className,
+  ]}
+>
+  <slot />
+</span>
