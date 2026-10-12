@@ -1,0 +1,35 @@
+---
+import { ICONS, type IconName } from './icons';
+
+/**
+ * Inline SVG icons drawn on a 24 px grid with a 1.75 stroke. Decorative by default
+ * (aria-hidden); pass `label` when the icon is the only content of a control.
+ */
+
+interface Props {
+  name: IconName;
+  size?: number;
+  label?: string;
+  class?: string;
+}
+
+const { name, size = 18, label, class: className } = Astro.props;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class:list={['shrink-0', className]}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+  set:html={ICONS[name]}
+/>

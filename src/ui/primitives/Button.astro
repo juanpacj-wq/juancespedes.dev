@@ -1,0 +1,69 @@
+---
+import Icon from '../icons/Icon.astro';
+import type { IconName } from '../icons/icons';
+
+/**
+ * One component for actions and navigations: renders <a> when it has an href, <button>
+ * otherwise. External links open in a new tab and say so to screen readers.
+ */
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'md' | 'lg';
+  icon?: IconName;
+  external?: boolean;
+  externalLabel?: string;
+  type?: 'button' | 'submit';
+  download?: boolean;
+  disabled?: boolean;
+  class?: string;
+  [key: `data-${string}`]: string;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  external = false,
+  externalLabel = '(opens in a new tab)',
+  type = 'button',
+  download = false,
+  disabled = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const classes = [
+  'inline-flex items-center justify-center gap-2 rounded-control font-medium whitespace-nowrap',
+  'transition-[background-color,border-color,color,transform] duration-150 ease-out',
+  'active:translate-y-px disabled:pointer-events-none disabled:opacity-50',
+  size === 'md' ? 'min-h-11 px-4 text-small' : 'min-h-12 px-5 text-body',
+  {
+    primary: 'bg-accent text-on-accent hover:brightness-110',
+    secondary: 'border border-line-strong bg-surface text-ink hover:border-ink',
+    ghost: 'text-ink hover:bg-surface-raised',
+  }[variant],
+  className,
+];
+---
+
+{href ? (
+  <a
+    href={href}
+    class:list={classes}
+    target={external ? '_blank' : undefined}
+    rel={external ? 'noopener noreferrer' : undefined}
+    download={download || undefined}
+    {...rest}
+  >
+    <slot />
+    {icon && <Icon name={icon} size={size === 'md' ? 16 : 18} />}
+    {external && <span class="sr-only">{externalLabel}</span>}
+  </a>
+) : (
+  <button type={type} class:list={classes} disabled={disabled} {...rest}>
+    <slot />
+    {icon && <Icon name={icon} size={size === 'md' ? 16 : 18} />}
+  </button>
+)}

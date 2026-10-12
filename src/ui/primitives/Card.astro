@@ -1,0 +1,26 @@
+---
+/**
+ * Bordered surface. `interactive` adds hover elevation for cards that are entirely a link;
+ * the link itself goes inside the slot so the accessible name stays meaningful.
+ */
+interface Props {
+  as?: 'div' | 'article' | 'li';
+  interactive?: boolean;
+  padding?: 'md' | 'lg';
+  class?: string;
+}
+
+const { as: Tag = 'div', interactive = false, padding = 'md', class: className } = Astro.props;
+---
+
+<Tag
+  class:list={[
+    'relative rounded-card border border-line bg-surface',
+    padding === 'md' ? 'p-5 sm:p-6' : 'p-6 sm:p-8',
+    interactive &&
+      'transition-[border-color,box-shadow,transform] duration-250 ease-out hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift focus-within:border-line-strong',
+    className,
+  ]}
+>
+  <slot />
+</Tag>

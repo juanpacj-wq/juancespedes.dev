@@ -1,0 +1,33 @@
+---
+/**
+ * Small mono label. `status` adds a dot (pulsing unless the visitor prefers reduced motion);
+ * the dot is decorative, so the text must carry the meaning on its own.
+ */
+interface Props {
+  tone?: 'neutral' | 'accent' | 'success';
+  status?: boolean;
+  class?: string;
+}
+
+const { tone = 'neutral', status = false, class: className } = Astro.props;
+---
+
+<span
+  class:list={[
+    'inline-flex w-fit items-center gap-2 rounded-chip border px-3 py-1 font-mono text-eyebrow',
+    {
+      neutral: 'border-line-strong text-muted',
+      accent: 'border-accent-ink/40 text-accent-ink',
+      success: 'border-success/40 text-ink',
+    }[tone],
+    className,
+  ]}
+>
+  {status && (
+    <span class="relative flex size-2" aria-hidden="true">
+      <span class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
+      <span class="relative inline-flex size-2 rounded-full bg-success" />
+    </span>
+  )}
+  <slot />
+</span>
