@@ -17,7 +17,7 @@ jobs:
     name: Format, lint, types, architecture
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v5
         with:
@@ -33,7 +33,7 @@ jobs:
     name: Unit tests and coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v5
         with:
@@ -50,7 +50,7 @@ jobs:
     name: End-to-end and accessibility
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v5
         with:
@@ -73,7 +73,7 @@ jobs:
     name: Lighthouse budgets
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v5
         with:
@@ -97,7 +97,7 @@ jobs:
       # gitleaks lists the pull request's commits to scan only what changed.
       pull-requests: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: pnpm/action-setup@v6
