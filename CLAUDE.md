@@ -22,7 +22,8 @@ MDX content collections, Cloudflare Workers via `@astrojs/cloudflare`. pnpm, Nod
 - Level: N2 with N3 frontend (`docs/nfr.md`). Apply the personal skills `frontend-produccion`,
   `backend-produccion`, `infra-entrega`, `observabilidad-confiabilidad`, `calidad-pruebas`,
   `privacidad-cumplimiento` and `funcionalidades-base` for the layer being touched.
-- Definition of done: `docs/definition-of-done.md`.
+- Definition of done: `docs/definition-of-done.md`. Design system: `docs/design-system.md`
+  (tokens only, enforced by `pnpm lint`; contrast checked by tests).
 - Code, docs and commit messages in English; site content in Spanish (es-CO, tuteo) and English.
 - Never write the em dash character in any text.
 - Commits: Conventional Commits, author `juanpacj-wq` only, no co-author trailers, no AI

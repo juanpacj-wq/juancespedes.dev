@@ -13,5 +13,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0006](0006-tailwind-on-design-tokens.md)  | Tailwind CSS v4 on top of design tokens                        | Accepted |
 | [0007](0007-testing-strategy.md)           | Testing strategy and quality gates                             | Accepted |
 | [0008](0008-content-validation-layers.md)  | Content validation in three layers, technology catalog, drafts | Accepted |
+| [0009](0009-theming-and-design-tokens.md)  | Theming with light-dark() tokens, enforced in CI               | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.
