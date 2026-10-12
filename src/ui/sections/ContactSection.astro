@@ -1,0 +1,43 @@
+---
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+
+import type { Locale } from '../../domain/shared/locale';
+import type { Dictionary } from '../i18n/dictionary';
+import ContactForm from '../islands/ContactForm';
+import Card from '../primitives/Card.astro';
+import Section from '../primitives/Section.astro';
+import TextLink from '../primitives/TextLink.astro';
+
+interface Props {
+  t: Dictionary;
+  locale: Locale;
+  email: string;
+  privacyHref: string;
+}
+
+const { t, locale, email, privacyHref } = Astro.props;
+---
+
+<Section id="contact" eyebrow={t.contact.eyebrow} title={t.contact.title}>
+  <p slot="description">{t.contact.description}</p>
+  <div class="grid gap-8 lg:grid-cols-[1fr_18rem]">
+    <Card padding="lg">
+      <ContactForm
+        client:visible
+        locale={locale}
+        endpoint="/api/contact"
+        siteKey={PUBLIC_TURNSTILE_SITE_KEY}
+        privacyHref={privacyHref}
+        text={t.form}
+      />
+    </Card>
+    <aside class="flex flex-col gap-2">
+      <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+        {t.contact.emailLabel}
+      </p>
+      <TextLink href={`mailto:${email}`} class="text-body break-words">
+        {email}
+      </TextLink>
+    </aside>
+  </div>
+</Section>

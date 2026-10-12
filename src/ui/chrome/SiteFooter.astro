@@ -6,9 +6,10 @@ import TextLink from '../primitives/TextLink.astro';
 interface Props {
   t: Dictionary;
   repositoryUrl: string;
+  privacyHref: string;
 }
 
-const { t, repositoryUrl } = Astro.props;
+const { t, repositoryUrl, privacyHref } = Astro.props;
 ---
 
 <footer class="border-t border-line py-10">
@@ -18,6 +19,8 @@ const { t, repositoryUrl } = Astro.props;
       <TextLink href={repositoryUrl} external externalLabel={t.a11y.external}>
         {t.footer.sourceCode}
       </TextLink>
+      {' · '}
+      <TextLink href={privacyHref}>{t.footer.privacy}</TextLink>
     </p>
     <p class="text-small text-subtle">{t.footer.rights}</p>
   </Container>

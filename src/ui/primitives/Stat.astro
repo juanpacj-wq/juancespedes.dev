@@ -8,16 +8,24 @@ interface Props {
   label: string;
   source: string;
   sourceLabel: string;
+  size?: 'md' | 'lg';
   class?: string;
 }
 
-const { value, label, source, sourceLabel, class: className } = Astro.props;
+const { value, label, source, sourceLabel, size = 'md', class: className } = Astro.props;
 ---
 
 <figure class:list={['flex h-full flex-col gap-3', className]}>
-  <p class="font-mono text-heading font-medium tracking-tight text-ink">{value}</p>
+  <p
+    class:list={[
+      'font-mono font-medium tracking-tight text-ink',
+      size === 'lg' ? 'text-display' : 'text-heading',
+    ]}
+  >
+    {value}
+  </p>
   <figcaption class="flex flex-1 flex-col justify-between gap-4">
-    <span class="text-small text-muted">{label}</span>
+    <span class:list={[size === 'lg' ? 'text-lead' : 'text-small', 'text-muted']}>{label}</span>
     <span class="font-mono text-eyebrow text-subtle">
       {sourceLabel}: {source}
     </span>

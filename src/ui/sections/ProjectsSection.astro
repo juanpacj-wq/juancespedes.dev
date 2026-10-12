@@ -1,0 +1,145 @@
+---
+import { CAPABILITIES, type Capability } from '../../domain/project/capability';
+import type { Project } from '../../domain/project/project';
+import type { Dictionary } from '../i18n/dictionary';
+import { formatYears } from '../i18n/format';
+import Badge from '../primitives/Badge.astro';
+import Section from '../primitives/Section.astro';
+import Tag from '../primitives/Tag.astro';
+
+/**
+ * Projects as an editorial list, filterable by capability. Without JavaScript every project is
+ * listed and the filter stays hidden; the script only enhances.
+ */
+interface Props {
+  t: Dictionary;
+  projects: readonly Project[];
+}
+
+const { t, projects } = Astro.props;
+const present = new Set<Capability>(projects.flatMap((project) => project.capabilities));
+const filters = CAPABILITIES.filter((capability) => present.has(capability));
+const countText = (count: number) =>
+  count === 1 ? t.projects.countOne : t.projects.count.replace('{count}', String(count));
+---
+
+<Section id="projects" eyebrow={t.projects.eyebrow} title={t.projects.title}>
+  <p slot="description">{t.projects.description}</p>
+
+  {projects.length === 0 ? (
+    <p class="rounded-card border border-dashed border-line-strong p-8 text-muted">
+      {t.projects.empty}
+    </p>
+  ) : (
+    <div data-project-filter>
+      <div
+        role="group"
+        aria-label={t.projects.filterLabel}
+        class="mb-6 flex flex-wrap gap-2"
+        data-filter-controls
+        hidden
+      >
+        {[
+          { value: 'all', label: t.projects.filterAll },
+          ...filters.map((c) => ({ value: c, label: t.capabilityLabels[c] })),
+        ].map((option, index) => (
+          <button
+            type="button"
+            data-filter-value={option.value}
+            aria-pressed={index === 0 ? 'true' : 'false'}
+            class="min-h-11 rounded-chip border border-line-strong px-4 text-small text-muted transition-colors duration-150 hover:border-ink hover:text-ink aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <p
+        class="mb-4 font-mono text-eyebrow text-subtle"
+        aria-live="polite"
+        data-filter-status
+        data-template-many={t.projects.count}
+        data-template-one={t.projects.countOne}
+      >
+        {countText(projects.length)}
+      </p>
+
+      <ol class="border-t border-line">
+        {projects.map((project) => {
+          const highlight = project.metrics[0];
+          return (
+            <li
+              id={`project-${project.slug}`}
+              data-capabilities={project.capabilities.join(' ')}
+              class="grid scroll-mt-24 gap-4 border-b border-line py-8 md:grid-cols-[8rem_1fr_14rem] md:gap-8"
+            >
+              <p class="font-mono text-small text-subtle">{formatYears(project.period, t)}</p>
+              <div class="flex flex-col gap-3">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="text-title font-medium text-balance">{project.title}</h3>
+                  <Badge tone="accent">{t.kindLabels[project.kind]}</Badge>
+                  {project.confidentiality === 'anonymized' && (
+                    <Badge>{t.projects.anonymized}</Badge>
+                  )}
+                </div>
+                <p class="max-w-prose text-muted">{project.summary}</p>
+                <ul class="flex flex-wrap gap-1.5" aria-label={t.projects.stack}>
+                  {project.stack.map((name) => (
+                    <li>
+                      <Tag>{name}</Tag>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {highlight && (
+                <p class="flex flex-col gap-1 md:text-right">
+                  <span class="font-mono text-title text-ink">{highlight.value}</span>
+                  <span class="text-small text-muted">{highlight.label}</span>
+                </p>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+      <p class="py-8 text-muted" data-filter-empty hidden>
+        {t.projects.empty}
+      </p>
+    </div>
+  )}
+</Section>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-project-filter]')) {
+    const controls = root.querySelector<HTMLElement>('[data-filter-controls]');
+    const status = root.querySelector<HTMLElement>('[data-filter-status]');
+    const empty = root.querySelector<HTMLElement>('[data-filter-empty]');
+    const items = [...root.querySelectorAll<HTMLElement>('[data-capabilities]')];
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-filter-value]')];
+    if (!controls || !status || !empty) continue;
+
+    const apply = (value: string) => {
+      let visible = 0;
+      for (const item of items) {
+        const show =
+          value === 'all' || (item.dataset['capabilities'] ?? '').split(' ').includes(value);
+        item.hidden = !show;
+        if (show) visible += 1;
+      }
+      for (const button of buttons) {
+        button.setAttribute('aria-pressed', String(button.dataset['filterValue'] === value));
+      }
+      empty.hidden = visible > 0;
+      const many = status.dataset['templateMany'] ?? '{count}';
+      status.textContent =
+        visible === 1
+          ? (status.dataset['templateOne'] ?? '1')
+          : many.replace('{count}', String(visible));
+    };
+
+    for (const button of buttons) {
+      button.addEventListener('click', () => {
+        apply(button.dataset['filterValue'] ?? 'all');
+      });
+    }
+    controls.hidden = false;
+  }
+</script>

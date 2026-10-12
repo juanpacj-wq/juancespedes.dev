@@ -1,0 +1,64 @@
+---
+import type { ProcessStep, Service } from '../../domain/profile/profile';
+import type { Dictionary } from '../i18n/dictionary';
+import Button from '../primitives/Button.astro';
+import Card from '../primitives/Card.astro';
+import Section from '../primitives/Section.astro';
+
+interface Props {
+  t: Dictionary;
+  services: readonly Service[];
+  process: readonly ProcessStep[];
+  pricing: string;
+}
+
+const { t, services, process, pricing } = Astro.props;
+---
+
+<Section id="services" eyebrow={t.services.eyebrow} title={t.services.title}>
+  <p slot="description">{t.services.description}</p>
+
+  <ul class="grid gap-4 md:grid-cols-2">
+    {services.map((service) => (
+      <li>
+        <Card class="h-full" padding="lg">
+          <h3 class="text-title font-medium">{service.title}</h3>
+          <p class="mt-2 text-muted">{service.summary}</p>
+          <p class="mt-6 mb-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+            {t.services.deliverables}
+          </p>
+          <ul class="flex flex-col gap-2 text-small">
+            {service.deliverables.map((deliverable) => (
+              <li class="flex gap-2">
+                <span class="text-accent-ink" aria-hidden="true">
+                  +
+                </span>
+                {deliverable}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      </li>
+    ))}
+  </ul>
+
+  <h3 class="mt-16 mb-6 text-title font-medium">{t.services.processTitle}</h3>
+  <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    {process.map((step, index) => (
+      <li class="flex flex-col gap-2 border-t border-line-strong pt-4">
+        <span class="font-mono text-small text-accent-ink">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <span class="font-medium">{step.title}</span>
+        <span class="text-small text-muted">{step.description}</span>
+      </li>
+    ))}
+  </ol>
+
+  <div class="mt-12 flex flex-col items-start gap-4 rounded-card border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-ink">{pricing}</p>
+    <Button href="#contact" icon="arrow-right">
+      {t.services.cta}
+    </Button>
+  </div>
+</Section>

@@ -1,0 +1,61 @@
+---
+import type { Capability } from '../../domain/project/capability';
+import type { Dictionary } from '../i18n/dictionary';
+import Card from '../primitives/Card.astro';
+import Section from '../primitives/Section.astro';
+
+/** View model: what the section renders, shaped by the page from the skill-evidence use case. */
+export interface CapabilityEvidenceView {
+  readonly capability: Capability;
+  readonly technologies: readonly {
+    readonly name: string;
+    readonly projects: readonly { readonly slug: string; readonly title: string }[];
+  }[];
+}
+
+interface Props {
+  t: Dictionary;
+  matrix: readonly CapabilityEvidenceView[];
+}
+
+const { t, matrix } = Astro.props;
+const rows = matrix.filter((row) => row.technologies.length > 0);
+---
+
+{rows.length > 0 && (
+  <Section id="capabilities" eyebrow={t.capabilities.eyebrow} title={t.capabilities.title}>
+    <p slot="description">{t.capabilities.description}</p>
+    <ul class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {rows.map((row) => (
+        <li>
+          <Card class="h-full">
+            <h3 class="mb-4 font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
+              {t.capabilityLabels[row.capability]}
+            </h3>
+            <ul class="flex flex-col divide-y divide-line">
+              {row.technologies.map((technology) => (
+                <li class="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
+                  <span class="font-medium text-ink">{technology.name}</span>
+                  <span class="text-small text-muted">
+                    {t.capabilities.provenBy}{' '}
+                    {technology.projects.map((project, index) => (
+                      <>
+                        {index > 0 && ', '}
+                        <a
+                          href={`#project-${project.slug}`}
+                          class="underline decoration-line-strong underline-offset-4 hover:text-accent-ink hover:decoration-accent-ink"
+                        >
+                          {project.title}
+                        </a>
+                      </>
+                    ))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </li>
+      ))}
+    </ul>
+  </Section>
+)}
