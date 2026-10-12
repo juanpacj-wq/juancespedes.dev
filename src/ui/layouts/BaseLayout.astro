@@ -3,11 +3,14 @@ import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
 import '../styles/global.css';
 
+import { APP_VERSION } from 'astro:env/server';
+
 import { SUPPORTED_LOCALES, type Locale } from '../../domain/shared/locale';
 import { dictionaryFor } from '../i18n/dictionary';
 import { alternatesFor, ogImagePath, privacyPath, type PageRoute } from '../i18n/routes';
 import { toJsonLd, type JsonLd } from '../seo/structured-data';
 import { absoluteUrl, SITE } from '../site';
+import ErrorReporter from '../chrome/ErrorReporter.astro';
 import SiteFooter from '../chrome/SiteFooter.astro';
 import SiteHeader, { type NavItem } from '../chrome/SiteHeader.astro';
 
@@ -48,7 +51,7 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} data-release={APP_VERSION}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -110,5 +113,6 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
       <slot />
     </main>
     <SiteFooter t={t} repositoryUrl={SITE.repositoryUrl} privacyHref={privacyPath(locale)} />
+    <ErrorReporter />
   </body>
 </html>

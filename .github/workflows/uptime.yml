@@ -1,0 +1,76 @@
+name: Uptime
+
+# Availability monitor (ADR 0013). Every 15 minutes it checks the health endpoint and both home
+# pages from outside Cloudflare. A failure opens an issue labeled "uptime" (GitHub notifies the
+# owner by email); the first successful check after that closes it with the downtime noted.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check the site
+        id: probe
+        run: |
+          failures=""
+          check() {
+            local url="$1" expect="$2"
+            # Three attempts, so a single network blip does not page anyone.
+            for attempt in 1 2 3; do
+              body=$(curl --silent --show-error --max-time 15 --write-out '\n%{http_code}' "$url") && {
+                code=$(printf '%s' "$body" | tail -n1)
+                if [ "$code" = "200" ] && printf '%s' "$body" | grep -q "$expect"; then
+                  echo "ok $url"
+                  return 0
+                fi
+              }
+              sleep 10
+            done
+            failures="$failures $url"
+            echo "::error::$url did not answer 200 with the expected content"
+          }
+          check "https://juancespedes.dev/api/health" '"status":"ok"'
+          check "https://juancespedes.dev/" 'Juan Céspedes'
+          check "https://juancespedes.dev/en" 'Juan Céspedes'
+          echo "failures=${failures# }" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the incident issue
+        if: steps.probe.outputs.failures != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FAILURES: ${{ steps.probe.outputs.failures }}
+        run: |
+          gh label create uptime --repo "$GITHUB_REPOSITORY" --color B60205 \
+            --description "Site availability incidents" 2>/dev/null || true
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --label uptime --state open --json number --jq '.[0].number')
+          note="$(date -u +%Y-%m-%dT%H:%MZ): failing: $FAILURES ([run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))"
+          if [ -z "$open" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" --label uptime \
+              --title "Site down: juancespedes.dev" --body "$note"
+          else
+            gh issue comment "$open" --repo "$GITHUB_REPOSITORY" --body "$note"
+          fi
+          exit 1
+
+      - name: Close the incident issue after recovery
+        if: steps.probe.outputs.failures == ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --label uptime --state open --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            gh issue close "$open" --repo "$GITHUB_REPOSITORY" \
+              --comment "$(date -u +%Y-%m-%dT%H:%MZ): all checks pass again."
+          fi

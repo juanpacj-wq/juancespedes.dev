@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Dispatched on the release-please branch by the release workflow (ADR 0013).
+  workflow_dispatch:
   schedule:
     - cron: '23 6 * * 1'
 

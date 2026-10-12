@@ -27,5 +27,6 @@ declare module 'cloudflare:workers' {
   export const env: {
     readonly CONTACT_EMAIL: SendEmailBinding;
     readonly CONTACT_RATE_LIMITER: RateLimitBinding;
+    readonly CLIENT_ERROR_RATE_LIMITER: RateLimitBinding;
   };
 }
