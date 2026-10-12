@@ -18,8 +18,13 @@ const useClientIp = async (page: Page) => {
 /** The form is a hydrated island: interact only once React owns it. */
 const openContactForm = async (page: Page) => {
   await page.goto('/#contact');
+  // The form hydrates when it becomes visible (client:visible). Under load WebKit sometimes skips
+  // the jump to #contact while the page is still loading, so scroll to it like a reader would.
+  await page.locator('#contact form').scrollIntoViewIfNeeded();
   // Astro removes the `ssr` attribute from an island once it has hydrated.
-  await expect(page.locator('#contact astro-island')).not.toHaveAttribute('ssr');
+  await expect(page.locator('#contact astro-island')).not.toHaveAttribute('ssr', {
+    timeout: 15_000,
+  });
   return page.locator('#contact form');
 };
 
