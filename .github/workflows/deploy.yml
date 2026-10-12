@@ -19,7 +19,8 @@ concurrency:
 
 jobs:
   deploy:
-    if: vars.CLOUDFLARE_DEPLOY_ENABLED == 'true'
+    # Dependabot runs get no repository secrets by design, so they cannot upload a preview.
+    if: vars.CLOUDFLARE_DEPLOY_ENABLED == 'true' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     environment: ${{ github.event_name == 'push' && 'production' || 'preview' }}
     steps:
