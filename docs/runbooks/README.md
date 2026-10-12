@@ -2,9 +2,10 @@
 
 Step-by-step procedures for known operational situations.
 
-| Runbook                | When                                                     |
-| ---------------------- | -------------------------------------------------------- |
-| [deploy.md](deploy.md) | First-time Cloudflare setup, normal deploys and rollback |
+| Runbook                            | When                                                     |
+| ---------------------------------- | -------------------------------------------------------- |
+| [deploy.md](deploy.md)             | First-time Cloudflare setup, normal deploys and rollback |
+| [contact-form.md](contact-form.md) | Contact messages fail or stop arriving                   |
 
 ## Template
 

@@ -12,8 +12,8 @@ Portfolio of **Juan Céspedes**, systems engineer in Barranquilla, Colombia: ful
 data and automation. Built in public: the repository is part of the portfolio, so the architecture,
 decisions and quality checks are meant to be read.
 
-> Status: **phase F2 (design system) done, deployed**. The home page is a placeholder until the
-> sections arrive in F3. Live design reference: [/design-system](https://juancespedes.dev/design-system)
+> Status: **phase F3 (home page and contact form) done, deployed**. Case study pages arrive in F4.
+> Live design reference: [/design-system](https://juancespedes.dev/design-system)
 > ([docs](docs/design-system.md)).
 
 ## Architecture at a glance
@@ -53,6 +53,7 @@ Imports may only point inward. Two independent tools check it on every pull requ
 | [0007](docs/adr/0007-testing-strategy.md)           | Testing strategy and quality gates                                        |
 | [0008](docs/adr/0008-content-validation-layers.md)  | Content validated in three layers: schema, domain rules, cross-file tests |
 | [0009](docs/adr/0009-theming-and-design-tokens.md)  | Theming with light-dark() tokens; raw colors rejected in CI               |
+| [0010](docs/adr/0010-contact-form-delivery.md)      | Contact form on Email Routing and Turnstile; fails closed; stores nothing |
 
 ## Quality gates
 
@@ -70,6 +71,7 @@ Every pull request must pass all of them ([ADR 0007](docs/adr/0007-testing-strat
 | End-to-end    | Playwright on Chromium, WebKit and mobile, against the production build on workerd | All pass                                                 |
 | Accessibility | axe-core                                                                           | 0 WCAG 2.2 AA violations                                 |
 | Performance   | Lighthouse CI                                                                      | ≥ 95 performance, best practices, SEO; 100 accessibility |
+| JavaScript    | Bundle budget script (gzip)                                                        | ≤ 75 kB total; islands hydrate on visibility             |
 | Security      | pnpm audit, gitleaks, CodeQL, Dependabot                                           | No high-severity findings                                |
 
 ## Run it locally
@@ -128,8 +130,8 @@ docs/
 | F0    | Foundations: tooling, CI, ADRs, health endpoint, deploy pipeline | Done    |
 | F1    | Domain model and typed project content                           | Done    |
 | F2    | Design system and layout                                         | Done    |
-| F3    | Home page sections and contact form                              | Next    |
-| F4    | Case studies                                                     | Planned |
+| F3    | Home page sections and contact form                              | Done    |
+| F4    | Case studies                                                     | Next    |
 | F5    | English version and SEO                                          | Planned |
 | F6    | Launch v1.0 on juancespedes.dev                                  | Planned |
 | F7    | Command palette, "Ask me" chat, notes                            | Planned |
