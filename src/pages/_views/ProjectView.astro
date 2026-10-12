@@ -1,0 +1,59 @@
+---
+import { container } from '../../composition/container';
+import type { Locale } from '../../domain/shared/locale';
+import { dictionaryFor } from '../../ui/i18n/dictionary';
+import {
+  homePath,
+  homeSectionPath,
+  ogImagePath,
+  projectPath,
+  projectsListPath,
+} from '../../ui/i18n/routes';
+import BaseLayout from '../../ui/layouts/BaseLayout.astro';
+import ProjectArticle from '../../ui/project/ProjectArticle.astro';
+import { projectGraph } from '../../ui/seo/structured-data';
+
+/** A project page in one language; the route files under src/pages render it. */
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+
+const { locale, slug } = Astro.props;
+const t = dictionaryFor(locale);
+const page = await container.getProjectPage(locale, slug);
+// getStaticPaths only lists visible projects, so this means the content changed mid-build.
+if (!page.ok) throw new Error(`Project "${slug}" is not published in "${locale}"`);
+const { project, previous, next } = page.value;
+const route = { page: 'project', slug } as const;
+
+const navItems = [
+  { href: homeSectionPath(locale, 'projects'), label: t.nav.projects },
+  { href: homeSectionPath(locale, 'capabilities'), label: t.nav.skills },
+  { href: homeSectionPath(locale, 'services'), label: t.nav.services },
+  { href: homeSectionPath(locale, 'contact'), label: t.nav.contact },
+];
+
+const jsonLd = projectGraph({
+  project,
+  authorName: t.profile.name,
+  url: projectPath(locale, slug),
+  image: ogImagePath(locale, route),
+  homeName: t.nav.home,
+  homeUrl: homePath(locale),
+  projectsName: t.nav.projects,
+  projectsUrl: projectsListPath(locale),
+});
+---
+
+<BaseLayout
+  title={`${project.title} | ${t.meta.siteName}`}
+  description={project.summary}
+  locale={locale}
+  route={route}
+  navItems={navItems}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <ProjectArticle t={t} project={project} previous={previous} next={next} />
+</BaseLayout>

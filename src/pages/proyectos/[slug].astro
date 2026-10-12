@@ -1,37 +1,14 @@
 ---
 import { container } from '../../composition/container';
-import { DEFAULT_LOCALE } from '../../domain/shared/locale';
-import { dictionaryFor } from '../../ui/i18n/dictionary';
-import BaseLayout from '../../ui/layouts/BaseLayout.astro';
-import ProjectArticle from '../../ui/project/ProjectArticle.astro';
+import ProjectView from '../_views/ProjectView.astro';
 
-/** One page per published project, generated at build time. */
+/** One page per published project, generated at build time. English: /en/projects/<slug>. */
 export async function getStaticPaths() {
-  const projects = await container.listProjects(DEFAULT_LOCALE);
+  const projects = await container.listProjects('es');
   return projects.map((project) => ({ params: { slug: project.slug } }));
 }
 
-const locale = DEFAULT_LOCALE;
-const t = dictionaryFor(locale);
 const { slug } = Astro.params;
-const page = await container.getProjectPage(locale, slug);
-// getStaticPaths only lists visible projects, so this means the content changed mid-build.
-if (!page.ok) throw new Error(`Project "${slug}" is not published in "${locale}"`);
-const { project, previous, next } = page.value;
-
-const navItems = [
-  { href: '/#projects', label: t.nav.projects },
-  { href: '/#capabilities', label: t.nav.skills },
-  { href: '/#services', label: t.nav.services },
-  { href: '/#contact', label: t.nav.contact },
-];
 ---
 
-<BaseLayout
-  title={`${project.title} | ${t.meta.siteName}`}
-  description={project.summary}
-  locale={locale}
-  navItems={navItems}
->
-  <ProjectArticle t={t} project={project} previous={previous} next={next} />
-</BaseLayout>
+<ProjectView locale="es" slug={slug} />

@@ -1,28 +1,46 @@
 ---
-import { DEFAULT_LOCALE } from '../domain/shared/locale';
+import { SUPPORTED_LOCALES } from '../domain/shared/locale';
 import { dictionaryFor } from '../ui/i18n/dictionary';
 import { homePath } from '../ui/i18n/routes';
 import BaseLayout from '../ui/layouts/BaseLayout.astro';
 import Button from '../ui/primitives/Button.astro';
 import Container from '../ui/primitives/Container.astro';
 
-const t = dictionaryFor(DEFAULT_LOCALE);
+/*
+ * One static page answers every unknown address, so it cannot know the reader's language: it
+ * speaks both, Spanish first. Each block declares its language for screen readers.
+ */
+const es = dictionaryFor('es');
 ---
 
 <BaseLayout
-  title={`${t.notFound.title} | ${t.meta.siteName}`}
-  description={t.notFound.description}
-  locale={DEFAULT_LOCALE}
+  title={`${es.notFound.title} | ${es.meta.siteName}`}
+  description={es.notFound.description}
+  locale="es"
   noindex
 >
-  <Container class="flex max-w-3xl flex-col gap-6 py-24 sm:py-32">
-    <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
-      {t.notFound.eyebrow}
-    </p>
-    <h1 class="text-heading font-semibold text-balance">{t.notFound.title}</h1>
-    <p class="text-lead text-muted">{t.notFound.description}</p>
-    <Button href={homePath(DEFAULT_LOCALE)} icon="arrow-right" size="lg" class="w-fit">
-      {t.notFound.back}
-    </Button>
+  <Container class="flex max-w-3xl flex-col gap-16 py-24 sm:py-32">
+    {SUPPORTED_LOCALES.map((locale, index) => {
+      const t = dictionaryFor(locale);
+      const Heading = index === 0 ? 'h1' : 'h2';
+      return (
+        <section lang={locale} class="flex flex-col gap-6">
+          <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
+            {t.notFound.eyebrow}
+          </p>
+          <Heading class="text-heading font-semibold text-balance">{t.notFound.title}</Heading>
+          <p class="text-lead text-muted">{t.notFound.description}</p>
+          <Button
+            href={homePath(locale)}
+            icon="arrow-right"
+            size="lg"
+            variant={index === 0 ? 'primary' : 'secondary'}
+            class="w-fit"
+          >
+            {t.notFound.back}
+          </Button>
+        </section>
+      );
+    })}
   </Container>
 </BaseLayout>

@@ -68,6 +68,9 @@ people are checked against a private denylist: `.content-denylist` locally (git-
 
 ## 4. Publish it
 
+A published project gets two pages, `/proyectos/<slug>` and `/en/projects/<slug>`, an Open
+Graph card per language and its place in `sitemap.xml`, all without touching code.
+
 Set `status: published` (and `featured: true` plus `order` if it belongs on the home page).
 `pnpm test` refuses a published project that still contains `TODO`.
 
@@ -77,5 +80,6 @@ Set `status: published` (and `featured: true` plus `order` if it belongs on the 
 | -------------------- | ------------------------------------------------------------------------ |
 | `astro sync` / build | Zod shape of each file plus the domain rules (`validateProjectContent`)  |
 | `pnpm test`          | Translation parity, catalog references, TODO on published, anonymization |
-| `pnpm test:e2e`      | Every project page renders the template; axe checks one in both themes   |
+| `pnpm test:e2e`      | Every project page renders the template in both languages, with hreflang |
+| `pnpm build`         | Generates the project's Open Graph cards and adds it to the sitemap      |
 | CI                   | All of the above on every pull request                                   |

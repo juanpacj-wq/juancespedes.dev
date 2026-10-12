@@ -7,6 +7,9 @@ const PAGES = [
   '/privacidad',
   '/proyectos/plant-telemetry',
   '/proyectos/no-existe',
+  '/en',
+  '/en/projects/plant-telemetry',
+  '/en/privacy',
 ] as const;
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 

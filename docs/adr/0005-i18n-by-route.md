@@ -1,6 +1,6 @@
 # 0005. Internationalization by route
 
-- Status: accepted
+- Status: accepted; URL scheme refined by [0012](0012-bilingual-routes-and-seo.md)
 - Date: 2026-10-12
 
 ## Context

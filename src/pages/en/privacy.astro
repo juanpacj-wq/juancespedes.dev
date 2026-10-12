@@ -1,0 +1,71 @@
+---
+/*
+ * English version of the privacy notice (src/pages/privacidad.astro). Colombian Law 1581 of 2012
+ * governs it in both languages; the two texts must say the same thing.
+ */
+import BaseLayout from '../../ui/layouts/BaseLayout.astro';
+import Container from '../../ui/primitives/Container.astro';
+import { homeSectionPath } from '../../ui/i18n/routes';
+import TextLink from '../../ui/primitives/TextLink.astro';
+import { SITE } from '../../ui/site';
+
+const EMAIL = SITE.email;
+const UPDATED = 'October 12, 2026';
+---
+
+<BaseLayout
+  title="Privacy notice | Juan Céspedes"
+  description="How I handle the data you send through the contact form on juancespedes.dev."
+  locale="en"
+  route={{ page: 'privacy' }}
+>
+  <Container class="max-w-3xl py-16 sm:py-24">
+    <article class="flex flex-col gap-6 text-muted [&_h2]:mt-6 [&_h2]:text-title [&_h2]:font-medium [&_h2]:text-ink">
+      <header class="flex flex-col gap-3">
+        <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">Privacy</p>
+        <h1 class="text-heading font-semibold text-ink">Privacy notice</h1>
+        <p class="font-mono text-small text-subtle">Last updated: {UPDATED}</p>
+      </header>
+
+      <h2>Data controller</h2>
+      <p>
+        Juan Pablo Céspedes, systems engineer, Barranquilla, Colombia. Email:{' '}
+        <TextLink href={`mailto:${EMAIL}`}>{EMAIL}</TextLink>.
+      </p>
+
+      <h2>What data I collect and why</h2>
+      <p>
+        Through the contact form I receive your name, your email address and the message you write.
+        I use them only to answer your request and, if we reach an agreement, to prepare the
+        proposal. I do not sell them, share them with third parties or use them for advertising.
+      </p>
+
+      <h2>How it is handled</h2>
+      <p>
+        The message is delivered to my inbox and is not stored in any database on this site. To
+        prevent spam, the form uses Cloudflare Turnstile, which checks that the sender is a person
+        without using advertising tracking cookies. The site uses cookieless analytics and does not
+        collect personal data from people who only visit it.
+      </p>
+
+      <h2>Your rights</h2>
+      <p>
+        Under Colombian Law 1581 of 2012, you can access, update and correct your data, request
+        proof of your consent, withdraw it, ask for your data to be deleted and file complaints with
+        the Superintendence of Industry and Commerce (SIC). To exercise any of these rights, write
+        to <TextLink href={`mailto:${EMAIL}`}>{EMAIL}</TextLink>. I answer inquiries within 10
+        business days and complaints within 15 business days.
+      </p>
+
+      <h2>Retention</h2>
+      <p>
+        I keep contact emails for as long as they are needed to handle your request or any
+        relationship that results from it. You can ask for them to be deleted at any time.
+      </p>
+
+      <p>
+        <TextLink href={homeSectionPath('en', 'contact')}>Back to the contact form</TextLink>
+      </p>
+    </article>
+  </Container>
+</BaseLayout>

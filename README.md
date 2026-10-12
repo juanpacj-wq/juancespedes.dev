@@ -12,7 +12,7 @@ Portfolio of **Juan Céspedes**, systems engineer in Barranquilla, Colombia: ful
 data and automation. Built in public: the repository is part of the portfolio, so the architecture,
 decisions and quality checks are meant to be read.
 
-> Status: **phase F4 (case study pages) done, deployed**. The English version and SEO arrive in F5.
+> Status: **phase F5 (English version and SEO) done, deployed**. Launch work (v1.0) comes in F6.
 > Live design reference: [/design-system](https://juancespedes.dev/design-system)
 > ([docs](docs/design-system.md)).
 
@@ -132,8 +132,8 @@ docs/
 | F2    | Design system and layout                                         | Done    |
 | F3    | Home page sections and contact form                              | Done    |
 | F4    | Case studies                                                     | Done    |
-| F5    | English version and SEO                                          | Next    |
-| F6    | Launch v1.0 on juancespedes.dev                                  | Planned |
+| F5    | English version and SEO                                          | Done    |
+| F6    | Launch v1.0 on juancespedes.dev                                  | Next    |
 | F7    | Command palette, "Ask me" chat, notes                            | Planned |
 
 ## Workflow

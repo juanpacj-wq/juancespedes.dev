@@ -9,30 +9,54 @@ const SLUGS = readdirSync(PROJECTS_DIR).filter((name) =>
   statSync(join(PROJECTS_DIR, name)).isDirectory(),
 );
 
-const CASE_STUDY_SECTIONS = [
-  'El problema',
-  'Mi rol',
-  'Restricciones',
-  'Decisiones',
-  'Arquitectura',
-  'Resultados',
-  'Qué haría distinto',
-  'Tecnologías',
-];
+const TEMPLATE = {
+  es: {
+    path: (slug: string) => `/proyectos/${slug}`,
+    sections: [
+      'El problema',
+      'Mi rol',
+      'Restricciones',
+      'Decisiones',
+      'Arquitectura',
+      'Resultados',
+      'Qué haría distinto',
+      'Tecnologías',
+    ],
+    diagram: 'Diagrama de arquitectura',
+    source: 'Fuente:',
+  },
+  en: {
+    path: (slug: string) => `/en/projects/${slug}`,
+    sections: [
+      'The problem',
+      'My role',
+      'Constraints',
+      'Decisions',
+      'Architecture',
+      'Results',
+      'What I would do differently',
+      'Technologies',
+    ],
+    diagram: 'Architecture diagram',
+    source: 'Source:',
+  },
+} as const;
 
 test.describe('project pages', () => {
-  for (const slug of SLUGS) {
-    test(`/proyectos/${slug} follows the case-study template`, async ({ page }) => {
-      const response = await page.goto(`/proyectos/${slug}`);
-      expect(response?.status()).toBe(200);
+  for (const [locale, template] of Object.entries(TEMPLATE)) {
+    for (const slug of SLUGS) {
+      test(`${template.path(slug)} follows the case-study template`, async ({ page }) => {
+        const response = await page.goto(template.path(slug));
+        expect(response?.status()).toBe(200);
 
-      await expect(page.locator('html')).toHaveAttribute('lang', 'es');
-      await expect(page.getByRole('heading', { level: 1 })).not.toBeEmpty();
-      await expect(page.locator('main section[id] > h2')).toHaveText(CASE_STUDY_SECTIONS);
-      await expect(page.getByRole('list', { name: 'Diagrama de arquitectura' })).toBeVisible();
-      await expect(page.getByText('Fuente:').first()).toBeVisible();
-      await expect(page).toHaveTitle(/\| Juan Céspedes$/);
-    });
+        await expect(page.locator('html')).toHaveAttribute('lang', locale);
+        await expect(page.getByRole('heading', { level: 1 })).not.toBeEmpty();
+        await expect(page.locator('main section[id] > h2')).toHaveText([...template.sections]);
+        await expect(page.getByRole('list', { name: template.diagram })).toBeVisible();
+        await expect(page.getByText(template.source).first()).toBeVisible();
+        await expect(page).toHaveTitle(/\| Juan Céspedes$/);
+      });
+    }
   }
 
   test('a row on the home page opens its project', async ({ page }) => {

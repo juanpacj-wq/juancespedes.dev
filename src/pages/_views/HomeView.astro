@@ -1,0 +1,77 @@
+---
+import { container } from '../../composition/container';
+import type { Locale } from '../../domain/shared/locale';
+import { dictionaryFor } from '../../ui/i18n/dictionary';
+import { homePath, privacyPath } from '../../ui/i18n/routes';
+import BaseLayout from '../../ui/layouts/BaseLayout.astro';
+import CapabilitiesSection from '../../ui/sections/CapabilitiesSection.astro';
+import ContactSection from '../../ui/sections/ContactSection.astro';
+import CredentialsSection from '../../ui/sections/CredentialsSection.astro';
+import ExperienceSection from '../../ui/sections/ExperienceSection.astro';
+import HeroSection from '../../ui/sections/HeroSection.astro';
+import MetricsSection from '../../ui/sections/MetricsSection.astro';
+import ProjectsSection from '../../ui/sections/ProjectsSection.astro';
+import ServicesSection from '../../ui/sections/ServicesSection.astro';
+import { homeGraph } from '../../ui/seo/structured-data';
+import { SITE } from '../../ui/site';
+
+/** The home page in one language; src/pages/index.astro and src/pages/en/index.astro render it. */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = dictionaryFor(locale);
+
+const [metrics, projects, matrix, profile] = await Promise.all([
+  container.listHeadlineMetrics(locale),
+  container.listProjects(locale),
+  container.buildSkillEvidenceMatrix(locale),
+  container.getProfile(locale),
+]);
+
+const navItems = [
+  { href: '#projects', label: t.nav.projects },
+  { href: '#capabilities', label: t.nav.skills },
+  { href: '#services', label: t.nav.services },
+  { href: '#contact', label: t.nav.contact },
+];
+
+const jsonLd = homeGraph({
+  locale,
+  name: t.profile.name,
+  jobTitle: t.profile.role,
+  description: t.meta.defaultDescription,
+  homeUrl: homePath(locale),
+  alumniOf: profile.education.map((item) => item.institution),
+  knowsAbout: matrix.flatMap((row) => row.technologies.map((technology) => technology.name)),
+});
+---
+
+<BaseLayout
+  title={`${t.profile.name} | ${t.profile.role}`}
+  description={t.meta.defaultDescription}
+  locale={locale}
+  route={{ page: 'home' }}
+  navItems={navItems}
+  jsonLd={jsonLd}
+>
+  <HeroSection t={t} email={SITE.email} githubUrl={SITE.githubUrl} linkedinUrl={SITE.linkedinUrl} />
+  <MetricsSection t={t} metrics={metrics} />
+  <ProjectsSection t={t} projects={projects} />
+  <CapabilitiesSection t={t} locale={locale} matrix={matrix} />
+  <ExperienceSection
+    t={t}
+    locale={locale}
+    experience={profile.experience}
+    education={profile.education}
+  />
+  <ServicesSection
+    t={t}
+    services={profile.services}
+    process={profile.process}
+    pricing={profile.pricing}
+  />
+  <CredentialsSection t={t} locale={locale} credentials={profile.credentials} />
+  <ContactSection t={t} locale={locale} email={SITE.email} privacyHref={privacyPath(locale)} />
+</BaseLayout>

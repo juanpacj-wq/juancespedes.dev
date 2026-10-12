@@ -21,10 +21,15 @@ const es = {
     external: '(se abre en otra pestaña)',
   },
   nav: {
+    home: 'Inicio',
     projects: 'Proyectos',
     skills: 'Capacidades',
     services: 'Servicios',
     contact: 'Contacto',
+  },
+  language: {
+    switchTo: 'Read this page in English',
+    short: 'EN',
   },
   theme: {
     toLight: 'Cambiar a tema claro',
@@ -221,10 +226,15 @@ const en: Dictionary = {
     external: '(opens in a new tab)',
   },
   nav: {
+    home: 'Home',
     projects: 'Projects',
     skills: 'Capabilities',
     services: 'Services',
     contact: 'Contact',
+  },
+  language: {
+    switchTo: 'Leer esta página en español',
+    short: 'ES',
   },
   theme: {
     toLight: 'Switch to light theme',
