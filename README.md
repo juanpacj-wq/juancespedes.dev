@@ -3,6 +3,8 @@
 [![CI](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/ci.yml/badge.svg)](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/codeql.yml/badge.svg)](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/codeql.yml)
 [![Deploy](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/deploy.yml/badge.svg)](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/deploy.yml)
+[![Uptime](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/uptime.yml/badge.svg)](https://github.com/juanpacj-wq/juancespedes.dev/actions/workflows/uptime.yml)
+[![Security headers](https://img.shields.io/security-headers?url=https%3A%2F%2Fjuancespedes.dev)](https://securityheaders.com/?q=juancespedes.dev&followRedirects=on)
 [![License: MIT (code)](<https://img.shields.io/badge/license-MIT%20(code)-blue.svg>)](LICENSE)
 
 **Live: [juancespedes.dev](https://juancespedes.dev)** ·
@@ -12,9 +14,28 @@ Portfolio of **Juan Céspedes**, systems engineer in Barranquilla, Colombia: ful
 data and automation. Built in public: the repository is part of the portfolio, so the architecture,
 decisions and quality checks are meant to be read.
 
-> Status: **phase F5 (English version and SEO) done, deployed**. Launch work (v1.0) comes in F6.
+> Status: **v1.0 launched** (phases F0 to F6). Next: command palette, "Ask me" chat and notes (F7).
 > Live design reference: [/design-system](https://juancespedes.dev/design-system)
 > ([docs](docs/design-system.md)).
+
+| Home (Spanish, dark theme)                                     | Home (English, light theme)                                      |
+| -------------------------------------------------------------- | ---------------------------------------------------------------- |
+| ![Home page in the dark theme](docs/screenshots/home-dark.png) | ![Home page in the light theme](docs/screenshots/home-light.png) |
+
+| Case study: architecture drawn from data                                 | Phone                                                |
+| ------------------------------------------------------------------------ | ---------------------------------------------------- |
+| ![Architecture section of a case study](docs/screenshots/case-study.png) | ![Home page on a phone](docs/screenshots/mobile.png) |
+
+## Operations
+
+- **Security headers** on every response, with a content security policy that allows only the
+  hashed inline scripts the build emitted ([ADR 0013](docs/adr/0013-launch-hardening-and-operations.md)).
+- **Uptime**: checked every 15 minutes from GitHub Actions; an outage opens an issue.
+- **Errors**: browser errors are reported, without visitor data, to Workers Logs.
+- **Analytics**: Cloudflare Web Analytics, cookieless.
+- **Releases**: release-please, with the same required checks as any pull request.
+- Runbooks: [deploy and rollback](docs/runbooks/deploy.md), [contact form](docs/runbooks/contact-form.md),
+  [monitoring and incidents](docs/runbooks/monitoring.md).
 
 ## Architecture at a glance
 
@@ -42,18 +63,21 @@ Imports may only point inward. Two independent tools check it on every pull requ
 
 ## Decisions
 
-| ADR                                                 | Decision                                                                  |
-| --------------------------------------------------- | ------------------------------------------------------------------------- |
-| [0001](docs/adr/0001-layered-architecture.md)       | Layered architecture in a mostly static site, and where it stops          |
-| [0002](docs/adr/0002-astro-with-react-islands.md)   | Astro with React islands                                                  |
-| [0003](docs/adr/0003-cloudflare-workers-hosting.md) | Cloudflare Workers with static assets                                     |
-| [0004](docs/adr/0004-projects-as-typed-content.md)  | Projects as typed content, extensible by kind                             |
-| [0005](docs/adr/0005-i18n-by-route.md)              | Spanish and English by route                                              |
-| [0006](docs/adr/0006-tailwind-on-design-tokens.md)  | Tailwind CSS v4 on design tokens                                          |
-| [0007](docs/adr/0007-testing-strategy.md)           | Testing strategy and quality gates                                        |
-| [0008](docs/adr/0008-content-validation-layers.md)  | Content validated in three layers: schema, domain rules, cross-file tests |
-| [0009](docs/adr/0009-theming-and-design-tokens.md)  | Theming with light-dark() tokens; raw colors rejected in CI               |
-| [0010](docs/adr/0010-contact-form-delivery.md)      | Contact form on Email Routing and Turnstile; fails closed; stores nothing |
+| ADR                                                      | Decision                                                                  |
+| -------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [0001](docs/adr/0001-layered-architecture.md)            | Layered architecture in a mostly static site, and where it stops          |
+| [0002](docs/adr/0002-astro-with-react-islands.md)        | Astro with React islands                                                  |
+| [0003](docs/adr/0003-cloudflare-workers-hosting.md)      | Cloudflare Workers with static assets                                     |
+| [0004](docs/adr/0004-projects-as-typed-content.md)       | Projects as typed content, extensible by kind                             |
+| [0005](docs/adr/0005-i18n-by-route.md)                   | Spanish and English by route                                              |
+| [0006](docs/adr/0006-tailwind-on-design-tokens.md)       | Tailwind CSS v4 on design tokens                                          |
+| [0007](docs/adr/0007-testing-strategy.md)                | Testing strategy and quality gates                                        |
+| [0008](docs/adr/0008-content-validation-layers.md)       | Content validated in three layers: schema, domain rules, cross-file tests |
+| [0009](docs/adr/0009-theming-and-design-tokens.md)       | Theming with light-dark() tokens; raw colors rejected in CI               |
+| [0010](docs/adr/0010-contact-form-delivery.md)           | Contact form on Email Routing and Turnstile; fails closed; stores nothing |
+| [0011](docs/adr/0011-case-study-pages.md)                | Case study pages: fixed template, diagrams as data, private denylist      |
+| [0012](docs/adr/0012-bilingual-routes-and-seo.md)        | Spanish at the root, English under /en; hreflang, sitemap, JSON-LD, OG    |
+| [0013](docs/adr/0013-launch-hardening-and-operations.md) | Security headers, monitoring without third parties, gated releases        |
 
 ## Quality gates
 
@@ -125,16 +149,16 @@ docs/
 
 ## Roadmap
 
-| Phase | Scope                                                            | State   |
-| ----- | ---------------------------------------------------------------- | ------- |
-| F0    | Foundations: tooling, CI, ADRs, health endpoint, deploy pipeline | Done    |
-| F1    | Domain model and typed project content                           | Done    |
-| F2    | Design system and layout                                         | Done    |
-| F3    | Home page sections and contact form                              | Done    |
-| F4    | Case studies                                                     | Done    |
-| F5    | English version and SEO                                          | Done    |
-| F6    | Launch v1.0 on juancespedes.dev                                  | Next    |
-| F7    | Command palette, "Ask me" chat, notes                            | Planned |
+| Phase | Scope                                                            | State |
+| ----- | ---------------------------------------------------------------- | ----- |
+| F0    | Foundations: tooling, CI, ADRs, health endpoint, deploy pipeline | Done  |
+| F1    | Domain model and typed project content                           | Done  |
+| F2    | Design system and layout                                         | Done  |
+| F3    | Home page sections and contact form                              | Done  |
+| F4    | Case studies                                                     | Done  |
+| F5    | English version and SEO                                          | Done  |
+| F6    | Launch v1.0 on juancespedes.dev                                  | Done  |
+| F7    | Command palette, "Ask me" chat, notes                            | Next  |
 
 ## Workflow
 

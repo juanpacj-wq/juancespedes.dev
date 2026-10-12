@@ -1,0 +1,44 @@
+---
+/**
+ * Reports uncaught JavaScript errors to /api/client-errors (ADR 0013): the message, the script
+ * path and line, the page path and the release. Nothing about the visitor. At most a few reports
+ * per page view, sent with sendBeacon so they never delay the page or survive a failure.
+ */
+---
+
+<script>
+  const MAX_REPORTS = 5;
+  let sent = 0;
+  const release = document.documentElement.dataset['release'] ?? 'unknown';
+
+  const report = (
+    kind: 'error' | 'unhandledrejection',
+    message: string,
+    source?: string,
+    line?: number,
+    column?: number,
+  ) => {
+    if (sent >= MAX_REPORTS || !('sendBeacon' in navigator)) return;
+    sent += 1;
+    const body = JSON.stringify({
+      kind,
+      message,
+      source,
+      line,
+      column,
+      page: location.pathname,
+      release,
+    });
+    navigator.sendBeacon('/api/client-errors', new Blob([body], { type: 'application/json' }));
+  };
+
+  addEventListener('error', (event) => {
+    // WebKit reports a missing filename as the string "undefined".
+    const source = event.filename && event.filename !== 'undefined' ? event.filename : undefined;
+    report('error', event.message, source, event.lineno, event.colno);
+  });
+  addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
+    const reason: unknown = event.reason;
+    report('unhandledrejection', reason instanceof Error ? reason.message : String(reason));
+  });
+</script>

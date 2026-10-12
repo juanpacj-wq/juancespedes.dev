@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  # The release workflow dispatches CI on the release-please branch: pull requests opened with
+  # GITHUB_TOKEN do not trigger workflows, and workflow_dispatch is the exception (ADR 0013).
+  workflow_dispatch:
 
 permissions:
   contents: read

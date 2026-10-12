@@ -1,6 +1,7 @@
 name: Release
 
-# Maintains a release PR with the changelog and version bump derived from Conventional Commits.
+# Maintains a release PR with the changelog and version bump derived from Conventional Commits,
+# and publishes the GitHub release and tag when that PR is merged.
 on:
   push:
     branches: [main]
@@ -8,12 +9,29 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # Needed to dispatch the required checks on the release branch (see the last step).
+  actions: write
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
       - uses: googleapis/release-please-action@v5
+        id: release
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+      # A pull request opened or updated with GITHUB_TOKEN triggers no workflows, so the release
+      # PR would never get its required checks. workflow_dispatch is the documented exception:
+      # run the same gates on the release branch so the PR is merged like any other (ADR 0013).
+      - name: Run the required checks on the release pull request
+        if: steps.release.outputs.pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+          TITLE: ${{ fromJSON(steps.release.outputs.pr).title }}
+        run: |
+          gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
+          gh workflow run codeql.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
+          gh workflow run pr-title.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH" -f title="$TITLE"
