@@ -2,12 +2,14 @@ import { APP_VERSION } from 'astro:env/server';
 
 import { makeBuildSkillEvidenceMatrix } from '../application/use-cases/build-skill-evidence-matrix';
 import { makeGetHealthStatus } from '../application/use-cases/get-health-status';
+import { makeGetProfile } from '../application/use-cases/get-profile';
 import { makeGetProject } from '../application/use-cases/get-project';
 import { makeListFeaturedProjects } from '../application/use-cases/list-featured-projects';
 import { makeListHeadlineMetrics } from '../application/use-cases/list-headline-metrics';
 import { makeListProjects } from '../application/use-cases/list-projects';
 import {
   astroHeadlineMetricRepository,
+  astroProfileRepository,
   astroProjectRepository,
   astroTechnologyCatalog,
 } from '../infrastructure/content/astro-content-repositories';
@@ -33,4 +35,5 @@ export const container = {
     catalog: astroTechnologyCatalog,
   }),
   listHeadlineMetrics: makeListHeadlineMetrics(astroHeadlineMetricRepository),
+  getProfile: makeGetProfile(astroProfileRepository),
 } as const;
