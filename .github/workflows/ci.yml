@@ -57,12 +57,12 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Local runtime config before building: Cloudflare's documented Turnstile test keys.
+      - run: cp .env.example .dev.vars
       - run: pnpm build
         env:
           APP_VERSION: ${{ github.sha }}
       - run: pnpm bundle:check
-      # Local runtime config: Cloudflare's documented Turnstile test keys (always pass).
-      - run: cp .env.example .dev.vars
       - run: pnpm exec playwright install --with-deps chromium webkit
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v7
@@ -83,8 +83,8 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build
       - run: cp .env.example .dev.vars
+      - run: pnpm build
       - run: pnpm lighthouse
       - uses: actions/upload-artifact@v7
         if: always()
