@@ -37,8 +37,10 @@ the required checks.
   endpoint and both home pages every 15 minutes, with retries. A failure opens an issue labeled
   `uptime`, which notifies the owner by email; recovery closes it.
 - **Analytics: Cloudflare Web Analytics**, cookieless and without personal data, as the privacy
-  notice says. It is enabled on the zone with automatic installation (Cloudflare injects the
-  beacon at the edge), and the CSP allows its script and endpoint.
+  notice says. Automatic installation at the edge does not reach pages served by the Worker's
+  asset layer, so the beacon is in the layout, rendered only when `PUBLIC_WEB_ANALYTICS_TOKEN` is
+  set. The deploy sets it for production only, so tests and previews never count page views. The
+  CSP allows its script and endpoint.
 - **Releases through release-please, with the same gates as any change.** Actions may open pull
   requests. After creating or updating the release PR, the release workflow dispatches CI, CodeQL
   and the title check on the release branch (`workflow_dispatch` is the event `GITHUB_TOKEN` is

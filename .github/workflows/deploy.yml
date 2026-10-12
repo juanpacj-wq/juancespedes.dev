@@ -37,6 +37,8 @@ jobs:
           # Real Turnstile site key (public by design); without it the test key is used and the
           # production secret rejects every token, so the form fails closed.
           PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+          # Page views are counted for production only; previews build without the beacon.
+          PUBLIC_WEB_ANALYTICS_TOKEN: ${{ github.event_name == 'push' && vars.PUBLIC_WEB_ANALYTICS_TOKEN || '' }}
       - name: Upload preview version
         if: github.event_name == 'pull_request'
         id: preview
