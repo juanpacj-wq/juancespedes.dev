@@ -32,7 +32,15 @@ const hashes = pages.flatMap((page) => inlineScripts(readFileSync(page, 'utf8'))
 const unique = [...new Set(hashes)];
 const csp = contentSecurityPolicy(unique);
 
-const existing = existsSync(HEADERS_FILE) ? readFileSync(HEADERS_FILE, 'utf8') : '';
+/** The adapter may or may not have written _headers: read it once, without checking first. */
+const readExisting = () => {
+  try {
+    return readFileSync(HEADERS_FILE, 'utf8');
+  } catch {
+    return '';
+  }
+};
+const existing = readExisting();
 writeFileSync(
   HEADERS_FILE,
   withGlobalHeaders(existing, { ...BASE_HEADERS, 'Content-Security-Policy': csp }),

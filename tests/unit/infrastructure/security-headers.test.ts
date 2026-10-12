@@ -19,10 +19,11 @@ describe('inline script hashing', () => {
     '<script src="/a.js"></script>',
     '<script type="application/ld+json">{"a":1}</script>',
     '<script>   </script>',
+    '<script>spaced()</script >',
   ].join('');
 
   it('finds only the scripts a browser would execute inline', () => {
-    expect(inlineScripts(html)).toEqual(['console.log(1)', 'import "x"']);
+    expect(inlineScripts(html)).toEqual(['console.log(1)', 'import "x"', 'spaced()']);
   });
 
   it('hashes with SHA-256 in CSP source syntax', () => {

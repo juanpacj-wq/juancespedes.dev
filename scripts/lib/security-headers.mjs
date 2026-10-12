@@ -21,7 +21,7 @@ export const BASE_HEADERS = BASE_SECURITY_HEADERS;
  * @returns {string[]} the exact text of each script
  */
 export const inlineScripts = (html) =>
-  [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)]
+  [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script[^>]*>/gi)]
     .filter(([, attributes = '']) => !/\bsrc\s*=/i.test(attributes))
     .filter(([, attributes = '']) => {
       const type = /\btype\s*=\s*["']?([^"'\s>]+)/i.exec(attributes)?.[1]?.toLowerCase();
