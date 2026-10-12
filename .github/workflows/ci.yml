@@ -92,6 +92,10 @@ jobs:
   security:
     name: Dependencies and secrets
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # gitleaks lists the pull request's commits to scan only what changed.
+      pull-requests: read
     steps:
       - uses: actions/checkout@v5
         with:
