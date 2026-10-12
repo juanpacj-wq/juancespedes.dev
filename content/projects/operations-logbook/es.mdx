@@ -1,0 +1,58 @@
+---
+kind: case-study
+title: Bitácora digital de operación para dos plantas térmicas
+summary: Reemplacé los libros de Excel de los turnos de operación por una aplicación web en tiempo real, con turnos como entidad de negocio, reportes oficiales generados desde los datos y más de 1.400 pruebas automatizadas.
+role: Ingeniero full-stack, único desarrollador (diseño, backend, frontend, base de datos, despliegue)
+period: { start: '2026-03', end: null }
+capabilities: [backend, frontend, data-bi, infrastructure]
+stack:
+  - React
+  - Vite
+  - Node.js
+  - Express
+  - WebSockets
+  - SQL Server
+  - Microsoft Entra ID
+  - Microsoft Graph
+  - Excel
+  - Linux
+  - nginx
+  - systemd
+metrics:
+  - value: '1.400+'
+    label: casos de prueba automatizados entre backend y frontend
+    source: Suites de node:test y Vitest del repositorio, septiembre de 2026
+  - value: '516'
+    label: commits en 6 meses de desarrollo continuo
+    source: Historial de git, marzo a septiembre de 2026
+  - value: '38 de 39'
+    label: hallazgos cerrados de una auditoría de seguridad propia
+    source: Informe interno de auditoría de seguridad, 2026
+featured: true
+order: 1
+status: draft
+confidentiality: anonymized
+problem: El personal de operación de dos plantas térmicas llevaba sus bitácoras de turno en libros de Excel. La información quedaba dispersa, el cierre de turno no tenía garantías y los reportes oficiales se armaban a mano.
+constraints:
+  - Usuarios en turnos de 24 horas cuyo día operativo cruza la medianoche.
+  - Inicio de sesión corporativo obligatorio con roles por cargo.
+  - Servidor propio en la red corporativa, detrás de un firewall con inspección TLS.
+  - Mínimas dependencias de terceros para facilitar la auditoría y el mantenimiento.
+decisions:
+  - title: Turnos como entidad de negocio, con cierre atómico
+    rationale: El cierre de turno congela la conformación del equipo en una instantánea inmutable, así el historial no cambia si después cambia el personal.
+    alternatives:
+      - Registrar eventos sueltos y reconstruir los turnos al consultar
+  - title: Tiempo real con WebSockets validando el origen
+    rationale: Varias personas trabajan sobre el mismo turno a la vez; los cambios llegan al instante y la validación de origen evita el secuestro de la conexión.
+    alternatives:
+      - Consultar al servidor cada pocos segundos
+  - title: Lector y escritor de .xlsx propios sobre zlib
+    rationale: El reporte oficial debía salir idéntico a la plantilla de Excel sin sumar librerías grandes al backend.
+    alternatives:
+      - Usar una librería de hojas de cálculo de terceros
+lessons:
+  - Los tests que protegen invariantes peligrosas (nunca borrar datos de una planta real) valen más que la cobertura por sí sola.
+---
+
+Borrador. El caso completo, con diagramas y capturas recreadas con datos ficticios, se escribe en la fase F4.

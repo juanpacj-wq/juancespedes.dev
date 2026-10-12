@@ -1,0 +1,57 @@
+---
+kind: case-study
+title: Telemetría de generación eléctrica en tiempo real
+summary: Construí el servicio que lee cinco medidores de energía cada 2 segundos, integra la energía por periodo horario, la compara contra el despacho del mercado y alimenta un tablero en vivo y un reporte de Power BI.
+role: Ingeniero de datos y backend, único desarrollador
+period: { start: '2026-03', end: null }
+capabilities: [data-bi, backend, automation-ai, infrastructure]
+stack:
+  - Node.js
+  - Python
+  - Modbus TCP
+  - WebSockets
+  - SQL Server
+  - Microsoft Fabric
+  - PostgreSQL
+  - Power BI
+  - Microsoft Graph
+  - React
+  - Linux
+  - systemd
+metrics:
+  - value: '2 s'
+    label: intervalo de lectura de 5 medidores por Modbus TCP, con latencia p50 de 15 a 25 ms
+    source: Configuración del servicio y mediciones de latencia, 2026
+  - value: '300 MB a 5 MB'
+    label: reducción del tamaño del despliegue al pasar de un navegador automatizado a lectura directa de medidores
+    source: Registro de decisiones de arquitectura del proyecto
+  - value: '410+'
+    label: casos de prueba automatizados entre Vitest y pytest
+    source: Suites del repositorio, septiembre de 2026
+featured: true
+order: 2
+status: draft
+confidentiality: anonymized
+problem: La operación necesitaba ver en una sola pantalla la generación real de cuatro unidades frente a lo despachado por el operador del mercado, y la lectura existente dependía de un sistema centralizado que era un punto único de falla.
+constraints:
+  - Lecturas cada 2 segundos sin perder la integración de energía si el servicio se reinicia.
+  - Dos plantas con convenciones de signo distintas según la frontera de medición.
+  - Un medidor caído no debe contaminar los totales con ceros falsos.
+decisions:
+  - title: Lectura directa de los medidores por Modbus TCP
+    rationale: Elimina el punto único de falla y el navegador automatizado del despliegue, y permite medir la latencia de cada lectura.
+    alternatives:
+      - Seguir raspando la interfaz web del sistema centralizado
+  - title: Nulo significa sin lectura, nunca cero
+    rationale: Distinguir la ausencia de dato del valor cero permite detectar un medidor caído en lugar de reportar generación nula.
+    alternatives:
+      - Rellenar con cero las lecturas faltantes
+  - title: Validación estadística antes de usar los medidores de respaldo
+    rationale: Una captura en paralelo de una hora con criterios de sesgo, p95 y energía integrada demostró que los medidores de respaldo son intercambiables.
+    alternatives:
+      - Asumir que los medidores de respaldo leen igual
+lessons:
+  - Documentar la convención de signos con lecturas en paralelo el día de la migración evitó semanas de discusiones sobre cifras.
+---
+
+Borrador. El caso completo, con el diagrama de arquitectura redibujado y sin direcciones internas, se escribe en la fase F4.

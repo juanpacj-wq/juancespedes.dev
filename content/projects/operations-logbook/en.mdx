@@ -1,0 +1,58 @@
+---
+kind: case-study
+title: Digital operations logbook for two thermal power plants
+summary: I replaced the shift teams' Excel logbooks with a real-time web application, with shifts as a business entity, official reports generated from the data, and more than 1,400 automated tests.
+role: Full-stack engineer and sole developer (design, backend, frontend, database, deployment)
+period: { start: '2026-03', end: null }
+capabilities: [backend, frontend, data-bi, infrastructure]
+stack:
+  - React
+  - Vite
+  - Node.js
+  - Express
+  - WebSockets
+  - SQL Server
+  - Microsoft Entra ID
+  - Microsoft Graph
+  - Excel
+  - Linux
+  - nginx
+  - systemd
+metrics:
+  - value: '1,400+'
+    label: automated test cases across backend and frontend
+    source: node:test and Vitest suites in the repository, September 2026
+  - value: '516'
+    label: commits over 6 months of continuous development
+    source: Git history, March to September 2026
+  - value: '38 of 39'
+    label: findings closed from a self-run security audit
+    source: Internal security audit report, 2026
+featured: true
+order: 1
+status: draft
+confidentiality: anonymized
+problem: Operations staff at two thermal power plants kept their shift logbooks in Excel workbooks. Information was scattered, closing a shift had no guarantees, and official reports were assembled by hand.
+constraints:
+  - Users on 24-hour shifts whose operating day crosses midnight.
+  - Mandatory corporate single sign-on with role-based permissions.
+  - Self-hosted on the corporate network, behind a firewall with TLS inspection.
+  - Minimal third-party dependencies to keep auditing and maintenance simple.
+decisions:
+  - title: Shifts as a business entity, closed atomically
+    rationale: Closing a shift freezes the team roster into an immutable snapshot, so history does not change when staffing changes later.
+    alternatives:
+      - Log loose events and rebuild shifts at query time
+  - title: Real time over WebSockets with origin validation
+    rationale: Several people work on the same shift at once; changes arrive instantly, and origin validation prevents connection hijacking.
+    alternatives:
+      - Poll the server every few seconds
+  - title: In-house .xlsx reader and writer on top of zlib
+    rationale: The official report had to match the Excel template exactly without adding large libraries to the backend.
+    alternatives:
+      - Use a third-party spreadsheet library
+lessons:
+  - Tests that guard dangerous invariants (never delete a real plant's data) are worth more than coverage on its own.
+---
+
+Draft. The full case study, with diagrams and screenshots recreated with fictitious data, is written in phase F4.

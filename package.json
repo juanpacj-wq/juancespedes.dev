@@ -11,6 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "cf:types": "wrangler types",
+    "new:project": "node scripts/new-project.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "astro sync && eslint . --max-warnings=0",
@@ -61,7 +62,8 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1",
     "vitest": "^5.0.4",
-    "wrangler": "^4.149.0"
+    "wrangler": "^4.149.0",
+    "yaml": "^2.9.1"
   },
   "private": true,
   "description": "Portfolio of Juan Céspedes: full-stack, data and automation engineering. Built in public with a layered architecture.",

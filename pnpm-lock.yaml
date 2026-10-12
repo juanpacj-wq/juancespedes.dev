@@ -111,6 +111,9 @@ importers:
       wrangler:
         specifier: ^4.149.0
         version: 4.149.0(@types/node@26.6.5)
+      yaml:
+        specifier: ^2.9.1
+        version: 2.9.1
 
 packages:
 

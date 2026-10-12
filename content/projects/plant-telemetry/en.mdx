@@ -1,0 +1,57 @@
+---
+kind: case-study
+title: Real-time power generation telemetry
+summary: I built the service that reads five energy meters every 2 seconds, integrates energy per hourly period, compares it with the market dispatch, and feeds a live dashboard and a Power BI report.
+role: Data and backend engineer, sole developer
+period: { start: '2026-03', end: null }
+capabilities: [data-bi, backend, automation-ai, infrastructure]
+stack:
+  - Node.js
+  - Python
+  - Modbus TCP
+  - WebSockets
+  - SQL Server
+  - Microsoft Fabric
+  - PostgreSQL
+  - Power BI
+  - Microsoft Graph
+  - React
+  - Linux
+  - systemd
+metrics:
+  - value: '2 s'
+    label: polling interval for 5 meters over Modbus TCP, with p50 latency of 15 to 25 ms
+    source: Service configuration and latency measurements, 2026
+  - value: '300 MB to 5 MB'
+    label: deployment size reduction after replacing an automated browser with direct meter reads
+    source: Project architecture decision log
+  - value: '410+'
+    label: automated test cases across Vitest and pytest
+    source: Repository test suites, September 2026
+featured: true
+order: 2
+status: draft
+confidentiality: anonymized
+problem: Operations needed to see, on one screen, the actual output of four generating units against what the market operator dispatched, and the existing readings depended on a centralized system that was a single point of failure.
+constraints:
+  - Readings every 2 seconds without losing the energy integration if the service restarts.
+  - Two plants with different sign conventions depending on the metering boundary.
+  - A failed meter must not pollute totals with false zeros.
+decisions:
+  - title: Read the meters directly over Modbus TCP
+    rationale: Removes the single point of failure and the automated browser from the deployment, and makes each read's latency measurable.
+    alternatives:
+      - Keep scraping the centralized system's web interface
+  - title: Null means no reading, never zero
+    rationale: Telling missing data apart from a zero value makes a failed meter detectable instead of reporting zero output.
+    alternatives:
+      - Fill missing readings with zero
+  - title: Statistical validation before trusting the backup meters
+    rationale: A one-hour parallel capture with bias, p95 and integrated-energy criteria showed the backup meters are interchangeable.
+    alternatives:
+      - Assume the backup meters read the same
+lessons:
+  - Documenting the sign convention with parallel readings on migration day prevented weeks of arguments about numbers.
+---
+
+Draft. The full case study, with a redrawn architecture diagram and no internal addresses, is written in phase F4.
