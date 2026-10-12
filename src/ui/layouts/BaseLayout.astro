@@ -1,15 +1,26 @@
 ---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 import '../styles/global.css';
 
 import type { Locale } from '../../domain/shared/locale';
+import { dictionaryFor } from '../i18n/dictionary';
+import SiteFooter from '../chrome/SiteFooter.astro';
+import SiteHeader, { type NavItem } from '../chrome/SiteHeader.astro';
 
 interface Props {
   title: string;
   description: string;
   locale: Locale;
+  navItems?: readonly NavItem[];
+  /** Pages that must not appear in search results (e.g. the design system reference). */
+  noindex?: boolean;
 }
 
-const { title, description, locale } = Astro.props;
+const { title, description, locale, navItems, noindex = false } = Astro.props;
+const t = dictionaryFor(locale);
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
+const REPOSITORY_URL = 'https://github.com/juanpacj-wq/juancespedes.dev';
 ---
 
 <!doctype html>
@@ -17,12 +28,35 @@ const { title, description, locale } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="color-scheme" content="dark light" />
+    <!-- tokens-allow: meta tags need a literal color; keep in sync with the dark --canvas token -->
+    <meta name="theme-color" content="#0b0b0d" />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
+    <!-- Applies a stored theme before first paint, so there is no flash of the wrong theme. -->
+    <script is:inline>
+      try {
+        const stored = localStorage.getItem('theme');
+        if (stored === 'light' || stored === 'dark')
+          document.documentElement.dataset.theme = stored;
+      } catch {}
+    </script>
   </head>
-  <body class="min-h-dvh">
-    <slot />
+  <body class="flex min-h-dvh flex-col bg-canvas text-ink">
+    <a
+      href="#main"
+      class="sr-only z-50 rounded-control bg-accent px-4 py-2 font-medium text-on-accent focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      {t.a11y.skipToContent}
+    </a>
+    <SiteHeader t={t} homeHref="/" navItems={navItems} />
+    <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
+      <slot />
+    </main>
+    <SiteFooter t={t} repositoryUrl={REPOSITORY_URL} />
   </body>
 </html>
