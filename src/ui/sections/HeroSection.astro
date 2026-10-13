@@ -102,28 +102,31 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
 </section>
 
 <style>
-  /* The painting as a backdrop covering the hero. It always fills the height and grows towards
-     the full width, overflowing by at most 12 % of its height; the overflow is cut mostly from
-     the bottom, which fades into the page, so the head stays whole. On a phone the crop leans
-     to the left, where the head is. */
+  /* The painting as a backdrop covering the hero. It always fills the first screen and grows
+     towards the full width, overflowing by at most 12 % of its height; the overflow is cut
+     mostly from the bottom, which fades into the page, so the head stays whole. On a phone the
+     crop leans to the left, where the head is. The size comes from the screen, not from the
+     section: on a phone the text sets the section's height, and it changes when the fonts
+     arrive, which would move the whole backdrop (a layout shift). */
   .hero-art {
     --anchor-x: 0.5;
+    --stage: calc(100svh - 4rem);
     position: absolute;
     inset: 0;
     overflow: hidden;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
-    container-type: size;
   }
 
   .hero-art :global(.ascii-art) {
-    /* --ratio is set on the figure itself, so the size is worked out here. */
-    --width: clamp(100cqh * var(--ratio), 100cqw, 112cqh * var(--ratio));
+    /* --ratio is set on the figure itself, so the size is worked out here. Percentages are of
+       the hero's width, in the width and in both margins alike. */
+    --width: clamp(var(--stage) * var(--ratio), 100%, var(--stage) * 1.12 * var(--ratio));
     flex: none;
     width: var(--width);
-    margin-inline-start: calc((100cqw - var(--width)) * var(--anchor-x));
-    margin-block-start: calc((100cqh - var(--width) / var(--ratio)) * 0.25);
+    margin-inline-start: calc((100% - var(--width)) * var(--anchor-x));
+    margin-block-start: calc((var(--stage) - var(--width) / var(--ratio)) * 0.25);
   }
 
   @media (max-width: 40rem) {
