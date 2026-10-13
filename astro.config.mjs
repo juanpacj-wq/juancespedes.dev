@@ -51,28 +51,30 @@ export default defineConfig({
       }),
       // "Ask me" chat (ADR 0017). Off unless enabled; the fake model costs nothing and is what
       // local runs, previews and tests use. Production sets CHAT_ENABLED and CHAT_MODEL.
-      CHAT_ENABLED: envField.boolean({ context: 'server', access: 'public', default: false }),
+      // `access: 'secret'` makes Astro read these at runtime from the Worker's variables. Public
+      // server variables are inlined at build time, which froze the kill switch at its default.
+      CHAT_ENABLED: envField.boolean({ context: 'server', access: 'secret', default: false }),
       CHAT_MODEL: envField.enum({
         context: 'server',
-        access: 'public',
+        access: 'secret',
         values: ['fake', 'deepseek', 'anthropic'],
         default: 'fake',
       }),
       // Provider model id; empty picks the provider default (deepseek-flash or claude-opus-5-5).
-      CHAT_MODEL_ID: envField.string({ context: 'server', access: 'public', default: '' }),
+      CHAT_MODEL_ID: envField.string({ context: 'server', access: 'secret', default: '' }),
       CHAT_EFFORT: envField.enum({
         context: 'server',
-        access: 'public',
+        access: 'secret',
         values: ['low', 'medium', 'high', 'xhigh', 'max'],
         default: 'high',
       }),
-      CHAT_MAX_TOKENS: envField.number({ context: 'server', access: 'public', default: 4000 }),
+      CHAT_MAX_TOKENS: envField.number({ context: 'server', access: 'secret', default: 4000 }),
       CHAT_VISITOR_DAILY_LIMIT: envField.number({
         context: 'server',
-        access: 'public',
+        access: 'secret',
         default: 10,
       }),
-      CHAT_DAILY_LIMIT: envField.number({ context: 'server', access: 'public', default: 150 }),
+      CHAT_DAILY_LIMIT: envField.number({ context: 'server', access: 'secret', default: 150 }),
       ANTHROPIC_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       DEEPSEEK_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       CHAT_VISITOR_PEPPER: envField.string({ context: 'server', access: 'secret', optional: true }),
