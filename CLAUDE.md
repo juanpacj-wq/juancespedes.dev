@@ -30,3 +30,24 @@ MDX content collections, Cloudflare Workers via `@astrojs/cloudflare`. pnpm, Nod
   attribution lines.
 - Content must not contain internal hostnames, IPs, real operational data or unapproved personal
   data. Testimonials are published only with the author's written approval.
+
+## Performance budget (read before touching the home page)
+
+CI blocks the merge below 0.95 performance on `/` and `/en` (`lighthouserc.json`), and the home
+page sits right at that line: there is no headroom. PR #34 failed it six times in a row and took
+81 minutes for a change that worked on the first try, one bottleneck per CI round. To avoid that:
+
+- Lighthouse does not run on the Windows workstation (NO_NAVSTART), so CI is the only meter and
+  each round costs about 11 minutes. Never use it to test one hypothesis at a time.
+- Before the first push, check the build against the known limits:
+  - Styles of a page stay under 4 kB so Astro inlines them; above that they become one more
+    render-blocking stylesheet (FCP went from 2.0 s to 2.4 s).
+  - Nothing heavy loads with the page: images that only an interaction needs are fetched on that
+    interaction, never preloaded or set in CSS from the start (a 23 kB webp pushed LCP to 2.7 s).
+  - No animation that repaints many glyphs or elements per frame (TBT reached 1.3 s).
+  - Large backgrounds take their size from the viewport (`svh`), not from content that reflows
+    when fonts arrive (CLS).
+  - Big text drawn in a web font preloads that font with the HTML.
+- On the first failure, download every report (`gh run download <run> -n lighthouse-reports`),
+  read all failing metrics and audits for both URLs, and fix them all in one push.
+- Do not undo and redo the same change across rounds; decide it from the report.
