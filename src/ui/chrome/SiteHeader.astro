@@ -2,6 +2,7 @@
 import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
 import Container from '../primitives/Container.astro';
+import CommandPalette from './CommandPalette.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 export interface NavItem {
@@ -42,6 +43,7 @@ const { t, homeHref, navItems = [], switchTo = null } = Astro.props;
           </ul>
         </nav>
       )}
+      <CommandPalette t={t} />
       {switchTo && (
         <a
           href={switchTo.href}
