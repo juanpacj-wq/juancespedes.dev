@@ -1,0 +1,248 @@
+---
+import type { Dictionary } from '../i18n/dictionary';
+import Icon from '../icons/Icon.astro';
+
+/**
+ * Ctrl+K / Cmd+K command palette (ADR 0016). A native <dialog> with the WAI-ARIA combobox pattern:
+ * the input owns focus, arrows move the active option, Enter opens it, Escape closes. Plain DOM
+ * script, no UI framework. The index is fetched from /palette/<lang>.json on first open.
+ */
+interface Props {
+  t: Dictionary;
+}
+
+const { t } = Astro.props;
+---
+
+<button
+  type="button"
+  data-palette-open
+  aria-haspopup="dialog"
+  aria-keyshortcuts="Control+K Meta+K"
+  class="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-control text-muted transition-colors duration-150 hover:bg-surface-raised hover:text-ink md:border md:border-line md:px-3"
+>
+  <Icon name="search" />
+  <span class="sr-only md:not-sr-only md:text-small">{t.palette.open}</span>
+  <kbd class="hidden rounded-chip bg-surface-raised px-1.5 font-mono text-eyebrow lg:inline">
+    Ctrl K
+  </kbd>
+</button>
+
+<dialog
+  data-palette
+  aria-labelledby="palette-title"
+  data-empty={t.palette.empty}
+  data-loading={t.palette.loading}
+  data-copied={t.palette.copied}
+  data-group-pages={t.palette.groups.pages}
+  data-group-projects={t.palette.groups.projects}
+  data-group-notes={t.palette.groups.notes}
+  data-group-actions={t.palette.groups.actions}
+  class="m-0 mx-auto mt-24 w-[min(40rem,calc(100vw-2rem))] max-w-none overflow-hidden rounded-panel border border-line-strong bg-surface p-0 text-ink shadow-lift backdrop:bg-canvas/70 backdrop:backdrop-blur-sm"
+>
+  <h2 id="palette-title" class="sr-only">
+    {t.palette.title}
+  </h2>
+  <div class="flex items-center gap-3 border-b border-line px-4">
+    <Icon name="search" class="text-subtle" />
+    <input
+      type="text"
+      role="combobox"
+      aria-expanded="true"
+      aria-controls="palette-list"
+      aria-autocomplete="list"
+      aria-label={t.palette.placeholder}
+      placeholder={t.palette.placeholder}
+      autocomplete="off"
+      spellcheck="false"
+      data-palette-input
+      class="min-h-14 flex-1 bg-transparent text-body text-ink placeholder:text-subtle focus:outline-none"
+    />
+    <button
+      type="button"
+      data-palette-close
+      class="inline-flex min-h-11 items-center rounded-control px-2 font-mono text-eyebrow text-subtle transition-colors hover:text-ink"
+    >
+      <span aria-hidden="true">Esc</span>
+      <span class="sr-only">{t.palette.close}</span>
+    </button>
+  </div>
+  <div
+    id="palette-list"
+    role="listbox"
+    aria-label={t.palette.results}
+    data-palette-list
+    class="max-h-[min(26rem,60vh)] overflow-y-auto p-2"
+  ></div>
+  <p
+    data-palette-status
+    role="status"
+    class="border-t border-line px-4 py-2 font-mono text-eyebrow text-subtle"
+  >
+    {t.palette.hint}
+  </p>
+</dialog>
+
+<script>
+  import type { PaletteItem } from '../palette/palette-index';
+  import { searchPalette } from '../palette/search';
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-palette]');
+  const input = dialog?.querySelector<HTMLInputElement>('[data-palette-input]');
+  const list = dialog?.querySelector<HTMLElement>('[data-palette-list]');
+  const status = dialog?.querySelector<HTMLElement>('[data-palette-status]');
+  const hint = status?.textContent ?? '';
+
+  if (dialog && input && list && status) {
+    let items: readonly PaletteItem[] | null = null;
+    let results: readonly PaletteItem[] = [];
+    let active = 0;
+    let opener: HTMLElement | null = null;
+
+    const text = (key: string) => dialog.dataset[key] ?? '';
+    const switchLink = () => document.querySelector<HTMLAnchorElement>('header a[hreflang]');
+
+    const load = async (): Promise<readonly PaletteItem[]> => {
+      if (items) return items;
+      const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
+      const response = await fetch(`/palette/${lang}.json`);
+      const all = (await response.json()) as PaletteItem[];
+      // The language switch only exists on pages that have a translation.
+      items = all.filter((item) => item.action !== 'switch-language' || switchLink() !== null);
+      return items;
+    };
+
+    const optionId = (index: number) => `palette-option-${String(index)}`;
+
+    const render = () => {
+      list.replaceChildren(
+        ...results.map((item, index) => {
+          const option = document.createElement('div');
+          option.id = optionId(index);
+          option.setAttribute('role', 'option');
+          option.setAttribute('aria-selected', String(index === active));
+          option.className =
+            'flex cursor-pointer items-center justify-between gap-4 rounded-control px-3 py-2.5 aria-selected:bg-surface-raised';
+          const label = document.createElement('span');
+          label.className = 'text-small text-ink';
+          label.textContent = item.label;
+          const meta = document.createElement('span');
+          meta.className = 'shrink-0 font-mono text-eyebrow text-subtle';
+          meta.textContent =
+            item.hint ?? text(`group${item.group[0]?.toUpperCase() ?? ''}${item.group.slice(1)}`);
+          option.append(label, meta);
+          option.addEventListener('mousemove', () => {
+            if (active !== index) {
+              active = index;
+              render();
+            }
+          });
+          option.addEventListener('click', () => {
+            void run(item);
+          });
+          return option;
+        }),
+      );
+      if (results.length > 0) {
+        input.setAttribute('aria-activedescendant', optionId(active));
+        document.getElementById(optionId(active))?.scrollIntoView({ block: 'nearest' });
+        status.textContent = hint;
+      } else {
+        input.removeAttribute('aria-activedescendant');
+        status.textContent = items ? text('empty') : text('loading');
+      }
+    };
+
+    const update = () => {
+      results = items ? searchPalette(items, input.value) : [];
+      active = 0;
+      render();
+    };
+
+    const close = () => {
+      dialog.close();
+    };
+
+    const run = async (item: PaletteItem) => {
+      if (item.href) {
+        close();
+        if (/^https?:/.test(item.href)) window.open(item.href, '_blank', 'noopener,noreferrer');
+        else window.location.href = item.href;
+        return;
+      }
+      switch (item.action) {
+        case 'toggle-theme':
+          document.querySelector<HTMLButtonElement>('.theme-toggle')?.click();
+          close();
+          break;
+        case 'switch-language':
+          close();
+          switchLink()?.click();
+          break;
+        case 'copy-email':
+          await navigator.clipboard.writeText(item.hint ?? '');
+          status.textContent = text('copied');
+          break;
+        default:
+          break;
+      }
+    };
+
+    /** `trigger` is the button that was clicked: Safari does not focus buttons on click. */
+    const open = async (trigger?: HTMLElement) => {
+      if (dialog.open) return;
+      opener =
+        trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+      input.value = '';
+      dialog.showModal();
+      input.focus();
+      render();
+      await load();
+      update();
+    };
+
+    input.addEventListener('input', update);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (results.length === 0) return;
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        active = (active + step + results.length) % results.length;
+        render();
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const item = results[active];
+        if (item) void run(item);
+      }
+    });
+
+    // Clicking the backdrop (the dialog element itself, outside its content) closes it.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) close();
+    });
+    dialog.addEventListener('close', () => {
+      opener?.focus();
+    });
+    dialog.querySelector('[data-palette-close]')?.addEventListener('click', close);
+
+    for (const button of document.querySelectorAll<HTMLElement>('[data-palette-open]')) {
+      button.addEventListener('click', () => {
+        void open(button);
+      });
+    }
+
+    document.addEventListener('keydown', (event) => {
+      const typing =
+        event.target instanceof HTMLElement &&
+        (event.target.isContentEditable || /^(input|textarea|select)$/i.test(event.target.tagName));
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        if (dialog.open) close();
+        else void open();
+      } else if (event.key === '/' && !typing && !dialog.open) {
+        event.preventDefault();
+        void open();
+      }
+    });
+  }
+</script>

@@ -2,6 +2,7 @@
 export const ICONS = {
   'arrow-up-right': '<path d="M7 17 17 7M8 7h9v9"/>',
   'arrow-right': '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
   mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>',
   github:
