@@ -9,21 +9,27 @@ import {
   makeAnthropicChatModel,
   type ChatEffort,
 } from '../../src/infrastructure/ai/anthropic-chat-model';
-import { costOf, gradeAnswer, type EvalCase } from './grade';
+import { makeDeepSeekChatModel } from '../../src/infrastructure/ai/deepseek-chat-model';
+import { costOf, gradeAnswer, type EvalCase, type Provider } from './grade';
 
 /*
  * Runs the 30-question set against the real model with the production prompt and the corpus the
- * build generated (dist/client/chat-corpus). It spends money, so it only runs when
- * ANTHROPIC_API_KEY is set: `pnpm eval:chat`. Thresholds (ADR 0017):
+ * build generated (dist/client/chat-corpus). It spends money, so it only runs when a provider key
+ * is set (DEEPSEEK_API_KEY, or ANTHROPIC_API_KEY): `pnpm eval:chat`. Thresholds (ADR 0017):
  *   - at least 27 of 30 cases pass;
- *   - average cost per question at most USD 0.08;
+ *   - average cost per question at most USD 0.005 on DeepSeek, 0.08 on Claude;
  *   - after the first question of each language, every request reads the corpus from the cache.
  */
 
 const ROOT = process.cwd();
-const API_KEY = process.env.ANTHROPIC_API_KEY ?? '';
+const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY ?? '';
+const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY ?? '';
+/** DeepSeek when its key is present (the production default), otherwise Claude. */
+const PROVIDER: Provider =
+  process.env.CHAT_MODEL === 'anthropic' || DEEPSEEK_KEY === '' ? 'anthropic' : 'deepseek';
+const API_KEY = PROVIDER === 'deepseek' ? DEEPSEEK_KEY : ANTHROPIC_KEY;
 const PASS_THRESHOLD = 27;
-const MAX_AVERAGE_COST = 0.08;
+const MAX_AVERAGE_COST: Readonly<Record<Provider, number>> = { deepseek: 0.005, anthropic: 0.08 };
 
 const readDenylist = (): RegExp[] => {
   const file = join(ROOT, '.content-denylist');
@@ -51,13 +57,21 @@ describe.skipIf(API_KEY === '')('"Ask me" evaluation set', () => {
         es: readFileSync(join(ROOT, 'dist', 'client', 'chat-corpus', 'es.txt'), 'utf8'),
         en: readFileSync(join(ROOT, 'dist', 'client', 'chat-corpus', 'en.txt'), 'utf8'),
       };
-      const model = makeAnthropicChatModel({
-        apiKey: API_KEY,
-        model: process.env.CHAT_MODEL_ID ?? 'claude-opus-5-5',
-        effort: (process.env.CHAT_EFFORT ?? 'high') as ChatEffort,
-        maxTokens: Number(process.env.CHAT_MAX_TOKENS ?? '4000'),
-        contactEmail: 'juanpablocespedesj@gmail.com',
-      });
+      const model =
+        PROVIDER === 'deepseek'
+          ? makeDeepSeekChatModel({
+              apiKey: API_KEY,
+              model: process.env.CHAT_MODEL_ID ?? 'deepseek-flash',
+              maxTokens: Number(process.env.CHAT_MAX_TOKENS ?? '4000'),
+              contactEmail: 'juanpablocespedesj@gmail.com',
+            })
+          : makeAnthropicChatModel({
+              apiKey: API_KEY,
+              model: process.env.CHAT_MODEL_ID ?? 'claude-opus-5-5',
+              effort: (process.env.CHAT_EFFORT ?? 'high') as ChatEffort,
+              maxTokens: Number(process.env.CHAT_MAX_TOKENS ?? '4000'),
+              contactEmail: 'juanpablocespedesj@gmail.com',
+            });
       const denylist = readDenylist();
       const seenLocale = new Set<string>();
 
@@ -96,13 +110,13 @@ describe.skipIf(API_KEY === '')('"Ask me" evaluation set', () => {
           passed: grade.passed,
           failures: grade.failures,
           usage,
-          cost: costOf(usage),
+          cost: costOf(usage, PROVIDER),
           cacheHit: usage.cacheReadTokens > 0,
           expectedCacheHit: warm,
           seconds: (Date.now() - started) / 1000,
         });
         console.log(
-          `${grade.passed ? 'PASS' : 'FAIL'} ${testCase.id} ($${costOf(usage).toFixed(4)}, cache ${String(usage.cacheReadTokens)})${grade.passed ? '' : `: ${grade.failures.join('; ')}`}`,
+          `${grade.passed ? 'PASS' : 'FAIL'} ${testCase.id} ($${costOf(usage, PROVIDER).toFixed(4)}, cache ${String(usage.cacheReadTokens)})${grade.passed ? '' : `: ${grade.failures.join('; ')}`}`,
         );
       }
 
@@ -112,8 +126,10 @@ describe.skipIf(API_KEY === '')('"Ask me" evaluation set', () => {
       const cacheMisses = results.filter((r) => r.expectedCacheHit && !r.cacheHit).map((r) => r.id);
       const summary = {
         date: new Date().toISOString(),
-        model: process.env.CHAT_MODEL_ID ?? 'claude-opus-5-5',
-        effort: process.env.CHAT_EFFORT ?? 'high',
+        provider: PROVIDER,
+        model:
+          process.env.CHAT_MODEL_ID ??
+          (PROVIDER === 'deepseek' ? 'deepseek-flash' : 'claude-opus-5-5'),
         passed,
         total: results.length,
         totalCostUsd: Number(total.toFixed(4)),
@@ -131,7 +147,7 @@ describe.skipIf(API_KEY === '')('"Ask me" evaluation set', () => {
       );
 
       expect(passed).toBeGreaterThanOrEqual(PASS_THRESHOLD);
-      expect(average).toBeLessThanOrEqual(MAX_AVERAGE_COST);
+      expect(average).toBeLessThanOrEqual(MAX_AVERAGE_COST[PROVIDER]);
       expect(cacheMisses).toEqual([]);
     },
     30 * 60 * 1000,

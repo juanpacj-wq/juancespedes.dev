@@ -201,7 +201,7 @@ const es = {
     example2: '¿Qué hizo en el portal corporativo?',
     example3: '¿Cómo trabaja en un proyecto freelance?',
     disclaimer:
-      'Responde un modelo de IA (Claude) solo con lo publicado aquí. Puede equivocarse, y las conversaciones no se guardan.',
+      'Responde un modelo de IA (DeepSeek) solo con lo publicado aquí. Puede equivocarse, las conversaciones no se guardan y no debes escribir datos personales.',
     refused: 'No puedo responder esa pregunta. Prueba con otra sobre mi trabajo o escríbeme.',
     truncated: '(respuesta recortada)',
     clear: 'Nueva conversación',
@@ -481,7 +481,7 @@ const en: Dictionary = {
     example2: 'What did he do on the corporate portal?',
     example3: 'How does he work on a freelance project?',
     disclaimer:
-      'An AI model (Claude) answers only from what is published here. It can be wrong, and conversations are not stored.',
+      'An AI model (DeepSeek) answers only from what is published here. It can be wrong, conversations are not stored, and you should not write personal data.',
     refused: 'I cannot answer that question. Try another one about my work, or write to me.',
     truncated: '(answer cut short)',
     clear: 'New conversation',

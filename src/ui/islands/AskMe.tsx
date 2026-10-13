@@ -195,7 +195,7 @@ export default function AskMe({ locale, endpoint, siteKey, email, text }: AskMeP
                           href={part.href}
                           className="text-ink underline decoration-line-strong underline-offset-4 hover:text-accent-ink"
                         >
-                          {part.href}
+                          {part.label}
                         </a>
                       ) : (
                         <span key={partIndex}>{part.text}</span>

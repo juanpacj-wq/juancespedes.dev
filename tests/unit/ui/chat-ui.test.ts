@@ -9,11 +9,11 @@ describe('linkify', () => {
   it('turns site paths into links and leaves the rest as text', () => {
     expect(linkify('Mira /proyectos/plant-telemetry y /en/notes/strict-csp, o /ahora.')).toEqual([
       { kind: 'text', text: 'Mira ' },
-      { kind: 'link', href: '/proyectos/plant-telemetry' },
+      { kind: 'link', href: '/proyectos/plant-telemetry', label: '/proyectos/plant-telemetry' },
       { kind: 'text', text: ' y ' },
-      { kind: 'link', href: '/en/notes/strict-csp' },
+      { kind: 'link', href: '/en/notes/strict-csp', label: '/en/notes/strict-csp' },
       { kind: 'text', text: ', o ' },
-      { kind: 'link', href: '/ahora' },
+      { kind: 'link', href: '/ahora', label: '/ahora' },
       { kind: 'text', text: '.' },
     ]);
   });
@@ -35,7 +35,7 @@ describe('linkify', () => {
   it('links the English home and stops at the end of the path', () => {
     expect(linkify('Visit /en.')).toEqual([
       { kind: 'text', text: 'Visit ' },
-      { kind: 'link', href: '/en' },
+      { kind: 'link', href: '/en', label: '/en' },
       { kind: 'text', text: '.' },
     ]);
   });

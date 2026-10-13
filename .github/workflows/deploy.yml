@@ -65,5 +65,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           # The chat runs on the real model only when CHAT_ENABLED is "true" (the kill switch) and
-          # the ANTHROPIC_API_KEY secret exists; otherwise the endpoint answers "disabled".
-          command: deploy --message "main ${{ github.sha }}" --var CHAT_ENABLED:${{ vars.CHAT_ENABLED || 'false' }} --var CHAT_MODEL:anthropic
+          # the provider's API key secret exists; otherwise the endpoint answers "disabled".
+          command: deploy --message "main ${{ github.sha }}" --var CHAT_ENABLED:${{ vars.CHAT_ENABLED || 'false' }} --var CHAT_MODEL:${{ vars.CHAT_MODEL || 'deepseek' }}

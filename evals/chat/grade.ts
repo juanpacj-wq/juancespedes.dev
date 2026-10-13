@@ -61,17 +61,35 @@ export const gradeAnswer = (
   return { passed: failures.length === 0, failures };
 };
 
-/** USD per million tokens for Claude Opus 5.5 (input, output, cache read, 5-minute cache write). */
-export const PRICES = { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 } as const;
+export type Provider = 'deepseek' | 'anthropic';
 
-export const costOf = (usage: {
-  readonly inputTokens: number;
-  readonly outputTokens: number;
-  readonly cacheReadTokens: number;
-  readonly cacheWriteTokens: number;
-}): number =>
-  (usage.inputTokens * PRICES.input +
-    usage.outputTokens * PRICES.output +
-    usage.cacheReadTokens * PRICES.cacheRead +
-    usage.cacheWriteTokens * PRICES.cacheWrite) /
-  1_000_000;
+/**
+ * USD per million tokens. Claude Opus 5.5: input, output, cache read, 5-minute cache write.
+ * DeepSeek Flash (peak hours, October 2026, from aggregators; the run reports the real usage):
+ * cache miss, output, cache hit; no separate cache write charge.
+ */
+export const PRICES: Readonly<
+  Record<Provider, { input: number; output: number; cacheRead: number; cacheWrite: number }>
+> = {
+  anthropic: { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 },
+  deepseek: { input: 0.3, output: 1.2, cacheRead: 0.006, cacheWrite: 0 },
+};
+
+export const costOf = (
+  usage: {
+    readonly inputTokens: number;
+    readonly outputTokens: number;
+    readonly cacheReadTokens: number;
+    readonly cacheWriteTokens: number;
+  },
+  provider: Provider = 'anthropic',
+): number => {
+  const price = PRICES[provider];
+  return (
+    (usage.inputTokens * price.input +
+      usage.outputTokens * price.output +
+      usage.cacheReadTokens * price.cacheRead +
+      usage.cacheWriteTokens * price.cacheWrite) /
+    1_000_000
+  );
+};

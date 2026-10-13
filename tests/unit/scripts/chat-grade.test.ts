@@ -48,6 +48,15 @@ describe('chat evaluation grading', () => {
     ]);
   });
 
+  it('prices DeepSeek usage, where cached input is almost free', () => {
+    expect(
+      costOf(
+        { inputTokens: 60, outputTokens: 300, cacheReadTokens: 10_000, cacheWriteTokens: 0 },
+        'deepseek',
+      ),
+    ).toBeCloseTo(0.000438, 9);
+  });
+
   it('prices usage at the Opus 5.5 rates', () => {
     expect(
       costOf({ inputTokens: 1_000_000, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 }),

@@ -55,14 +55,11 @@ export default defineConfig({
       CHAT_MODEL: envField.enum({
         context: 'server',
         access: 'public',
-        values: ['fake', 'anthropic'],
+        values: ['fake', 'deepseek', 'anthropic'],
         default: 'fake',
       }),
-      CHAT_MODEL_ID: envField.string({
-        context: 'server',
-        access: 'public',
-        default: 'claude-opus-5-5',
-      }),
+      // Provider model id; empty picks the provider default (deepseek-flash or claude-opus-5-5).
+      CHAT_MODEL_ID: envField.string({ context: 'server', access: 'public', default: '' }),
       CHAT_EFFORT: envField.enum({
         context: 'server',
         access: 'public',
@@ -77,6 +74,7 @@ export default defineConfig({
       }),
       CHAT_DAILY_LIMIT: envField.number({ context: 'server', access: 'public', default: 150 }),
       ANTHROPIC_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      DEEPSEEK_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       CHAT_VISITOR_PEPPER: envField.string({ context: 'server', access: 'secret', optional: true }),
       // Build-time switch for the chat section. On by default so local runs and tests have it; the
       // production deploy sets it from a repository variable until the chat is live.
