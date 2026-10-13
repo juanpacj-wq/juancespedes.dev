@@ -20,17 +20,14 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
 <section class="relative overflow-hidden">
   <!-- Candlelight behind the figure: the one light source of the page (chiaroscuro). -->
   <div class="hero-light pointer-events-none absolute inset-0" aria-hidden="true"></div>
-  <Container class="relative grid items-center gap-12 pt-10 pb-16 sm:pt-16 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:py-12">
+  <Container class="relative grid items-center gap-12 pt-10 pb-16 sm:pt-16 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-10 lg:py-12">
     <div class="flex flex-col gap-7">
       <Badge tone="success" status>
         {t.availability.available}
       </Badge>
-      <div class="flex flex-wrap items-baseline gap-x-2 text-lead">
+      <div class="flex flex-col gap-1 text-lead">
         <h1 class="font-medium text-ink">{t.profile.name}</h1>
-        <p class="text-muted">
-          <span aria-hidden="true">· </span>
-          {t.hero.intro}
-        </p>
+        <p class="text-muted">{t.hero.intro}</p>
       </div>
       <p class="font-display text-display font-light text-balance">{t.hero.headline}</p>
       <p class="max-w-xl text-lead text-pretty text-muted">{t.hero.pitch}</p>

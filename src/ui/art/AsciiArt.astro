@@ -27,13 +27,16 @@ const { locale, alt, caption, characters, lightOn, lightOff, class: className } 
 
 const text = art.replace(/\n+$/, '');
 const count = text.replace(/\s/g, '').length;
-const columns = text.split('\n')[0]?.length ?? 120;
+const lines = text.split('\n');
+const columns = lines[0]?.length ?? 120;
+// Width over height of the drawing: cells are 0.6 wide for each 1 of height.
+const ratio = (columns * 0.6) / lines.length;
 // The colour layer only needs one pixel per character, so a tiny copy of the painting is enough.
 const colour = await getImage({ src: painting, width: columns * 2, format: 'webp' });
 const countLabel = characters.replace('{count}', formatNumber(locale, count));
 ---
 
-<figure class:list={['ascii-art', className]} data-ascii>
+<figure class:list={['ascii-art', className]} style={`--ratio: ${ratio.toFixed(4)}`} data-ascii>
   <div
     class="ascii-canvas"
     role="img"
@@ -84,6 +87,14 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     container-type: inline-size;
   }
 
+  /* Beside the text, as large as the column allows while the whole figure and its caption stay
+     within one screen. */
+  @media (min-width: 64rem) {
+    .ascii-art {
+      width: min(100%, calc((100svh - 13rem) * var(--ratio)));
+    }
+  }
+
   .ascii-canvas {
     --x: 38%;
     --y: 40%;
@@ -97,6 +108,8 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     margin: 0;
     /* Geist Mono advances 0.6em per character: this fits every column in the figure's width. */
     font-family: var(--font-mono);
+    /* The glyph ramp was measured at this weight (scripts/generate-ascii.mjs). */
+    font-weight: 600;
     font-size: calc(100cqi / (var(--columns) * 0.6));
     line-height: 1;
     letter-spacing: 0;
@@ -124,7 +137,7 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     background-clip: text;
     color: transparent;
     /* Caravaggio's ground is near black: lift the paint so the lit figure reads on the page. */
-    filter: brightness(1.8) saturate(1.15);
+    filter: brightness(2.5) saturate(1.2);
     /* Light where the lamp is, plus the flood that a click sends across the figure. */
     mask-image:
       radial-gradient(circle var(--lamp) at var(--x) var(--y), black 35%, transparent),
@@ -145,7 +158,13 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
 
   /* A lamp held close burns brighter than the room light. */
   .ascii-canvas[data-lamp]:not([data-lit]) .ascii-paint {
-    filter: brightness(2.6) saturate(1.2);
+    filter: brightness(3) saturate(1.2);
+  }
+
+  /* On the light ground the paint needs depth, not light: brightened, it fades into the page. */
+  :global(:root[data-theme='light']) .ascii-paint,
+  :global(:root[data-theme='light']) .ascii-canvas[data-lamp]:not([data-lit]) .ascii-paint {
+    filter: brightness(0.85) contrast(1.25) saturate(1.4);
   }
 
   .ascii-canvas[data-lit] + figcaption .ascii-bulb {
