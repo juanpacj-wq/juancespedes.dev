@@ -18,6 +18,7 @@ interface Props {
   disabled?: boolean;
   class?: string;
   [key: `data-${string}`]: string;
+  [key: `aria-${string}`]: string;
 }
 
 const {
@@ -35,13 +36,14 @@ const {
 } = Astro.props;
 
 const classes = [
-  'inline-flex items-center justify-center gap-2 rounded-control font-medium whitespace-nowrap',
-  'transition-[background-color,border-color,color,transform] duration-150 ease-out',
-  'active:translate-y-px disabled:pointer-events-none disabled:opacity-50',
-  size === 'md' ? 'min-h-11 px-4 text-small' : 'min-h-12 px-5 text-body',
+  'inline-flex items-center justify-center gap-2 rounded-chip font-medium whitespace-nowrap',
+  'transition-[background-color,border-color,color,scale] duration-500 ease-out',
+  'motion-safe:hover:scale-103 motion-safe:active:scale-97',
+  'disabled:pointer-events-none disabled:opacity-50',
+  size === 'md' ? 'min-h-11 px-5 text-small' : 'min-h-12 px-6 text-body',
   {
-    primary: 'bg-accent text-on-accent hover:brightness-110',
-    secondary: 'border border-line-strong bg-surface text-ink hover:border-ink',
+    primary: 'bg-accent text-on-accent shadow-bevel hover:brightness-110',
+    secondary: 'bg-surface-raised text-ink shadow-bevel hover:bg-frame',
     ghost: 'text-ink hover:bg-surface-raised',
   }[variant],
   className,

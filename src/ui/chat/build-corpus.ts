@@ -4,7 +4,7 @@ import type { Project } from '../../domain/project/project';
 import type { Locale } from '../../domain/shared/locale';
 import type { Note } from '../../domain/writing/note';
 import type { Dictionary } from '../i18n/dictionary';
-import { formatPeriod } from '../i18n/format';
+import { formatMoney, formatPeriod } from '../i18n/format';
 import { notePath, nowPath, projectPath } from '../i18n/routes';
 
 /*
@@ -35,6 +35,7 @@ const LABELS = {
     deliverables: 'Entregables',
     process: 'Forma de trabajo',
     pricing: 'Precio',
+    from: 'Desde',
     projects: 'Proyectos',
     page: 'Página',
     kind: 'Tipo',
@@ -70,6 +71,7 @@ const LABELS = {
     deliverables: 'Deliverables',
     process: 'How engagements work',
     pricing: 'Pricing',
+    from: 'From',
     projects: 'Projects',
     page: 'Page',
     kind: 'Kind',
@@ -189,7 +191,7 @@ export const buildCorpus = ({
     '',
     `## ${l.services}`,
     ...profile.services.flatMap((service) => [
-      `- ${service.title}: ${service.summary} ${l.deliverables}: ${service.deliverables.join('; ')}.`,
+      `- ${service.title}: ${service.summary} ${l.deliverables}: ${service.deliverables.join('; ')}. ${l.from} ${formatMoney(locale, service.price.from, profile.currency)} ${profile.currency} (${service.price.scope}).`,
     ]),
     `${l.process}: ${profile.process.map((step) => `${step.title} (${step.description})`).join('; ')}`,
     `${l.pricing}: ${profile.pricing}`,

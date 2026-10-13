@@ -1,0 +1,43 @@
+---
+/**
+ * A stage inside a frame: an outer bevelled frame with a small label row, and an inner panel
+ * (the stage) with concentric corners. The frame radius is the stage radius plus the frame's
+ * padding, so the two curves stay parallel. `inverted` swaps the stage to ink on canvas, which
+ * gives one item emphasis in both themes without another color.
+ */
+interface Props {
+  as?: 'div' | 'article' | 'li';
+  label?: string;
+  inverted?: boolean;
+  class?: string;
+  stageClass?: string;
+}
+
+const { as: Tag = 'div', label, inverted = false, class: className, stageClass } = Astro.props;
+---
+
+<Tag
+  class:list={[
+    'flex flex-col rounded-frame bg-frame p-2 shadow-bevel',
+    'transition-[scale] duration-500 ease-out motion-safe:hover:scale-101',
+    className,
+  ]}
+>
+  {(label || Astro.slots.has('label') || Astro.slots.has('badge')) && (
+    <div class="flex min-h-8 items-center justify-between gap-3 px-3 pt-1 pb-2 text-small text-subtle">
+      <slot name="label">
+        <span>{label}</span>
+      </slot>
+      <slot name="badge" />
+    </div>
+  )}
+  <div
+    class:list={[
+      'flex flex-1 flex-col rounded-stage p-6 sm:p-8',
+      inverted ? 'bg-ink text-canvas' : 'bg-surface shadow-bevel',
+      stageClass,
+    ]}
+  >
+    <slot />
+  </div>
+</Tag>

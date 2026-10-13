@@ -24,11 +24,18 @@ export interface Credential {
   readonly url: string | null;
 }
 
-/** Something a client can hire: what it is and what they receive. */
+/** Prices on the site are shown in pesos to Spanish readers and in dollars to English ones. */
+export type Currency = 'COP' | 'USD';
+
+/** Something a client can hire: what it is, what they receive and where its price starts. */
 export interface Service {
   readonly title: string;
   readonly summary: string;
   readonly deliverables: readonly string[];
+  /** A floor, not a quote: "from" this amount, for the scope described in `scope`. */
+  readonly price: { readonly from: number; readonly scope: string };
+  /** The service shown with emphasis, the core of the work. At most one. */
+  readonly featured: boolean;
 }
 
 export interface ProcessStep {
@@ -42,7 +49,9 @@ export interface Profile {
   readonly credentials: readonly Credential[];
   readonly services: readonly Service[];
   readonly process: readonly ProcessStep[];
-  /** How engagements are priced, e.g. "quote from the requirement". */
+  /** The currency of every price in this profile. */
+  readonly currency: Currency;
+  /** How engagements are priced beyond the floors: support, adjustments, what is fixed. */
   readonly pricing: string;
 }
 

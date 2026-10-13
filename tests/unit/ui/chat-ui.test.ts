@@ -64,8 +64,17 @@ describe('buildCorpus', () => {
       experience: [],
       education: [],
       credentials: [],
-      services: [{ title: 'Web', summary: 'Apps.', deliverables: ['Código'] }],
+      services: [
+        {
+          title: 'Web',
+          summary: 'Apps.',
+          deliverables: ['Código'],
+          price: { from: 6000000, scope: 'Un módulo' },
+          featured: true,
+        },
+      ],
       process: [{ title: 'Conversación', description: 'Hablamos.' }],
+      currency: 'COP',
       pricing: 'Cotización a partir del requerimiento.',
     },
     projects: [logbook],
@@ -86,6 +95,7 @@ describe('buildCorpus', () => {
     ]) {
       expect(corpus).toContain(fragment);
     }
+    expect(corpus).toMatch(/Desde \$\s6\.000\.000 COP \(Un módulo\)/);
   });
 
   it('is deterministic, so the prompt cache can reuse it', () => {
@@ -100,6 +110,7 @@ describe('buildCorpus', () => {
           credentials: [],
           services: [],
           process: [],
+          currency: 'COP',
           pricing: 'x',
         },
         projects: [],
@@ -117,6 +128,7 @@ describe('buildCorpus', () => {
           credentials: [],
           services: [],
           process: [],
+          currency: 'COP',
           pricing: 'x',
         },
         projects: [],

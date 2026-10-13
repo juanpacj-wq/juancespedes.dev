@@ -26,7 +26,7 @@ const photo = Object.values(photos)[0]?.default;
 
 <div
   class:list={[
-    'relative aspect-4/5 w-full overflow-hidden rounded-panel border border-line bg-surface',
+    'relative aspect-4/5 w-full overflow-hidden rounded-frame bg-frame shadow-bevel',
     className,
   ]}
 >
@@ -43,7 +43,7 @@ const photo = Object.values(photos)[0]?.default;
     />
   ) : (
     <div role="img" aria-label={alt} class="portrait-placeholder grid size-full place-items-center">
-      <span class="font-mono text-display font-semibold text-ink/80" aria-hidden="true">
+      <span class="font-display text-display font-light text-ink/70" aria-hidden="true">
         {initials}
       </span>
     </div>
@@ -51,19 +51,12 @@ const photo = Object.values(photos)[0]?.default;
 </div>
 
 <style>
-  /* Placeholder texture: a faint grid and an accent glow, built only from color tokens. */
+  /* Placeholder: a single warm light falling on the monogram, built only from color tokens. */
   .portrait-placeholder {
-    background-image:
-      radial-gradient(
-        120% 80% at 80% 0%,
-        color-mix(in srgb, var(--color-accent) 22%, transparent),
-        transparent 60%
-      ),
-      linear-gradient(var(--color-line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
-    background-size:
-      100% 100%,
-      2rem 2rem,
-      2rem 2rem;
+    background-image: radial-gradient(
+      90% 70% at 30% 20%,
+      color-mix(in srgb, var(--color-accent) 16%, transparent),
+      transparent 65%
+    );
   }
 </style>

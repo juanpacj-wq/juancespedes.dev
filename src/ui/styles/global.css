@@ -16,18 +16,22 @@
  */
 :root {
   color-scheme: dark;
-  --canvas: light-dark(#fafaf9, #0b0b0d);
-  --surface: light-dark(#ffffff, #141417);
-  --surface-raised: light-dark(#f3f3f1, #1c1c20);
-  --line: light-dark(#e4e4e0, #27272c);
-  --line-strong: light-dark(#cfcfc9, #3b3b42);
-  --ink: light-dark(#18181b, #ededef);
-  --muted: light-dark(#52525b, #a1a1aa);
-  --subtle: light-dark(#63636b, #8b8b94);
-  --accent: light-dark(#f5a524, #f5a524);
-  --accent-ink: light-dark(#a14a07, #f5a524);
-  --on-accent: light-dark(#18181b, #111113);
-  --success: light-dark(#15803d, #3ecf8e);
+  /* Chiaroscuro: a warm near-black ground, cream ink and one candle-ochre light (ADR 0018). */
+  --canvas: light-dark(#fafaf9, #0e0d0b);
+  --surface: light-dark(#ffffff, #161513);
+  --surface-raised: light-dark(#f3f2ef, #1e1c19);
+  --frame: light-dark(#efede9, #1a1816);
+  --line: light-dark(#e6e3de, #2a2723);
+  --line-strong: light-dark(#cfcac2, #3d3934);
+  --ink: light-dark(#1a1714, #f2ede4);
+  --muted: light-dark(#57514a, #b7b0a5);
+  --subtle: light-dark(#6a635b, #948d82);
+  --accent: light-dark(#e8a33a, #e8a33a);
+  --accent-ink: light-dark(#9a4b0c, #e8a33a);
+  --on-accent: light-dark(#14110d, #14110d);
+  --success: light-dark(#0f766e, #5cc2a8);
+  --ascii: light-dark(#a8540f, #e8a33a);
+  --bevel: light-dark(#000000, #ffffff);
   --shadow-tint: light-dark(#6b6259, #000000);
 }
 
@@ -55,6 +59,8 @@
   --color-accent-ink: var(--accent-ink);
   --color-on-accent: var(--on-accent);
   --color-success: var(--success);
+  --color-frame: var(--frame);
+  --color-ascii: var(--ascii);
   --color-transparent: transparent;
   --color-current: currentColor;
 
@@ -64,9 +70,16 @@
   --shadow-lift:
     0 2px 4px color-mix(in srgb, var(--shadow-tint) 10%, transparent),
     0 16px 40px color-mix(in srgb, var(--shadow-tint) 16%, transparent);
+  /* Hairline light on the top-left edge and a softer one bottom-right: depth without borders. */
+  --shadow-bevel:
+    inset 0.75px 0.75px 0 color-mix(in srgb, var(--bevel) 14%, transparent),
+    inset -0.75px -0.75px 1px color-mix(in srgb, var(--bevel) 6%, transparent),
+    0 10px 30px -14px color-mix(in srgb, var(--shadow-tint) 60%, transparent);
+  --shadow-glow: 0 0 10px color-mix(in srgb, var(--success) 65%, transparent);
 }
 
 @theme {
+  --font-display: 'Literata Display', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
 
@@ -81,21 +94,44 @@
   --text-lead--line-height: 1.6;
   --text-title: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
   --text-title--line-height: 1.3;
-  --text-heading: clamp(1.75rem, 1.35rem + 1.75vw, 2.75rem);
-  --text-heading--line-height: 1.1;
-  --text-heading--letter-spacing: -0.025em;
-  --text-display: clamp(2.75rem, 1.6rem + 5vw, 5.5rem);
-  --text-display--line-height: 0.98;
-  --text-display--letter-spacing: -0.04em;
+  --text-quote: clamp(1.375rem, 1.1rem + 1.1vw, 2rem);
+  --text-quote--line-height: 1.3;
+  --text-price: 2.25rem;
+  --text-price--line-height: 1;
+  --text-price--letter-spacing: -0.025em;
+  /* Display and heading are set in the serif (font-display), light weight. */
+  --text-heading: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);
+  --text-heading--line-height: 1.04;
+  --text-heading--letter-spacing: -0.015em;
+  --text-display: clamp(2.75rem, 1.7rem + 4.2vw, 5.25rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.02em;
 
   --radius-chip: 999px;
   --radius-control: 0.625rem;
   --radius-card: 1.25rem;
   --radius-panel: 1.75rem;
+  /* Frame and stage are concentric: frame radius = stage radius + frame padding (0.5rem). */
+  --radius-frame: 1.75rem;
+  --radius-stage: 1.25rem;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   --breakpoint-xs: 25rem;
+}
+
+/* ---------- Display face ---------- */
+
+/*
+ * Literata (OFL, src/assets/fonts/LITERATA-OFL.txt), cut down to what headings need: the
+ * display optical size, weights 300 to 500 and Latin. 43 kB instead of 110 kB (ADR 0018).
+ */
+@font-face {
+  font-family: 'Literata Display';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 500;
+  src: url('../../assets/fonts/literata-display.woff2') format('woff2');
 }
 
 /* ---------- Base ---------- */
@@ -134,6 +170,33 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+}
+
+/* ---------- Motion ---------- */
+
+/*
+ * Scroll reveal: content is visible by default and only animates where the browser supports
+ * view timelines and the visitor accepts motion, so a hidden tab or a headless renderer never
+ * ships a blank section. Rise 18 px and clear a 6 px blur, the reveal used by the reference.
+ */
+@layer utilities {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: reveal linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    translate: 0 18px;
   }
 }
 

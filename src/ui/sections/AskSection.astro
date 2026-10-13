@@ -17,7 +17,7 @@ interface Props {
 const { t, locale, email } = Astro.props;
 ---
 
-<Section id="ask" eyebrow={t.chat.eyebrow} title={t.chat.title}>
+<Section id="ask" title={t.chat.title}>
   <p slot="description">{t.chat.description}</p>
   <Card padding="lg" class="max-w-3xl">
     <AskMe

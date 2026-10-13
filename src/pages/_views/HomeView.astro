@@ -6,6 +6,7 @@ import type { Locale } from '../../domain/shared/locale';
 import { dictionaryFor } from '../../ui/i18n/dictionary';
 import { homePath, privacyPath } from '../../ui/i18n/routes';
 import BaseLayout from '../../ui/layouts/BaseLayout.astro';
+import AboutSection from '../../ui/sections/AboutSection.astro';
 import AskSection from '../../ui/sections/AskSection.astro';
 import CapabilitiesSection from '../../ui/sections/CapabilitiesSection.astro';
 import ContactSection from '../../ui/sections/ContactSection.astro';
@@ -59,9 +60,16 @@ const jsonLd = homeGraph({
   navItems={navItems}
   jsonLd={jsonLd}
 >
-  <HeroSection t={t} email={SITE.email} githubUrl={SITE.githubUrl} linkedinUrl={SITE.linkedinUrl} />
+  <HeroSection
+    t={t}
+    locale={locale}
+    email={SITE.email}
+    githubUrl={SITE.githubUrl}
+    linkedinUrl={SITE.linkedinUrl}
+  />
   <MetricsSection t={t} metrics={metrics} />
   <ProjectsSection t={t} projects={projects} />
+  <AboutSection t={t} />
   <CapabilitiesSection t={t} locale={locale} matrix={matrix} />
   <ExperienceSection
     t={t}
@@ -71,8 +79,10 @@ const jsonLd = homeGraph({
   />
   <ServicesSection
     t={t}
+    locale={locale}
     services={profile.services}
     process={profile.process}
+    currency={profile.currency}
     pricing={profile.pricing}
   />
   <CredentialsSection t={t} locale={locale} credentials={profile.credentials} />

@@ -6,25 +6,30 @@ Decisions: [ADR 0006](adr/0006-tailwind-on-design-tokens.md) and
 
 ## Direction
 
-Dark first, with a complete light theme. Geist Sans for text and names; Geist Mono for roles,
-labels and technical data. One amber "signal" accent. Rounded cards with 1 px borders. Motion is
-quiet (hover lift, color transitions) and switches off with `prefers-reduced-motion`.
+Chiaroscuro ([ADR 0018](adr/0018-chiaroscuro-redesign.md)): a warm near-black ground, cream ink
+and one candle-ochre light, with a complete light theme. Literata (light, display optical size)
+for headlines and section titles, Geist Sans for text, Geist Mono for data, captions and the
+ASCII painting. Surfaces are bevelled rather than bordered; the `Frame` primitive nests a stage
+inside a frame with concentric corners. Buttons are pills. Motion is quiet and switches off with
+`prefers-reduced-motion`: pills scale slightly, sections rise and clear a small blur on scroll
+where the browser supports view timelines, and the hero painting develops from the dark.
 
 ## Tokens
 
 All values live in `src/ui/styles/global.css`.
 
-| Group   | Tokens (Tailwind utilities)                                                                          |
-| ------- | ---------------------------------------------------------------------------------------------------- |
-| Surface | `canvas`, `surface`, `surface-raised`, `line`, `line-strong`                                         |
-| Text    | `ink` (primary), `muted` (secondary), `subtle` (tertiary, still AA)                                  |
-| Accent  | `accent` (fills), `accent-ink` (accent text and links), `on-accent` (text on accent fills)           |
-| Status  | `success`                                                                                            |
-| Type    | `text-display`, `text-heading`, `text-title`, `text-lead`, `text-body`, `text-small`, `text-eyebrow` |
-| Radius  | `rounded-chip`, `rounded-control`, `rounded-card`, `rounded-panel`                                   |
-| Shadow  | `shadow-card`, `shadow-lift`                                                                         |
+| Group   | Tokens (Tailwind utilities)                                                                                                                      |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Surface | `canvas`, `surface`, `surface-raised`, `frame`, `line`, `line-strong`                                                                            |
+| Text    | `ink` (primary), `muted` (secondary), `subtle` (tertiary, still AA)                                                                              |
+| Accent  | `accent` (fills), `accent-ink` (accent text and links), `on-accent` (text on accent fills)                                                       |
+| Status  | `success` (verdigris)                                                                                                                            |
+| Art     | `ascii` (the ink of the hero painting)                                                                                                           |
+| Type    | `font-display`; `text-display`, `text-heading`, `text-quote`, `text-title`, `text-price`, `text-lead`, `text-body`, `text-small`, `text-eyebrow` |
+| Radius  | `rounded-chip`, `rounded-control`, `rounded-card`, `rounded-panel`, `rounded-frame`, `rounded-stage`                                             |
+| Shadow  | `shadow-card`, `shadow-lift`, `shadow-bevel`, `shadow-glow`                                                                                      |
 
-Display and heading sizes are fluid (`clamp()`), so headings scale between phone and desktop
+Display, heading and quote sizes are fluid (`clamp()`), so headings scale between phone and desktop
 without breakpoints.
 
 ## Primitives (`src/ui/primitives`)
@@ -37,9 +42,14 @@ without breakpoints.
 | `TextLink`  | Inline underlined link, external arrow and screen-reader note                    |
 | `Badge`     | Mono label; `status` adds a decorative live dot                                  |
 | `Tag`       | Technology chip, always text                                                     |
-| `Card`      | Bordered surface; `interactive` lifts on hover and focus                         |
+| `Card`      | Bevelled surface; `interactive` brightens and scales slightly on hover           |
+| `Frame`     | Frame with a label row around a stage; `inverted` swaps ink and canvas           |
 | `Stat`      | Headline figure that always prints its source                                    |
-| `Portrait`  | 4:5 photo with AVIF/WebP, or a monogram placeholder until the photo exists       |
+| `Portrait`  | 4:5 photo with AVIF/WebP, or a serif monogram placeholder until the photo exists |
+
+Art (`src/ui/art`): `AsciiArt` renders the committed ASCII grid of Caravaggio's _Narcissus_
+(`pnpm ascii` regenerates it) with a lamp that follows the pointer and a switch that floods the
+painting's real colours.
 
 Site chrome (`src/ui/chrome`): `SiteHeader`, `SiteFooter`, `ThemeToggle`. Page layout:
 `src/ui/layouts/BaseLayout.astro` (meta, theme bootstrap, skip link, header, footer).

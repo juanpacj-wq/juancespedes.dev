@@ -124,6 +124,7 @@ describe('getProfile', () => {
     credentials: [],
     services: [],
     process: [],
+    currency: 'USD',
     pricing: 'Quoted',
   };
   const repository: ProfileRepository = { get: () => Promise.resolve(profile) };

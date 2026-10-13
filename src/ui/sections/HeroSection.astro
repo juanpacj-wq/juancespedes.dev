@@ -1,76 +1,95 @@
 ---
+import type { Locale } from '../../domain/shared/locale';
+import AsciiArt from '../art/AsciiArt.astro';
 import type { Dictionary } from '../i18n/dictionary';
-import Icon from '../icons/Icon.astro';
 import Badge from '../primitives/Badge.astro';
 import Button from '../primitives/Button.astro';
 import Container from '../primitives/Container.astro';
-import Portrait from '../primitives/Portrait.astro';
 
 interface Props {
   t: Dictionary;
+  locale: Locale;
   email: string;
   githubUrl: string;
   linkedinUrl: string;
 }
 
-const { t, email, githubUrl, linkedinUrl } = Astro.props;
+const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
 ---
 
-<Container
-  as="section"
-  class="grid gap-12 pt-12 pb-16 sm:pt-20 sm:pb-24 lg:grid-cols-[1fr_22rem] lg:items-end lg:gap-16"
->
-  <div class="flex flex-col gap-6">
-    <Badge tone="success" status>
-      {t.availability.available}
-    </Badge>
-    <h1 class="text-display font-semibold text-balance">{t.profile.name}</h1>
-    <p class="max-w-2xl font-mono text-title text-muted">{t.profile.role}</p>
-    <p class="max-w-prose text-lead text-muted">{t.hero.pitch}</p>
-    <p class="flex items-center gap-2 text-small text-subtle">
-      <Icon name="map-pin" size={16} />
-      {t.profile.location}
-    </p>
-    <div class="flex flex-wrap gap-3">
-      <Button href="#projects" icon="arrow-right" size="lg">
-        {t.hero.primaryCta}
-      </Button>
-      <Button href="#contact" variant="secondary" size="lg">
-        {t.hero.secondaryCta}
-      </Button>
+<section class="relative overflow-hidden">
+  <!-- Candlelight behind the figure: the one light source of the page (chiaroscuro). -->
+  <div class="hero-light pointer-events-none absolute inset-0" aria-hidden="true"></div>
+  <Container class="relative grid items-center gap-12 pt-10 pb-16 sm:pt-16 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:py-12">
+    <div class="flex flex-col gap-7">
+      <Badge tone="success" status>
+        {t.availability.available}
+      </Badge>
+      <div class="flex flex-wrap items-baseline gap-x-2 text-lead">
+        <h1 class="font-medium text-ink">{t.profile.name}</h1>
+        <p class="text-muted">
+          <span aria-hidden="true">· </span>
+          {t.hero.intro}
+        </p>
+      </div>
+      <p class="font-display text-display font-light text-balance">{t.hero.headline}</p>
+      <p class="max-w-xl text-lead text-pretty text-muted">{t.hero.pitch}</p>
+      <div class="flex flex-wrap gap-3">
+        <Button href="#projects" icon="arrow-right" size="lg">
+          {t.hero.primaryCta}
+        </Button>
+        <Button href="#contact" variant="secondary" size="lg">
+          {t.hero.secondaryCta}
+        </Button>
+      </div>
+      <ul class="-ms-5 flex flex-wrap items-center gap-1 text-small" aria-label={t.hero.elsewhere}>
+        <li>
+          <Button
+            href={githubUrl}
+            variant="ghost"
+            icon="github"
+            external
+            externalLabel={t.a11y.external}
+          >
+            GitHub
+          </Button>
+        </li>
+        <li>
+          <Button
+            href={linkedinUrl}
+            variant="ghost"
+            icon="linkedin"
+            external
+            externalLabel={t.a11y.external}
+          >
+            LinkedIn
+          </Button>
+        </li>
+        <li>
+          <Button href={`mailto:${email}`} variant="ghost" icon="mail">
+            {email}
+          </Button>
+        </li>
+      </ul>
     </div>
-    <ul
-      class="flex flex-wrap items-center gap-2 text-small text-muted"
-      aria-label={t.hero.elsewhere}
-    >
-      <li>
-        <Button
-          href={githubUrl}
-          variant="ghost"
-          icon="github"
-          external
-          externalLabel={t.a11y.external}
-        >
-          GitHub
-        </Button>
-      </li>
-      <li>
-        <Button
-          href={linkedinUrl}
-          variant="ghost"
-          icon="linkedin"
-          external
-          externalLabel={t.a11y.external}
-        >
-          LinkedIn
-        </Button>
-      </li>
-      <li>
-        <Button href={`mailto:${email}`} variant="ghost" icon="mail">
-          {email}
-        </Button>
-      </li>
-    </ul>
-  </div>
-  <Portrait alt={t.profile.portraitAlt} initials="JC" priority class="max-w-sm" />
-</Container>
+    <AsciiArt
+      locale={locale}
+      alt={t.art.alt}
+      caption={t.art.caption}
+      characters={t.art.characters}
+      lightOn={t.art.lightOn}
+      lightOff={t.art.lightOff}
+      class="mx-auto w-full max-w-xl lg:max-w-none"
+    />
+  </Container>
+</section>
+
+<style>
+  .hero-light {
+    background: radial-gradient(
+      50% 60% at 78% 38%,
+      color-mix(in srgb, var(--color-accent) 9%, transparent),
+      transparent 70%
+    );
+  }
+</style>

@@ -141,9 +141,22 @@ export const profileSchema = z.strictObject({
       url: z.url({ protocol: /^https$/ }).nullable(),
     }),
   ),
+  currency: z.enum(['COP', 'USD']),
   services: z
-    .array(z.strictObject({ title: text, summary: text, deliverables: z.array(text).min(1) }))
-    .min(1),
+    .array(
+      z.strictObject({
+        title: text,
+        summary: text,
+        deliverables: z.array(text).min(1),
+        price: z.strictObject({ from: z.number().int().positive(), scope: text }),
+        featured: z.boolean().default(false),
+      }),
+    )
+    .min(1)
+    .refine(
+      (services) => services.filter((service) => service.featured).length <= 1,
+      'at most one featured service',
+    ),
   process: z.array(z.strictObject({ title: text, description: text })).min(1),
   pricing: text,
 });

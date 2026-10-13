@@ -18,7 +18,7 @@ interface Props {
 const { t, locale, email, privacyHref } = Astro.props;
 ---
 
-<Section id="contact" eyebrow={t.contact.eyebrow} title={t.contact.title}>
+<Section id="contact" title={t.contact.title}>
   <p slot="description">{t.contact.description}</p>
   <div class="grid gap-8 lg:grid-cols-[1fr_18rem]">
     <Card padding="lg">

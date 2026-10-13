@@ -25,7 +25,7 @@ const countText = (count: number) =>
   count === 1 ? t.projects.countOne : t.projects.count.replace('{count}', String(count));
 ---
 
-<Section id="projects" eyebrow={t.projects.eyebrow} title={t.projects.title}>
+<Section id="projects" title={t.projects.title}>
   <p slot="description">{t.projects.description}</p>
 
   {projects.length === 0 ? (

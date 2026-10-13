@@ -10,19 +10,21 @@ import BaseLayout from '../ui/layouts/BaseLayout.astro';
 import Badge from '../ui/primitives/Badge.astro';
 import Button from '../ui/primitives/Button.astro';
 import Card from '../ui/primitives/Card.astro';
+import Frame from '../ui/primitives/Frame.astro';
 import Portrait from '../ui/primitives/Portrait.astro';
 import Section from '../ui/primitives/Section.astro';
 import Stat from '../ui/primitives/Stat.astro';
 import Tag from '../ui/primitives/Tag.astro';
 import TextLink from '../ui/primitives/TextLink.astro';
 
-const surfaces = ['canvas', 'surface', 'surface-raised', 'line', 'line-strong'] as const;
-const inks = ['ink', 'muted', 'subtle', 'accent-ink', 'accent', 'success'] as const;
+const surfaces = ['canvas', 'surface', 'surface-raised', 'frame', 'line', 'line-strong'] as const;
+const inks = ['ink', 'muted', 'subtle', 'accent-ink', 'accent', 'ascii', 'success'] as const;
 
 const swatchClass: Record<(typeof surfaces)[number] | (typeof inks)[number], string> = {
   canvas: 'bg-canvas',
   surface: 'bg-surface',
   'surface-raised': 'bg-surface-raised',
+  frame: 'bg-frame',
   line: 'bg-line',
   'line-strong': 'bg-line-strong',
   ink: 'bg-ink',
@@ -30,12 +32,15 @@ const swatchClass: Record<(typeof surfaces)[number] | (typeof inks)[number], str
   subtle: 'bg-subtle',
   'accent-ink': 'bg-accent-ink',
   accent: 'bg-accent',
+  ascii: 'bg-ascii',
   success: 'bg-success',
 };
 
 const typeScale = [
-  ['text-display', 'Display', 'text-display font-semibold'],
-  ['text-heading', 'Heading', 'text-heading font-semibold'],
+  ['text-display', 'Display serif', 'font-display text-display font-light'],
+  ['text-heading', 'Heading serif', 'font-display text-heading font-light'],
+  ['text-quote', 'A lead sentence set in the serif', 'font-display text-quote font-light'],
+  ['text-price', '$ 6.000.000', 'text-price font-semibold tabular-nums'],
   ['text-title', 'Title', 'text-title font-medium'],
   ['text-lead', 'Lead paragraph', 'text-lead'],
   ['text-body', 'Body text for long reading', 'text-body'],
@@ -157,6 +162,16 @@ const iconNames = Object.keys(ICONS) as IconName[];
         </h3>
         <p class="mt-2 text-small text-muted">The whole card is the link target; hover lifts it.</p>
       </Card>
+    </div>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      <Frame label="Frame with a label row">
+        <p class="text-muted">
+          The stage sits inside the frame with concentric corners and a bevel instead of a border.
+        </p>
+      </Frame>
+      <Frame label="Inverted stage" inverted>
+        <p>Inverted swaps ink and canvas to give one item emphasis in both themes.</p>
+      </Frame>
     </div>
   </Section>
 

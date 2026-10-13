@@ -14,7 +14,7 @@ const { t, metrics } = Astro.props;
 ---
 
 {metrics.length > 0 && (
-  <Section id="metrics" eyebrow={t.metrics.eyebrow} title={t.metrics.title}>
+  <Section id="metrics" title={t.metrics.title}>
     <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {metrics.map((metric, index) => (
         <li class:list={[index === 0 && 'sm:col-span-2 lg:row-span-2']}>

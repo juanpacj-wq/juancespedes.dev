@@ -1,0 +1,62 @@
+---
+import type { Dictionary } from '../i18n/dictionary';
+import Icon from '../icons/Icon.astro';
+import Portrait from '../primitives/Portrait.astro';
+import Section from '../primitives/Section.astro';
+
+/**
+ * The person behind the work: the portrait lives here, away from the hero (which carries the
+ * art), with a caption and the live local time in Barranquilla.
+ */
+interface Props {
+  t: Dictionary;
+}
+
+const { t } = Astro.props;
+const [lead, ...rest] = t.about.paragraphs;
+---
+
+<Section id="about" title={t.about.title}>
+  <div class="grid gap-10 md:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] md:gap-16 lg:gap-24">
+    <figure class="reveal">
+      <Portrait alt={t.profile.portraitAlt} initials="JC" />
+      <figcaption class="mt-4 flex flex-col gap-1 text-small text-subtle">
+        <span class="text-ink">{t.profile.name}</span>
+        <span class="flex items-center gap-2">
+          <Icon name="map-pin" size={14} />
+          {t.profile.location}
+        </span>
+        <span class="font-mono text-eyebrow" data-clock hidden>
+          {t.about.localTime} <time class="text-muted"></time>
+        </span>
+      </figcaption>
+    </figure>
+    <div class="reveal flex max-w-2xl flex-col gap-6 self-center">
+      {lead && <p class="font-display text-quote font-light text-pretty">{lead}</p>}
+      {rest.map((paragraph) => (
+        <p class="text-lead text-pretty text-muted">{paragraph}</p>
+      ))}
+    </div>
+  </div>
+</Section>
+
+<script>
+  // Local time in Barranquilla, refreshed every half minute. Without JavaScript it stays hidden.
+  const format = new Intl.DateTimeFormat(document.documentElement.lang || 'es', {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'America/Bogota',
+  });
+  for (const clock of document.querySelectorAll<HTMLElement>('[data-clock]')) {
+    const time = clock.querySelector('time');
+    if (!time) continue;
+    const tick = (): void => {
+      const now = new Date();
+      time.dateTime = now.toISOString();
+      time.textContent = format.format(now);
+    };
+    tick();
+    clock.hidden = false;
+    window.setInterval(tick, 30_000);
+  }
+</script>

@@ -4,6 +4,18 @@ import type { Dictionary } from './dictionary';
 
 const INTL_LOCALE: Readonly<Record<Locale, string>> = { es: 'es-CO', en: 'en-US' };
 
+/** "10.527" in Spanish, "10,527" in English. */
+export const formatNumber = (locale: Locale, value: number): string =>
+  new Intl.NumberFormat(INTL_LOCALE[locale]).format(value);
+
+/** "$ 6.000.000" in Spanish (pesos), "$1,500" in English (dollars): whole amounts only. */
+export const formatMoney = (locale: Locale, amount: number, currency: string): string =>
+  new Intl.NumberFormat(INTL_LOCALE[locale], {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
+
 /** "jul. 2024" in Spanish, "Jul 2024" in English. Months are UTC so the date never shifts. */
 export const formatYearMonth = (locale: Locale, value: string): string => {
   const [year, month] = value.split('-').map(Number);
