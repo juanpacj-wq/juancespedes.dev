@@ -83,16 +83,9 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     initial-value: 160%;
   }
 
+  /* --ratio (width over height) lets a parent size the figure by the height it has. */
   .ascii-art {
     container-type: inline-size;
-  }
-
-  /* Beside the text, as large as the column allows while the whole figure and its caption stay
-     within one screen. */
-  @media (min-width: 64rem) {
-    .ascii-art {
-      width: min(100%, calc((100svh - 13rem) * var(--ratio)));
-    }
   }
 
   .ascii-canvas {

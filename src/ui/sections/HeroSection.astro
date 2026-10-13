@@ -20,8 +20,8 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
 <section class="relative overflow-hidden">
   <!-- Candlelight behind the figure: the one light source of the page (chiaroscuro). -->
   <div class="hero-light pointer-events-none absolute inset-0" aria-hidden="true"></div>
-  <Container class="relative grid items-center gap-12 pt-10 pb-16 sm:pt-16 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-10 lg:py-12">
-    <div class="flex flex-col gap-7">
+  <Container class="relative grid items-center pt-10 pb-12 sm:pt-16 lg:min-h-[calc(100svh-4rem)] lg:py-12">
+    <div class="flex flex-col gap-7 lg:w-[42%]">
       <Badge tone="success" status>
         {t.availability.available}
       </Badge>
@@ -69,6 +69,8 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
         </li>
       </ul>
     </div>
+  </Container>
+  <div class="hero-art mx-auto max-w-xl px-4 pb-16 sm:px-6">
     <AsciiArt
       locale={locale}
       alt={t.art.alt}
@@ -76,17 +78,44 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
       characters={t.art.characters}
       lightOn={t.art.lightOn}
       lightOff={t.art.lightOff}
-      class="mx-auto w-full max-w-xl lg:max-w-none"
+      class="w-full"
     />
-  </Container>
+  </div>
 </section>
 
 <style>
   .hero-light {
     background: radial-gradient(
-      50% 60% at 78% 38%,
+      50% 60% at 72% 48%,
       color-mix(in srgb, var(--color-accent) 9%, transparent),
       transparent 70%
     );
+  }
+
+  /* From a laptop up the painting leaves the content column: it takes everything right of the
+     text (42 % of the content width) out to the edge of the screen, and the full height of the
+     hero, at the largest size whose proportions fit. */
+  @media (min-width: 64rem) {
+    .hero-art {
+      position: absolute;
+      inset-block: 0.75rem;
+      right: clamp(1rem, 2vw, 2rem);
+      /* The content box is at most 80rem wide with 2rem of padding on each side. */
+      --gutter: max(2rem, (100vw - 80rem) / 2 + 2rem);
+      --text: calc((min(100vw, 80rem) - 4rem) * 0.42);
+      left: calc(var(--gutter) + var(--text) + 2.5rem);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      container-type: size;
+    }
+
+    .hero-art :global(.ascii-art) {
+      /* 4rem is the caption row under the drawing. */
+      width: min(100cqw, calc((100cqh - 4rem) * var(--ratio)));
+    }
   }
 </style>

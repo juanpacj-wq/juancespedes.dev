@@ -54,8 +54,9 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
   read as noise, so it was replaced. `AsciiArt.astro` stacks two copies
   of the text: ochre ink, and the same characters filled with a 192 px copy of the painting
   (`background-clip: text`). A lamp follows a fine pointer and shows the true colours around
-  it; a click or the labelled switch floods the whole figure with them. Beside the text the figure is
-  as wide as its column allows while it and its caption fit in one screen. Masks and registered
+  it; a click or the labelled switch floods the whole figure with them. From a laptop up the figure
+  leaves the content column: it takes the whole height of the hero and everything right of the
+  text out to the edge of the screen, at the largest size whose proportions fit. Masks and registered
   custom properties do the animation; the script is under 1 kB and inline. The ink develops
   outward on first paint unless the visitor prefers reduced motion. Screen readers get one
   image with a description, and the caption credits the painting.
