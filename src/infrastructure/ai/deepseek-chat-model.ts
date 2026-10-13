@@ -11,6 +11,9 @@ import { chatInstructions } from './chat-instructions';
  * - `finish_reason: "content_filter"` is reported as a refusal; other abnormal ends as errors.
  */
 
+/** Answers run 50 to 170 tokens; the cap bounds what one question can cost if the model rambles. */
+export const DEEPSEEK_DEFAULT_MAX_TOKENS = 600;
+
 export interface DeepSeekChatModelOptions {
   readonly apiKey: string;
   readonly model: string;

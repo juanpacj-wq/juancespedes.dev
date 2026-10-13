@@ -31,6 +31,9 @@ export interface AnthropicChatModelOptions {
   readonly client?: Pick<Anthropic, 'beta'>;
 }
 
+/** Higher than DeepSeek's: Claude always thinks, and thinking counts toward the cap. */
+export const ANTHROPIC_DEFAULT_MAX_TOKENS = 4000;
+
 const FALLBACK_BETA = 'server-side-fallback-2026-07-01';
 
 export const makeAnthropicChatModel = ({

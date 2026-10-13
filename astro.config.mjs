@@ -68,13 +68,20 @@ export default defineConfig({
         values: ['low', 'medium', 'high', 'xhigh', 'max'],
         default: 'high',
       }),
-      CHAT_MAX_TOKENS: envField.number({ context: 'server', access: 'secret', default: 4000 }),
+      // Unset picks the provider default (600 for DeepSeek, 4000 for Claude, which also thinks).
+      CHAT_MAX_TOKENS: envField.number({ context: 'server', access: 'secret', optional: true }),
       CHAT_VISITOR_DAILY_LIMIT: envField.number({
         context: 'server',
         access: 'secret',
         default: 10,
       }),
-      CHAT_DAILY_LIMIT: envField.number({ context: 'server', access: 'secret', default: 150 }),
+      CHAT_DAILY_LIMIT: envField.number({ context: 'server', access: 'secret', default: 100 }),
+      // Below this DeepSeek balance (USD) the chat pauses itself until the account is topped up.
+      CHAT_MIN_BALANCE_USD: envField.number({
+        context: 'server',
+        access: 'secret',
+        default: 0.5,
+      }),
       ANTHROPIC_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       DEEPSEEK_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       CHAT_VISITOR_PEPPER: envField.string({ context: 'server', access: 'secret', optional: true }),

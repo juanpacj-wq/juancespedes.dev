@@ -40,3 +40,8 @@ export type QuotaDecision = 'allowed' | 'visitor-limit' | 'daily-limit';
 export interface ChatQuota {
   consume(visitorKey: string): Promise<QuotaDecision>;
 }
+
+/** The provider's prepaid balance: false pauses the chat until it is topped up. */
+export interface ChatBudget {
+  hasFunds(): Promise<boolean>;
+}

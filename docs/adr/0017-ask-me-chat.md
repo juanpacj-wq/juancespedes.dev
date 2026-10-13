@@ -36,12 +36,19 @@ details the case studies keep out, or talk about a job search the owner keeps di
   keep the job search out of it ("available for projects"), never give prices, and answer
   off-topic or manipulative questions with one exact sentence the evaluation can detect.
 - **Cost and abuse limits**, in layers (the same for both providers): Turnstile on every question; 3 questions per minute per
-  visitor (Workers rate limiting); daily quotas per visitor (10) and for the site (150) on
+  visitor (Workers rate limiting); daily quotas per visitor (10) and for the site (100) on
   Workers KV, failing closed; question of 500 characters at most, 4 turns of history of 1,500
-  characters each; a 4,000-token cap per answer; the monthly spending cap in the Anthropic
-  console of the provider; and the kill switch (`CHAT_ENABLED`). The visitor id is a salted, daily-rotating hash
+  characters each; a cap per answer of 600 tokens on DeepSeek (answers measure 50 to 170) and
+  4,000 on Claude, whose thinking counts toward it; the balance guard below; the provider's own
+  spending limit (DeepSeek is prepaid); and the kill switch (`CHAT_ENABLED`). The visitor id is a salted, daily-rotating hash
   of the IP; the raw IP and the conversation are never stored. Logs keep token counts and timing,
   never questions or answers.
+- **Balance guard.** On DeepSeek the Worker reads the account balance (`/user/balance`, cached ten
+  minutes in KV) before the quota, and pauses the chat (`paused`, a 503 the interface explains)
+  while it is under `CHAT_MIN_BALANCE_USD` (USD 0.50), failing closed if it cannot be read. The
+  `chat-budget` workflow checks `/api/chat-status` every day and keeps an issue open while the
+  chat is paused, so a drained balance is noticed without the key ever leaving Cloudflare. At the
+  site cap a sustained attack costs about USD 0.40 a day at most.
 - **Previews and tests never pay.** `CHAT_MODEL=fake` (the default) streams a deterministic
   answer from the same corpus, so the endpoint, quotas, interface and end-to-end tests run for
   free. Pull request previews force the fake model; production uses the real one only when
@@ -62,7 +69,7 @@ details the case studies keep out, or talk about a job search the owner keeps di
 - Any change to the instructions, the corpus format, the model or the effort invalidates the cache
   and must be followed by `pnpm eval:chat`.
 - KV counters are eventually consistent: under a burst a few questions may pass a limit. The
-  per-minute limit and the monthly cap bound the cost of that.
+  per-minute limit and the balance guard bound the cost of that.
 - The evaluation spends real money (30 questions per run, cents on DeepSeek) and is run by hand,
   not in CI.
 - Switching provider is a variable (`CHAT_MODEL`) plus a key, and needs a new evaluation run and an

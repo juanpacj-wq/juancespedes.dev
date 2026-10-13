@@ -27,16 +27,26 @@ const setup = (
   const consume = vi.fn(() => Promise.resolve(decision));
   const verify = vi.fn(() => Promise.resolve(true));
   const allow = vi.fn(() => Promise.resolve(true));
+  const hasFunds = vi.fn(() => Promise.resolve(true));
   const deps: AnswerQuestionDeps = {
     enabled: true,
     model: { answer },
     corpus: { get: corpusGet },
     quota: { consume },
+    budget: { hasFunds },
     verifier: { verify },
     rateLimiter: { allow },
     ...overrides,
   };
-  return { answer, corpusGet, consume, verify, allow, run: makeAnswerPortfolioQuestion(deps) };
+  return {
+    answer,
+    corpusGet,
+    consume,
+    verify,
+    allow,
+    hasFunds,
+    run: makeAnswerPortfolioQuestion(deps),
+  };
 };
 
 const input = {
@@ -94,6 +104,14 @@ describe('answerPortfolioQuestion', () => {
     const bot = setup({ verifier: { verify: () => Promise.resolve(false) } });
     expect(await bot.run(input)).toEqual({ ok: false, error: { kind: 'verification-failed' } });
     expect(bot.consume).not.toHaveBeenCalled();
+    expect(bot.hasFunds).not.toHaveBeenCalled();
+  });
+
+  it('pauses on a low balance without using up the quota or calling the model', async () => {
+    const { run, answer, consume } = setup({ budget: { hasFunds: () => Promise.resolve(false) } });
+    expect(await run(input)).toEqual({ ok: false, error: { kind: 'paused' } });
+    expect(consume).not.toHaveBeenCalled();
+    expect(answer).not.toHaveBeenCalled();
   });
 
   it.each(['visitor-limit', 'daily-limit'] as const)(

@@ -1,7 +1,7 @@
 import { validateChatQuestion, type ChatQuestionIssue } from '../../domain/chat/question';
 import type { Locale } from '../../domain/shared/locale';
 import { err, ok, type Result } from '../../domain/shared/result';
-import type { ChatEvent, ChatModel, ChatQuota, PortfolioCorpus } from '../ports/chat';
+import type { ChatBudget, ChatEvent, ChatModel, ChatQuota, PortfolioCorpus } from '../ports/chat';
 import type { HumanVerifier, RateLimiter } from '../ports/contact';
 
 export interface AnswerQuestionInput {
@@ -19,6 +19,7 @@ export type AnswerQuestionError =
   | { readonly kind: 'invalid'; readonly issue: ChatQuestionIssue }
   | { readonly kind: 'rate-limited' }
   | { readonly kind: 'verification-failed' }
+  | { readonly kind: 'paused' }
   | { readonly kind: 'visitor-limit' }
   | { readonly kind: 'daily-limit' };
 
@@ -28,6 +29,8 @@ export interface AnswerQuestionDeps {
   readonly model: ChatModel;
   readonly corpus: PortfolioCorpus;
   readonly quota: ChatQuota;
+  /** The automatic switch: a low provider balance answers "paused". */
+  readonly budget: ChatBudget;
   readonly verifier: HumanVerifier;
   /** Short-window burst limit (per minute); the quota covers the day. */
   readonly rateLimiter: RateLimiter;
@@ -38,7 +41,7 @@ export interface AnswerQuestionDeps {
  * model, the only paid step, runs last. Nothing about the conversation is stored.
  */
 export const makeAnswerPortfolioQuestion =
-  ({ enabled, model, corpus, quota, verifier, rateLimiter }: AnswerQuestionDeps) =>
+  ({ enabled, model, corpus, quota, budget, verifier, rateLimiter }: AnswerQuestionDeps) =>
   async (
     input: AnswerQuestionInput,
   ): Promise<Result<AsyncIterable<ChatEvent>, AnswerQuestionError>> => {
@@ -52,6 +55,9 @@ export const makeAnswerPortfolioQuestion =
     if (!(await verifier.verify(input.humanToken, input.remoteIp))) {
       return err({ kind: 'verification-failed' });
     }
+
+    // Before the quota, so a paused chat does not use up anyone's questions.
+    if (!(await budget.hasFunds())) return err({ kind: 'paused' });
 
     const decision = await quota.consume(input.visitorKey);
     if (decision !== 'allowed') return err({ kind: decision });

@@ -1,0 +1,72 @@
+name: Chat budget
+
+# Balance watch for "Ask me" (ADR 0017). The Worker pauses the chat by itself when the DeepSeek
+# balance drops below CHAT_MIN_BALANCE_USD; this daily check makes that visible. While the chat is
+# paused it keeps one issue labeled "chat-budget" open (GitHub notifies the owner by email), and
+# closes it once the chat answers again after a top-up. The DeepSeek key never leaves Cloudflare:
+# the endpoint only says on, off or paused.
+on:
+  schedule:
+    - cron: '0 13 * * *' # 08:00 in Bogotá
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: chat-budget
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read the chat status
+        id: status
+        run: |
+          for attempt in 1 2 3; do
+            body=$(curl --silent --show-error --max-time 15 https://juancespedes.dev/api/chat-status) &&
+              status=$(printf '%s' "$body" | jq -r '.chat // empty') && [ -n "$status" ] && break
+            status=""
+            sleep 20
+          done
+          if [ -z "$status" ]; then
+            # The uptime workflow reports an unreachable site; this one only watches the balance.
+            echo "::warning::The chat status could not be read."
+          fi
+          echo "chat: ${status:-unknown}"
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the budget issue
+        if: steps.status.outputs.status == 'paused'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create chat-budget --repo "$GITHUB_REPOSITORY" --color FBCA04 \
+            --description "Ask me chat paused for a low DeepSeek balance" 2>/dev/null || true
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --label chat-budget --state open --json number --jq '.[0].number')
+          note="$(date -u +%Y-%m-%d): the chat is still paused ([run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID))."
+          if [ -z "$open" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" --label chat-budget \
+              --title "Ask me paused: DeepSeek balance is low" \
+              --body "The DeepSeek balance dropped below the minimum (CHAT_MIN_BALANCE_USD), so the Worker paused the chat. Visitors see a message pointing to the email.
+
+          To resume, top up at https://platform.deepseek.com/top_up. The chat answers again within ten minutes, and the next daily check closes this issue. See docs/runbooks/ask-me-chat.md.
+
+          $note"
+          else
+            gh issue comment "$open" --repo "$GITHUB_REPOSITORY" --body "$note"
+          fi
+
+      - name: Close the budget issue after a top-up
+        if: steps.status.outputs.status == 'on'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --label chat-budget --state open --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            gh issue close "$open" --repo "$GITHUB_REPOSITORY" \
+              --comment "$(date -u +%Y-%m-%d): the chat answers again."
+          fi
