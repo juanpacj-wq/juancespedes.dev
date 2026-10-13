@@ -30,7 +30,16 @@
       "namespace_id": "1002",
       "simple": { "limit": 10, "period": 60 },
     },
+    // "Ask me" chat (ADR 0017): at most 3 questions per minute per visitor; the daily quotas
+    // live in CHAT_QUOTA.
+    {
+      "name": "CHAT_RATE_LIMITER",
+      "namespace_id": "1003",
+      "simple": { "limit": 3, "period": 60 },
+    },
   ],
+  // Daily question counters for the chat, per anonymized visitor and for the whole site.
+  "kv_namespaces": [{ "binding": "CHAT_QUOTA", "id": "fdf95983768546a998eb92b105a63424" }],
   "observability": {
     "enabled": true,
   },

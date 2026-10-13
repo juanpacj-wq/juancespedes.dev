@@ -14,6 +14,7 @@ import {
 } from '../../domain/contact/contact-request';
 import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
+import { loadTurnstile } from './turnstile';
 
 /*
  * Contact form island. Server-rendered as a plain HTML form (it posts to /api/contact even
@@ -21,18 +22,6 @@ import type { Dictionary } from '../i18n/dictionary';
  * runs Cloudflare Turnstile and submits with fetch, announcing every state to screen readers.
  */
 
-interface TurnstileApi {
-  render(container: HTMLElement, options: Record<string, unknown>): string;
-  reset(widgetId: string): void;
-}
-
-declare global {
-  interface Window {
-    turnstile?: TurnstileApi;
-  }
-}
-
-const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 const FIELD_ORDER: readonly ContactField[] = ['name', 'email', 'message', 'consent'];
 
 type Status =
@@ -55,25 +44,6 @@ const readField = (form: FormData, name: string): string => {
   const value = form.get(name);
   return typeof value === 'string' ? value : '';
 };
-
-const loadTurnstile = (): Promise<TurnstileApi> =>
-  new Promise((resolve, reject) => {
-    if (window.turnstile) {
-      resolve(window.turnstile);
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = TURNSTILE_SRC;
-    script.async = true;
-    script.onload = () => {
-      if (window.turnstile) resolve(window.turnstile);
-      else reject(new Error('Turnstile did not load'));
-    };
-    script.onerror = () => {
-      reject(new Error('Turnstile did not load'));
-    };
-    document.head.append(script);
-  });
 
 export default function ContactForm({
   locale,

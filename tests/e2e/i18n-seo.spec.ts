@@ -94,6 +94,7 @@ test.describe('bilingual site and SEO', () => {
       'Experience and education',
       "Let's work together",
       'Education and certifications',
+      'Ask my portfolio',
       'Tell me what you need',
     ]);
     const esRows = await page.request

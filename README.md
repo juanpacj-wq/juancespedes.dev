@@ -34,6 +34,9 @@ decisions and quality checks are meant to be read.
 - **Errors**: browser errors are reported, without visitor data, to Workers Logs.
 - **Analytics**: Cloudflare Web Analytics, cookieless.
 - **Releases**: release-please, with the same required checks as any pull request.
+- **"Ask me"**: a chat that answers about the published work (DeepSeek by default, Claude optional), with prompt caching,
+  Turnstile, daily quotas, a kill switch and a 30-question evaluation set
+  ([ADR 0017](docs/adr/0017-ask-me-chat.md), [runbook](docs/runbooks/ask-me-chat.md)).
 - **Command palette**: Ctrl+K (or the Search button) jumps to any page, project or note and runs
   a few actions ([ADR 0016](docs/adr/0016-command-palette.md)).
 - **Writing**: [technical notes](https://juancespedes.dev/notas) and a [now page](https://juancespedes.dev/ahora), both bilingual content validated like the projects ([ADR 0015](docs/adr/0015-notes-and-now-page.md)).
@@ -84,6 +87,7 @@ Imports may only point inward. Two independent tools check it on every pull requ
 | [0014](docs/adr/0014-mutation-testing.md)                | Mutation testing of the domain with Stryker, weekly                       |
 | [0015](docs/adr/0015-notes-and-now-page.md)              | Technical notes and a "now" page as validated, bilingual content          |
 | [0016](docs/adr/0016-command-palette.md)                 | Ctrl+K command palette with a native dialog, no UI framework              |
+| [0017](docs/adr/0017-ask-me-chat.md)                     | "Ask me" chat with a cached corpus, quotas and an evaluation set          |
 
 ## Quality gates
 
@@ -118,6 +122,7 @@ pnpm verify           # format, lint, types, architecture, unit coverage, build
 pnpm exec playwright install chromium webkit
 pnpm test:e2e         # end-to-end and accessibility on the production build
 pnpm test:mutation    # mutation testing of the domain (about ten minutes)
+pnpm eval:chat        # chat evaluation set against the real model (needs ANTHROPIC_API_KEY, costs money)
 ```
 
 Environment variables are documented in [.env.example](.env.example) and validated at startup.
