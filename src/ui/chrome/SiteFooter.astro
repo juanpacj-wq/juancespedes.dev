@@ -7,9 +7,11 @@ interface Props {
   t: Dictionary;
   repositoryUrl: string;
   privacyHref: string;
+  notesHref: string;
+  nowHref: string;
 }
 
-const { t, repositoryUrl, privacyHref } = Astro.props;
+const { t, repositoryUrl, privacyHref, notesHref, nowHref } = Astro.props;
 ---
 
 <footer class="border-t border-line py-10">
@@ -19,6 +21,10 @@ const { t, repositoryUrl, privacyHref } = Astro.props;
       <TextLink href={repositoryUrl} external externalLabel={t.a11y.external}>
         {t.footer.sourceCode}
       </TextLink>
+      {' · '}
+      <TextLink href={notesHref}>{t.nav.notes}</TextLink>
+      {' · '}
+      <TextLink href={nowHref}>{t.nav.now}</TextLink>
       {' · '}
       <TextLink href={privacyHref}>{t.footer.privacy}</TextLink>
     </p>

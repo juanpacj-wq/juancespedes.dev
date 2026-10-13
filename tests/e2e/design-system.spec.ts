@@ -10,6 +10,10 @@ const PAGES = [
   '/en',
   '/en/projects/plant-telemetry',
   '/en/privacy',
+  '/notas',
+  '/notas/strict-csp-astro-cloudflare',
+  '/en/notes/mutation-testing-coverage',
+  '/ahora',
 ] as const;
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 

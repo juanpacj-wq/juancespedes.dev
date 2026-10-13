@@ -1,0 +1,48 @@
+---
+import type { NowPage } from '../../domain/now/now-page';
+import type { Locale } from '../../domain/shared/locale';
+import type { Dictionary } from '../i18n/dictionary';
+import { formatIsoDate } from '../i18n/format';
+import Container from '../primitives/Container.astro';
+import TextLink from '../primitives/TextLink.astro';
+
+/** The "now" page. The update date sits next to the title: the page is only true as of then. */
+interface Props {
+  t: Dictionary;
+  locale: Locale;
+  page: NowPage;
+}
+
+const { t, locale, page } = Astro.props;
+---
+
+<Container class="flex max-w-3xl flex-col gap-12 py-16 sm:py-24">
+  <header class="flex flex-col gap-4">
+    <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">{t.now.eyebrow}</p>
+    <h1 class="text-heading font-semibold text-balance">{t.now.title}</h1>
+    <p class="text-lead text-muted">{t.now.description}</p>
+    <p class="font-mono text-small text-subtle">
+      {t.now.updated} <time datetime={page.updated}>{formatIsoDate(locale, page.updated)}</time>
+    </p>
+  </header>
+
+  {page.sections.map((section) => (
+    <section class="flex flex-col gap-4 border-t border-line pt-8">
+      <h2 class="text-title font-medium">{section.title}</h2>
+      <ul class="flex flex-col gap-3">
+        {section.items.map((item) => (
+          <li class="flex gap-3 text-muted">
+            <span class="mt-2.5 size-1.5 shrink-0 rounded-chip bg-accent" aria-hidden="true" />
+            {item}
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+
+  <p class="text-small text-subtle">
+    <TextLink href="https://nownownow.com/about" external externalLabel={t.a11y.external}>
+      {t.now.about}
+    </TextLink>
+  </p>
+</Container>

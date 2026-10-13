@@ -1,0 +1,14 @@
+---
+import { container } from '../../composition/container';
+import NoteView from '../_views/NoteView.astro';
+
+/** One page per published note. English: /en/notes/<slug>. */
+export async function getStaticPaths() {
+  const notes = await container.listNotes('es');
+  return notes.map((note) => ({ params: { slug: note.slug } }));
+}
+
+const { slug } = Astro.params;
+---
+
+<NoteView locale="es" slug={slug} />

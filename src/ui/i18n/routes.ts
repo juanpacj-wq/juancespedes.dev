@@ -9,11 +9,28 @@ import { SUPPORTED_LOCALES, type Locale } from '../../domain/shared/locale';
 export type PageRoute =
   | { readonly page: 'home' }
   | { readonly page: 'privacy' }
-  | { readonly page: 'project'; readonly slug: string };
+  | { readonly page: 'project'; readonly slug: string }
+  | { readonly page: 'now' }
+  | { readonly page: 'notes' }
+  | { readonly page: 'note'; readonly slug: string };
 
-const PATHS: Readonly<Record<Locale, { home: string; privacy: string; projects: string }>> = {
-  es: { home: '/', privacy: '/privacidad', projects: '/proyectos' },
-  en: { home: '/en', privacy: '/en/privacy', projects: '/en/projects' },
+interface LocalePaths {
+  readonly home: string;
+  readonly privacy: string;
+  readonly projects: string;
+  readonly now: string;
+  readonly notes: string;
+}
+
+const PATHS: Readonly<Record<Locale, LocalePaths>> = {
+  es: { home: '/', privacy: '/privacidad', projects: '/proyectos', now: '/ahora', notes: '/notas' },
+  en: {
+    home: '/en',
+    privacy: '/en/privacy',
+    projects: '/en/projects',
+    now: '/en/now',
+    notes: '/en/notes',
+  },
 };
 
 export const pathFor = (locale: Locale, route: PageRoute): string => {
@@ -25,6 +42,12 @@ export const pathFor = (locale: Locale, route: PageRoute): string => {
       return paths.privacy;
     case 'project':
       return `${paths.projects}/${route.slug}`;
+    case 'now':
+      return paths.now;
+    case 'notes':
+      return paths.notes;
+    case 'note':
+      return `${paths.notes}/${route.slug}`;
   }
 };
 
@@ -48,6 +71,21 @@ export const homeSectionPath = (locale: Locale, section: string): string =>
 
 export const projectsListPath = (locale: Locale): string => homeSectionPath(locale, 'projects');
 
+export const nowPath = (locale: Locale): string => pathFor(locale, { page: 'now' });
+
+export const notesPath = (locale: Locale): string => pathFor(locale, { page: 'notes' });
+
+export const notePath = (locale: Locale, slug: string): string =>
+  pathFor(locale, { page: 'note', slug });
+
 /** The Open Graph card generated for a page (scripts/generate-og.mjs writes the same paths). */
-export const ogImagePath = (locale: Locale, route: PageRoute): string =>
-  `/og/${locale}/${route.page === 'project' ? `projects/${route.slug}` : route.page}.png`;
+export const ogImagePath = (locale: Locale, route: PageRoute): string => {
+  switch (route.page) {
+    case 'project':
+      return `/og/${locale}/projects/${route.slug}.png`;
+    case 'note':
+      return `/og/${locale}/notes/${route.slug}.png`;
+    default:
+      return `/og/${locale}/${route.page}.png`;
+  }
+};

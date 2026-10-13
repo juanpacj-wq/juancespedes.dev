@@ -12,6 +12,15 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   integrations: [react(), mdx()],
+  // Code in notes: both Shiki themes as CSS variables, so the site theme picks the colors. The
+  // light theme is the high-contrast one: github-light's orange and red fail AA on our surface.
+  // (global.css) instead of a fixed dark block in the light theme.
+  markdown: {
+    shikiConfig: {
+      themes: { light: 'github-light-high-contrast', dark: 'github-dark' },
+      defaultColor: false,
+    },
+  },
   // Images are optimized at build time (sharp); no Cloudflare Images binding needed.
   adapter: cloudflare({ imageService: 'compile' }),
   // No server-side sessions: the site has no accounts. Avoids provisioning a KV namespace.

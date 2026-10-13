@@ -1,0 +1,53 @@
+---
+title: When 100 % coverage was not enough
+summary: Mutation testing on this site's domain found rules the tests executed without checking. First I had to find out why the tool reported 41 % for a reason that had nothing to do with the tests.
+published: '2026-10-12'
+tags: [testing, stryker, quality]
+status: published
+---
+
+This site's domain has 100 % line and branch coverage. It is a good number and it says less than
+it seems: coverage means a line ran during some test, not that some test would fail if that line
+were wrong.
+
+Mutation testing answers the second question. The tool (Stryker, here) makes small changes to the
+code, one at a time: it flips a comparison, replaces a condition with `true`, deletes a message.
+For each change it runs the tests. If one fails, the mutant is killed; if they all pass, it
+survives, and that points to a rule the tests do not really pin down.
+
+## First, distrust the number
+
+The first run reported 41 %. Before writing a single test I looked at one concrete survivor:
+
+```diff
+- if (a.featured !== b.featured) return a.featured ? -1 : 1;
++ if (false) return a.featured ? -1 : 1;
+```
+
+That change breaks the order of featured projects, and a test checks it explicitly. Its survival
+had only one explanation: the mutant was never activated. Stryker's Vitest plugin reused cached
+modules under Vitest 5, so the tests ran against the original code. With the command runner,
+which starts a fresh process per mutant, the real score was 90.7 %. Slower, about ten minutes,
+but every result is true.
+
+## What the real survivors found
+
+The mutants that did survive were genuine gaps:
+
+- No test used a valid https link, so changing link validation to "always invalid" went
+  unnoticed.
+- Exact limits were not tested: a name of exactly two characters, an email of exactly 254.
+- An email with text after the domain passed once the `$` anchor was removed from the pattern.
+- Tests checked which field had a problem, but never the message that explains it.
+- Date ordering was tested by sorting lists, and the sort algorithm never compared two finished
+  projects in the order that would reveal the bug.
+
+Ten new tests closed those gaps and the score rose to 95.1 %. The remaining survivors are
+equivalent mutants: changes that do not alter behavior, such as a redundant condition another
+rule already covers.
+
+## Where it ended up
+
+Mutation testing takes too long for every pull request, so it runs weekly and on demand, with an
+80 % threshold that fails the workflow if the score drops. Coverage is still a gate on every
+change; mutation testing tells whether that coverage is worth anything.

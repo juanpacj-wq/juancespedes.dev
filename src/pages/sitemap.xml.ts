@@ -7,11 +7,17 @@ import { buildSitemap } from '../ui/seo/sitemap';
 
 /** Generated at build time from the same route table the pages use. */
 export const GET: APIRoute = async () => {
-  // Project parity across languages is enforced by the content tests, so one locale lists them.
-  const projects = await container.listProjects(DEFAULT_LOCALE);
+  // Parity across languages is enforced by the content tests, so one locale lists the slugs.
+  const [projects, notes] = await Promise.all([
+    container.listProjects(DEFAULT_LOCALE),
+    container.listNotes(DEFAULT_LOCALE),
+  ]);
   const routes: PageRoute[] = [
     { page: 'home' },
     ...projects.map((project) => ({ page: 'project' as const, slug: project.slug })),
+    { page: 'notes' },
+    ...notes.map((note) => ({ page: 'note' as const, slug: note.slug })),
+    { page: 'now' },
     { page: 'privacy' },
   ];
   return new Response(buildSitemap(routes), {

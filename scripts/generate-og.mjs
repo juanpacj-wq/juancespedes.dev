@@ -14,6 +14,7 @@ import { cardSvg } from './lib/og-card.mjs';
 const ROOT = process.cwd();
 const OUT = join(ROOT, 'public', 'og');
 const PROJECTS = join(ROOT, 'content', 'projects');
+const NOTES = join(ROOT, 'content', 'notes');
 const LOCALES = /** @type {const} */ (['es', 'en']);
 
 const FONT_DIR = join(ROOT, 'node_modules', 'geist', 'dist', 'fonts');
@@ -43,7 +44,10 @@ const write = (relativePath, card) => {
   writeFileSync(path, png);
 };
 
-const slugs = readdirSync(PROJECTS).filter((name) => statSync(join(PROJECTS, name)).isDirectory());
+/** @param {string} dir */
+const folders = (dir) => readdirSync(dir).filter((name) => statSync(join(dir, name)).isDirectory());
+const slugs = folders(PROJECTS);
+const noteSlugs = folders(NOTES);
 let count = 0;
 
 for (const locale of LOCALES) {
@@ -64,7 +68,31 @@ for (const locale of LOCALES) {
     subtitle: t.meta.siteName,
     footer: byline,
   });
-  count += 2;
+  write(`${locale}/now.png`, {
+    eyebrow: t.now.eyebrow,
+    title: t.now.title,
+    subtitle: t.now.description,
+    footer: byline,
+  });
+  write(`${locale}/notes.png`, {
+    eyebrow: t.notes.eyebrow,
+    title: t.notes.title,
+    subtitle: t.notes.description,
+    footer: byline,
+  });
+  count += 4;
+
+  for (const slug of noteSlugs) {
+    const note = frontmatter(join(NOTES, slug, `${locale}.mdx`));
+    if (note.status !== 'published') continue;
+    write(`${locale}/notes/${slug}.png`, {
+      eyebrow: t.notes.eyebrow,
+      title: note.title,
+      subtitle: note.summary,
+      footer: byline,
+    });
+    count += 1;
+  }
 
   for (const slug of slugs) {
     const project = frontmatter(join(PROJECTS, slug, `${locale}.mdx`));

@@ -1,0 +1,80 @@
+---
+import type { Note } from '../../domain/writing/note';
+import type { Dictionary } from '../i18n/dictionary';
+import { formatIsoDate } from '../i18n/format';
+import { notesPath } from '../i18n/routes';
+import Icon from '../icons/Icon.astro';
+import Container from '../primitives/Container.astro';
+import Tag from '../primitives/Tag.astro';
+
+/**
+ * A technical note: header with dates and topics, an outline when the note has sections, and the
+ * MDX body in the default slot, styled by `.prose`.
+ */
+interface Props {
+  t: Dictionary;
+  note: Note;
+  headings: readonly { readonly depth: number; readonly slug: string; readonly text: string }[];
+}
+
+const { t, note, headings } = Astro.props;
+const outline = headings.filter((heading) => heading.depth === 2);
+---
+
+<article>
+  <Container as="header" class="flex max-w-4xl flex-col gap-6 pt-10 pb-10 sm:pt-16">
+    <a
+      href={notesPath(note.locale)}
+      class="inline-flex w-fit items-center gap-2 text-small text-muted transition-colors hover:text-ink"
+    >
+      <Icon name="arrow-right" size={16} class="rotate-180" />
+      {t.notes.back}
+    </a>
+    <h1 class="text-heading font-semibold text-balance">{note.title}</h1>
+    <p class="max-w-3xl text-lead text-muted">{note.summary}</p>
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-small text-subtle">
+      <p>
+        {t.notes.published}{' '}
+        <time datetime={note.published}>{formatIsoDate(note.locale, note.published)}</time>
+      </p>
+      {note.updated && (
+        <p>
+          {t.notes.updated}{' '}
+          <time datetime={note.updated}>{formatIsoDate(note.locale, note.updated)}</time>
+        </p>
+      )}
+      <ul class="flex flex-wrap gap-1.5" aria-label={t.notes.tags}>
+        {note.tags.map((tag) => (
+          <li>
+            <Tag>{tag}</Tag>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Container>
+
+  <Container class="grid max-w-4xl gap-10 border-t border-line pt-10 pb-20">
+    {outline.length > 1 && (
+      <nav aria-labelledby="note-outline" class="rounded-card border border-line p-5">
+        <h2
+          id="note-outline"
+          class="mb-3 font-mono text-eyebrow tracking-widest text-subtle uppercase"
+        >
+          {t.notes.contents}
+        </h2>
+        <ol class="flex flex-col gap-2 text-small">
+          {outline.map((heading) => (
+            <li>
+              <a href={`#${heading.slug}`} class="text-muted transition-colors hover:text-ink">
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
+    <div class="prose min-w-0">
+      <slot />
+    </div>
+  </Container>
+</article>

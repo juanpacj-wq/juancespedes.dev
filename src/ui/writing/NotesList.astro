@@ -1,0 +1,53 @@
+---
+import type { Note } from '../../domain/writing/note';
+import type { Dictionary } from '../i18n/dictionary';
+import { formatIsoDate } from '../i18n/format';
+import { notePath } from '../i18n/routes';
+import Icon from '../icons/Icon.astro';
+import Tag from '../primitives/Tag.astro';
+
+/** Notes as an editorial list, newest first. The whole row is the link. */
+interface Props {
+  t: Dictionary;
+  notes: readonly Note[];
+}
+
+const { t, notes } = Astro.props;
+---
+
+{notes.length === 0 ? (
+  <p class="rounded-card border border-dashed border-line-strong p-8 text-muted">{t.notes.empty}</p>
+) : (
+  <ol class="border-t border-line">
+    {notes.map((note) => (
+      <li class="group relative grid gap-3 border-b border-line py-8 transition-colors duration-150 hover:bg-surface md:grid-cols-[10rem_1fr] md:gap-8">
+        <p class="font-mono text-small text-subtle">
+          <time datetime={note.published}>{formatIsoDate(note.locale, note.published)}</time>
+        </p>
+        <div class="flex flex-col gap-3">
+          <h2 class="text-title font-medium text-balance">
+            <a
+              href={notePath(note.locale, note.slug)}
+              class="inline-flex items-center gap-2 after:absolute after:inset-0 group-hover:text-accent-ink"
+            >
+              {note.title}
+              <Icon
+                name="arrow-right"
+                size={18}
+                class="transition-transform duration-150 group-hover:translate-x-1"
+              />
+            </a>
+          </h2>
+          <p class="max-w-prose text-muted">{note.summary}</p>
+          <ul class="flex flex-wrap gap-1.5" aria-label={t.notes.tags}>
+            {note.tags.map((tag) => (
+              <li>
+                <Tag>{tag}</Tag>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </li>
+    ))}
+  </ol>
+)}
