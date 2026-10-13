@@ -78,6 +78,7 @@ Imports may only point inward. Two independent tools check it on every pull requ
 | [0011](docs/adr/0011-case-study-pages.md)                | Case study pages: fixed template, diagrams as data, private denylist      |
 | [0012](docs/adr/0012-bilingual-routes-and-seo.md)        | Spanish at the root, English under /en; hreflang, sitemap, JSON-LD, OG    |
 | [0013](docs/adr/0013-launch-hardening-and-operations.md) | Security headers, monitoring without third parties, gated releases        |
+| [0014](docs/adr/0014-mutation-testing.md)                | Mutation testing of the domain with Stryker, weekly                       |
 
 ## Quality gates
 
@@ -98,6 +99,9 @@ Every pull request must pass all of them ([ADR 0007](docs/adr/0007-testing-strat
 | JavaScript    | Bundle budget script (gzip)                                                        | ≤ 75 kB total; islands hydrate on visibility             |
 | Security      | pnpm audit, gitleaks, CodeQL, Dependabot                                           | No high-severity findings                                |
 
+Weekly, and on demand: **mutation testing** of the domain with Stryker, break below 80 %
+([ADR 0014](docs/adr/0014-mutation-testing.md)).
+
 ## Run it locally
 
 Requirements: Node 24+ and pnpm 10.
@@ -108,6 +112,7 @@ pnpm dev              # http://localhost:4321
 pnpm verify           # format, lint, types, architecture, unit coverage, build
 pnpm exec playwright install chromium webkit
 pnpm test:e2e         # end-to-end and accessibility on the production build
+pnpm test:mutation    # mutation testing of the domain (about ten minutes)
 ```
 
 Environment variables are documented in [.env.example](.env.example) and validated at startup.

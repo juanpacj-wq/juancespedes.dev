@@ -33,7 +33,17 @@ const allowed = {
 
 export default defineConfig(
   {
-    ignores: ['dist/', '.astro/', '.wrangler/', 'coverage/', 'playwright-report/', 'test-results/'],
+    ignores: [
+      'dist/',
+      '.astro/',
+      '.wrangler/',
+      'coverage/',
+      'playwright-report/',
+      'test-results/',
+      // Stryker's sandbox copy and its HTML report (ADR 0014).
+      '.stryker-tmp/',
+      'reports/',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,

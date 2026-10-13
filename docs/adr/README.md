@@ -18,5 +18,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0011](0011-case-study-pages.md)                | Case study pages: fixed template, diagrams as data, private denylist    | Accepted |
 | [0012](0012-bilingual-routes-and-seo.md)        | Bilingual routes and SEO: Spanish at the root, English under /en        | Accepted |
 | [0013](0013-launch-hardening-and-operations.md) | Launch: security headers, monitoring without third parties, releases    | Accepted |
+| [0014](0014-mutation-testing.md)                | Mutation testing of the domain with Stryker                             | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.

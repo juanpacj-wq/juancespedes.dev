@@ -7,3 +7,5 @@ playwright-report/
 .lighthouseci/
 pnpm-lock.yaml
 CHANGELOG.md
+.stryker-tmp/
+reports/
