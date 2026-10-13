@@ -40,7 +40,9 @@ the required checks.
   notice says. Automatic installation at the edge does not reach pages served by the Worker's
   asset layer, so the beacon is in the layout, rendered only when `PUBLIC_WEB_ANALYTICS_TOKEN` is
   set. The deploy sets it for production only, so tests and previews never count page views. The
-  CSP allows its script and endpoint.
+  site must be in "Enable with JS Snippet installation" mode in the dashboard: in automatic mode
+  Cloudflare rejected the beacon's reports (no CORS header), which was caught by inspecting the
+  real request. The CSP allows its script and endpoint.
 - **Releases through release-please, with the same gates as any change.** Actions may open pull
   requests. After creating or updating the release PR, the release workflow dispatches CI, CodeQL
   and the title check on the release branch (`workflow_dispatch` is the event `GITHUB_TOKEN` is
