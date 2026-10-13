@@ -1,5 +1,6 @@
 import type { Project } from '../../domain/project/project';
 import type { Locale } from '../../domain/shared/locale';
+import type { Note } from '../../domain/writing/note';
 import { absoluteUrl, SITE } from '../site';
 
 /*
@@ -105,6 +106,36 @@ export const projectGraph = ({
         { '@type': 'ListItem', position: 2, name: projectsName, item: absoluteUrl(projectsUrl) },
         { '@type': 'ListItem', position: 3, name: project.title, item: absoluteUrl(url) },
       ],
+    },
+  ],
+});
+
+export interface NotePageFacts {
+  readonly note: Note;
+  readonly authorName: string;
+  readonly url: string;
+  readonly image: string;
+  readonly homeUrl: string;
+}
+
+/** A technical note as a blog post by the same Person as the rest of the site. */
+export const noteGraph = ({ note, authorName, url, image, homeUrl }: NotePageFacts): JsonLd => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'Person', '@id': PERSON_ID, name: authorName, url: absoluteUrl(homeUrl) },
+    {
+      '@type': 'BlogPosting',
+      '@id': `${absoluteUrl(url)}#post`,
+      headline: note.title,
+      description: note.summary,
+      url: absoluteUrl(url),
+      mainEntityOfPage: absoluteUrl(url),
+      image: absoluteUrl(image),
+      inLanguage: LANGUAGE_TAG[note.locale],
+      datePublished: note.published,
+      dateModified: note.updated ?? note.published,
+      keywords: note.tags.join(', '),
+      author: { '@id': PERSON_ID },
     },
   ],
 });

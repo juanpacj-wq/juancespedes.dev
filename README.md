@@ -34,6 +34,7 @@ decisions and quality checks are meant to be read.
 - **Errors**: browser errors are reported, without visitor data, to Workers Logs.
 - **Analytics**: Cloudflare Web Analytics, cookieless.
 - **Releases**: release-please, with the same required checks as any pull request.
+- **Writing**: [technical notes](https://juancespedes.dev/notas) and a [now page](https://juancespedes.dev/ahora), both bilingual content validated like the projects ([ADR 0015](docs/adr/0015-notes-and-now-page.md)).
 - Runbooks: [deploy and rollback](docs/runbooks/deploy.md), [contact form](docs/runbooks/contact-form.md),
   [monitoring and incidents](docs/runbooks/monitoring.md).
 
@@ -79,6 +80,7 @@ Imports may only point inward. Two independent tools check it on every pull requ
 | [0012](docs/adr/0012-bilingual-routes-and-seo.md)        | Spanish at the root, English under /en; hreflang, sitemap, JSON-LD, OG    |
 | [0013](docs/adr/0013-launch-hardening-and-operations.md) | Security headers, monitoring without third parties, gated releases        |
 | [0014](docs/adr/0014-mutation-testing.md)                | Mutation testing of the domain with Stryker, weekly                       |
+| [0015](docs/adr/0015-notes-and-now-page.md)              | Technical notes and a "now" page as validated, bilingual content          |
 
 ## Quality gates
 

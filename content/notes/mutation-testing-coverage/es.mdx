@@ -1,0 +1,55 @@
+---
+title: Cuando el 100 % de cobertura no bastaba
+summary: Las pruebas de mutación sobre el dominio de este sitio encontraron reglas que las pruebas ejecutaban sin verificar. Antes hubo que descubrir que la herramienta reportaba 41 % por un motivo que no tenía que ver con las pruebas.
+published: '2026-10-12'
+tags: [pruebas, stryker, calidad]
+status: published
+---
+
+El dominio de este sitio tiene 100 % de cobertura de líneas y de ramas. Es una buena cifra y dice
+menos de lo que parece: cobertura significa que una línea se ejecutó durante alguna prueba, no
+que alguna prueba fallaría si esa línea estuviera mal.
+
+Las pruebas de mutación responden la segunda pregunta. La herramienta (Stryker, en este caso)
+hace cambios pequeños al código, uno a la vez: invierte una comparación, reemplaza una condición
+por `true`, borra un mensaje. Por cada cambio corre las pruebas. Si alguna falla, el mutante muere;
+si todas pasan, sobrevive, y eso señala una regla que las pruebas no fijan de verdad.
+
+## Primero, desconfiar del número
+
+La primera corrida dio 41 %. Antes de escribir una sola prueba revisé un sobreviviente concreto:
+
+```diff
+- if (a.featured !== b.featured) return a.featured ? -1 : 1;
++ if (false) return a.featured ? -1 : 1;
+```
+
+Ese cambio rompe el orden de los proyectos destacados, y hay una prueba que lo verifica
+explícitamente. Que sobreviviera solo tenía una explicación: el mutante nunca se activó. El
+complemento de Vitest para Stryker reutilizaba los módulos en caché con Vitest 5 y las pruebas
+corrían contra el código original. Con el ejecutor por comandos, que lanza un proceso nuevo por
+mutante, el puntaje real fue 90,7 %. Más lento, alrededor de diez minutos, pero cada resultado
+es cierto.
+
+## Lo que encontraron los sobrevivientes reales
+
+Los mutantes que sí sobrevivieron eran huecos genuinos:
+
+- Ninguna prueba usaba un enlace https válido, así que cambiar la validación de enlaces por
+  "siempre inválido" pasaba desapercibido.
+- Los límites exactos no estaban probados: un nombre de exactamente dos caracteres, un correo de
+  exactamente 254.
+- Un correo con texto después del dominio pasaba si se quitaba el ancla `$` de la expresión.
+- Las pruebas revisaban qué campo tenía un problema, pero nunca el mensaje que lo explica.
+- El orden por fecha se probaba ordenando listas, y el algoritmo de ordenamiento nunca llegaba a
+  comparar dos proyectos terminados en el orden que revelaba el error.
+
+Diez pruebas nuevas cerraron esos huecos y el puntaje subió a 95,1 %. Los sobrevivientes que
+quedan son mutantes equivalentes: cambios que no alteran el comportamiento, como una condición
+redundante que otra regla ya cubre.
+
+## Cómo quedó en el proyecto
+
+Las pruebas de mutación tardan demasiado para cada pull request, así que corren cada semana y a
+demanda, con un umbral de 80 % que hace fallar el flujo si baja. La cobertura sigue siendo una
+puerta en cada cambio; la mutación dice si esa cobertura vale algo.

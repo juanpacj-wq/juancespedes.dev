@@ -3,6 +3,8 @@ import { file, glob } from 'astro/loaders';
 
 import {
   headlineMetricSchema,
+  noteFrontmatterSchema,
+  nowSchema,
   profileSchema,
   projectFrontmatterSchema,
   technologySchema,
@@ -24,6 +26,14 @@ export const collections = {
   profile: defineCollection({
     loader: glob({ pattern: '{es,en}.yaml', base: './content/profile' }),
     schema: profileSchema,
+  }),
+  notes: defineCollection({
+    loader: glob({ pattern: '*/{es,en}.mdx', base: './content/notes' }),
+    schema: noteFrontmatterSchema,
+  }),
+  now: defineCollection({
+    loader: glob({ pattern: '{es,en}.yaml', base: './content/now' }),
+    schema: nowSchema,
   }),
   technologies: defineCollection({
     loader: file('./content/technologies.yaml'),

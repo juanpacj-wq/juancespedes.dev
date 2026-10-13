@@ -2,17 +2,22 @@ import { APP_VERSION } from 'astro:env/server';
 
 import { makeBuildSkillEvidenceMatrix } from '../application/use-cases/build-skill-evidence-matrix';
 import { makeGetHealthStatus } from '../application/use-cases/get-health-status';
+import { makeGetNowPage } from '../application/use-cases/get-now-page';
 import { makeGetProfile } from '../application/use-cases/get-profile';
 import { makeGetProject } from '../application/use-cases/get-project';
 import { makeGetProjectPage } from '../application/use-cases/get-project-page';
 import { makeListFeaturedProjects } from '../application/use-cases/list-featured-projects';
 import { makeListHeadlineMetrics } from '../application/use-cases/list-headline-metrics';
 import { makeListProjects } from '../application/use-cases/list-projects';
+import { makeGetNote, makeListNotes } from '../application/use-cases/notes';
 import {
   astroHeadlineMetricRepository,
+  astroNoteRepository,
+  astroNowRepository,
   astroProfileRepository,
   astroProjectRepository,
   astroTechnologyCatalog,
+  renderNoteBody,
 } from '../infrastructure/content/astro-content-repositories';
 import { systemClock } from '../infrastructure/system/system-clock';
 
@@ -26,6 +31,8 @@ const listProjects = makeListProjects({
   includeDrafts: import.meta.env.DEV,
 });
 
+const listNotes = makeListNotes({ notes: astroNoteRepository, includeDrafts: import.meta.env.DEV });
+
 export const container = {
   getHealthStatus: makeGetHealthStatus({ clock: systemClock, version: APP_VERSION }),
   listProjects,
@@ -38,4 +45,8 @@ export const container = {
   }),
   listHeadlineMetrics: makeListHeadlineMetrics(astroHeadlineMetricRepository),
   getProfile: makeGetProfile(astroProfileRepository),
+  listNotes,
+  getNote: makeGetNote(listNotes),
+  renderNoteBody,
+  getNowPage: makeGetNowPage(astroNowRepository),
 } as const;

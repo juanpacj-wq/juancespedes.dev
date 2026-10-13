@@ -1,0 +1,37 @@
+---
+import { container } from '../../composition/container';
+import type { Locale } from '../../domain/shared/locale';
+import { dictionaryFor } from '../../ui/i18n/dictionary';
+import BaseLayout from '../../ui/layouts/BaseLayout.astro';
+import Container from '../../ui/primitives/Container.astro';
+import NotesList from '../../ui/writing/NotesList.astro';
+import { siteNav } from './site-nav';
+
+/** The list of technical notes in one language. */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = dictionaryFor(locale);
+const notes = await container.listNotes(locale);
+---
+
+<BaseLayout
+  title={`${t.notes.title} | ${t.meta.siteName}`}
+  description={t.notes.description}
+  locale={locale}
+  route={{ page: 'notes' }}
+  navItems={siteNav(t, locale)}
+>
+  <Container class="flex flex-col gap-10 py-16 sm:py-24">
+    <header class="flex max-w-3xl flex-col gap-4">
+      <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
+        {t.notes.eyebrow}
+      </p>
+      <h1 class="text-heading font-semibold text-balance">{t.notes.title}</h1>
+      <p class="text-lead text-muted">{t.notes.description}</p>
+    </header>
+    <NotesList t={t} notes={notes} />
+  </Container>
+</BaseLayout>

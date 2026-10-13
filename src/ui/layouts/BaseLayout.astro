@@ -8,7 +8,14 @@ import { APP_VERSION } from 'astro:env/server';
 
 import { SUPPORTED_LOCALES, type Locale } from '../../domain/shared/locale';
 import { dictionaryFor } from '../i18n/dictionary';
-import { alternatesFor, ogImagePath, privacyPath, type PageRoute } from '../i18n/routes';
+import {
+  alternatesFor,
+  notesPath,
+  nowPath,
+  ogImagePath,
+  privacyPath,
+  type PageRoute,
+} from '../i18n/routes';
 import { toJsonLd, type JsonLd } from '../seo/structured-data';
 import { absoluteUrl, SITE } from '../site';
 import ErrorReporter from '../chrome/ErrorReporter.astro';
@@ -122,7 +129,13 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
     <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
       <slot />
     </main>
-    <SiteFooter t={t} repositoryUrl={SITE.repositoryUrl} privacyHref={privacyPath(locale)} />
+    <SiteFooter
+      t={t}
+      repositoryUrl={SITE.repositoryUrl}
+      privacyHref={privacyPath(locale)}
+      notesHref={notesPath(locale)}
+      nowHref={nowPath(locale)}
+    />
     <ErrorReporter />
   </body>
 </html>

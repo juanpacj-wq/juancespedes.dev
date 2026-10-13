@@ -22,6 +22,8 @@ const es = {
   },
   nav: {
     home: 'Inicio',
+    notes: 'Notas',
+    now: 'Ahora',
     projects: 'Proyectos',
     skills: 'Capacidades',
     services: 'Servicios',
@@ -182,6 +184,26 @@ const es = {
     previous: 'Anterior',
     next: 'Siguiente',
   },
+  notes: {
+    eyebrow: 'Notas',
+    title: 'Notas técnicas',
+    description:
+      'Cómo construí o resolví cosas concretas, con el detalle que no cabe en un caso de estudio.',
+    published: 'Publicada el',
+    updated: 'Actualizada el',
+    tags: 'Temas',
+    empty: 'Todavía no hay notas publicadas.',
+    back: 'Todas las notas',
+    contents: 'En esta nota',
+  },
+  now: {
+    eyebrow: 'Ahora',
+    title: 'En qué estoy ahora',
+    description:
+      'Lo que tiene mi atención en este momento: trabajo, lo que estoy construyendo y lo que estoy aprendiendo.',
+    updated: 'Actualizada el',
+    about: 'Qué es una página "ahora"',
+  },
   notFound: {
     eyebrow: 'Error 404',
     title: 'Esta página no existe',
@@ -227,6 +249,8 @@ const en: Dictionary = {
   },
   nav: {
     home: 'Home',
+    notes: 'Notes',
+    now: 'Now',
     projects: 'Projects',
     skills: 'Capabilities',
     services: 'Services',
@@ -385,6 +409,26 @@ const en: Dictionary = {
     more: 'More projects',
     previous: 'Previous',
     next: 'Next',
+  },
+  notes: {
+    eyebrow: 'Notes',
+    title: 'Technical notes',
+    description:
+      'How I built or solved specific things, with the detail that does not fit in a case study.',
+    published: 'Published on',
+    updated: 'Updated on',
+    tags: 'Topics',
+    empty: 'No published notes yet.',
+    back: 'All notes',
+    contents: 'In this note',
+  },
+  now: {
+    eyebrow: 'Now',
+    title: 'What I am doing now',
+    description:
+      'What has my attention at this moment: work, what I am building and what I am learning.',
+    updated: 'Updated on',
+    about: 'What a "now" page is',
   },
   notFound: {
     eyebrow: 'Error 404',

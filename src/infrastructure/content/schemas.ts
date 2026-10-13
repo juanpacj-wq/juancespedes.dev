@@ -2,6 +2,7 @@ import { z } from 'astro/zod';
 
 import { CAPABILITIES } from '../../domain/project/capability';
 import { validateProjectContent, type ProjectContent } from '../../domain/project/project';
+import { validateNoteContent, type NoteContent } from '../../domain/writing/note';
 
 /*
  * Shape of the content files. Zod checks types and required keys; the domain's
@@ -148,3 +149,31 @@ export const profileSchema = z.strictObject({
 });
 
 export type ProfileEntry = z.output<typeof profileSchema>;
+
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'expected YYYY-MM-DD');
+
+/** Technical notes: content/notes/<slug>/{es,en}.mdx. The body is the article (MDX). */
+export const noteFrontmatterSchema = z
+  .strictObject({
+    title: text.max(90),
+    summary: text.max(240),
+    published: isoDate,
+    updated: isoDate.nullable().default(null),
+    tags: z.array(text.max(30)).min(1),
+    status: z.enum(['draft', 'published']).default('draft'),
+  })
+  .superRefine((content: NoteContent, context) => {
+    for (const issue of validateNoteContent(content)) {
+      context.addIssue({ code: 'custom', path: issue.field.split('.'), message: issue.message });
+    }
+  });
+
+export type NoteFrontmatter = z.output<typeof noteFrontmatterSchema>;
+
+/** The "now" page: content/now/{es,en}.yaml. */
+export const nowSchema = z.strictObject({
+  updated: isoDate,
+  sections: z.array(z.strictObject({ title: text, items: z.array(text).min(1) })).min(1),
+});
+
+export type NowEntry = z.output<typeof nowSchema>;

@@ -26,3 +26,14 @@ export const formatYears = (period: Period, t: Dictionary): string => {
   const end = period.end === null ? t.period.present : period.end.slice(0, 4);
   return start === end ? start : `${start} ${t.period.to} ${end}`;
 };
+
+/** "12 de octubre de 2026" / "October 12, 2026" for an ISO date `YYYY-MM-DD`. */
+export const formatIsoDate = (locale: Locale, value: string): string => {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Intl.DateTimeFormat(INTL_LOCALE[locale], {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year ?? 1970, (month ?? 1) - 1, day ?? 1)));
+};

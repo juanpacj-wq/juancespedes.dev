@@ -1,0 +1,19 @@
+# "Now" page (nownownow.com): what I am focused on at this moment. Update `updated` whenever
+# something changes; the date is shown on the page.
+updated: '2026-10-12'
+sections:
+  - title: Work
+    items:
+      - I run and extend production systems for a power generation company in Barranquilla, including the digital operations logbook, plant telemetry and the e-invoicing pipeline.
+      - I handle incidents with a written root-cause record and turn every fix into automated tests before it ships.
+  - title: Building
+    items:
+      - This site, in public. Every architecture decision is documented in the repository and every change goes through the same quality gates.
+      - An assistant that answers questions about my work based on the case studies published here.
+  - title: Learning
+    items:
+      - AI agents with the Model Context Protocol applied to operations, with dry runs by default and human confirmation before any action that changes something.
+      - Mutation testing, to measure how well the tests protect the business rules beyond coverage.
+  - title: Available for
+    items:
+      - Web development, data and reporting, and automation projects, quoted from the requirement.
