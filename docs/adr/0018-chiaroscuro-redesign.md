@@ -46,7 +46,7 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
   Literata is OFL; it is instanced to the display optical size and weights 300 to 500 and
   subset to Latin: 43 kB instead of 110 kB, preloaded.
 - **The ASCII painting is text, not WebGL.** `scripts/generate-ascii.mjs` (sharp) turns a
-  1200 px copy of the painting (its empty top band cropped) into a 160 x 107 grid once: a
+  1200 px copy of the painting into a 240 x 92 grid once: a
   percentile stretch, an empty floor for the dark ground, a gamma that lifts the half-lit paint,
   and one glyph per tone chosen by the share of the cell that Geist Mono inks at weight 600,
   measured on a canvas. The grid is committed. A first version (96 columns, histogram
@@ -54,9 +54,12 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
   read as noise, so it was replaced. `AsciiArt.astro` stacks two copies
   of the text: ochre ink, and the same characters filled with a 192 px copy of the painting
   (`background-clip: text`). A lamp follows a fine pointer and shows the true colours around
-  it; a click or the labelled switch floods the whole figure with them. From a laptop up the figure
-  leaves the content column: it takes the whole height of the hero and everything right of the
-  text out to the edge of the screen, at the largest size whose proportions fit. Masks and registered
+  it; a click or the labelled switch floods the whole figure with them. The figure is the backdrop of
+  the hero and the content stands centred in front of it, dimmed by a pool of shadow and a halo
+  on the text. The copy is cropped at the waterline, without the reflection: Narcissus bends
+  over the page, and the work below is what holds his gaze. Without the reflection the painting
+  is close to the shape of a screen (1.56 : 1), so it covers the hero, overflowing by at most
+  12 % of its height, cut from the bottom where it fades into the next section. Masks and registered
   custom properties do the animation; the script is under 1 kB and inline. The ink develops
   outward on first paint unless the visitor prefers reduced motion. Screen readers get one
   image with a description, and the caption credits the painting.

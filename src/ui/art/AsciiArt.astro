@@ -83,15 +83,14 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     initial-value: 160%;
   }
 
-  /* --ratio (width over height) lets a parent size the figure by the height it has. */
-  .ascii-art {
-    container-type: inline-size;
-  }
+  /* --ratio (width over height) lets a parent size the figure by the height it has. The size
+     container is the drawing, not the figure, so a parent can also place the caption. */
 
   .ascii-canvas {
     --x: 38%;
     --y: 40%;
     position: relative;
+    container-type: inline-size;
     transition:
       --lamp 400ms var(--ease-out),
       --flood 1400ms var(--ease-out);
@@ -195,11 +194,13 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
 
 <script>
   // Lamp follows a fine pointer; the switch (or a click on the figure) floods the real colours.
+  // When the art is a backdrop, the lamp follows the pointer over the whole stage around it.
   for (const figure of document.querySelectorAll<HTMLElement>('[data-ascii]')) {
     const canvas = figure.querySelector<HTMLElement>('.ascii-canvas');
     const button = figure.querySelector<HTMLButtonElement>('.ascii-switch');
     const label = button?.querySelector('.ascii-switch-label');
     if (!canvas || !button || !label) continue;
+    const stage = figure.closest<HTMLElement>('[data-ascii-stage]') ?? canvas;
 
     const aim = (event: PointerEvent): void => {
       const box = canvas.getBoundingClientRect();
@@ -214,9 +215,9 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     };
 
     if (window.matchMedia('(pointer: fine)').matches) {
-      canvas.addEventListener('pointerenter', () => canvas.toggleAttribute('data-lamp', true));
-      canvas.addEventListener('pointerleave', () => canvas.toggleAttribute('data-lamp', false));
-      canvas.addEventListener('pointermove', aim);
+      stage.addEventListener('pointerenter', () => canvas.toggleAttribute('data-lamp', true));
+      stage.addEventListener('pointerleave', () => canvas.toggleAttribute('data-lamp', false));
+      stage.addEventListener('pointermove', aim);
     }
     canvas.addEventListener('click', (event) => {
       aim(event);

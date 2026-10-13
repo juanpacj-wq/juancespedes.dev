@@ -2,6 +2,7 @@
 import type { Locale } from '../../domain/shared/locale';
 import AsciiArt from '../art/AsciiArt.astro';
 import type { Dictionary } from '../i18n/dictionary';
+import Icon from '../icons/Icon.astro';
 import Badge from '../primitives/Badge.astro';
 import Button from '../primitives/Button.astro';
 import Container from '../primitives/Container.astro';
@@ -17,60 +18,12 @@ interface Props {
 const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
 ---
 
-<section class="relative overflow-hidden">
-  <!-- Candlelight behind the figure: the one light source of the page (chiaroscuro). -->
-  <div class="hero-light pointer-events-none absolute inset-0" aria-hidden="true"></div>
-  <Container class="relative grid items-center pt-10 pb-12 sm:pt-16 lg:min-h-[calc(100svh-4rem)] lg:py-12">
-    <div class="flex flex-col gap-7 lg:w-[42%]">
-      <Badge tone="success" status>
-        {t.availability.available}
-      </Badge>
-      <div class="flex flex-col gap-1 text-lead">
-        <h1 class="font-medium text-ink">{t.profile.name}</h1>
-        <p class="text-muted">{t.hero.intro}</p>
-      </div>
-      <p class="font-display text-display font-light text-balance">{t.hero.headline}</p>
-      <p class="max-w-xl text-lead text-pretty text-muted">{t.hero.pitch}</p>
-      <div class="flex flex-wrap gap-3">
-        <Button href="#projects" icon="arrow-right" size="lg">
-          {t.hero.primaryCta}
-        </Button>
-        <Button href="#contact" variant="secondary" size="lg">
-          {t.hero.secondaryCta}
-        </Button>
-      </div>
-      <ul class="-ms-5 flex flex-wrap items-center gap-1 text-small" aria-label={t.hero.elsewhere}>
-        <li>
-          <Button
-            href={githubUrl}
-            variant="ghost"
-            icon="github"
-            external
-            externalLabel={t.a11y.external}
-          >
-            GitHub
-          </Button>
-        </li>
-        <li>
-          <Button
-            href={linkedinUrl}
-            variant="ghost"
-            icon="linkedin"
-            external
-            externalLabel={t.a11y.external}
-          >
-            LinkedIn
-          </Button>
-        </li>
-        <li>
-          <Button href={`mailto:${email}`} variant="ghost" icon="mail">
-            {email}
-          </Button>
-        </li>
-      </ul>
-    </div>
-  </Container>
-  <div class="hero-art mx-auto max-w-xl px-4 pb-16 sm:px-6">
+<!--
+  Two layers: the painting fills the hero as a backdrop, the content stands centred in front of
+  it. The lamp follows the pointer anywhere on the stage (data-ascii-stage).
+-->
+<section class="hero relative isolate overflow-hidden" data-ascii-stage>
+  <div class="hero-art">
     <AsciiArt
       locale={locale}
       alt={t.art.alt}
@@ -78,44 +31,174 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
       characters={t.art.characters}
       lightOn={t.art.lightOn}
       lightOff={t.art.lightOff}
-      class="w-full"
     />
   </div>
+  <!-- A pool of shadow behind the text, so it reads over the brightest paint. -->
+  <div class="hero-veil pointer-events-none absolute inset-0" aria-hidden="true"></div>
+  <Container class="hero-front relative flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center gap-7 pt-16 pb-28 text-center">
+    <Badge tone="success" status>
+      {t.availability.available}
+    </Badge>
+    <div class="flex flex-col items-center gap-x-2 gap-y-1 text-lead sm:flex-row sm:flex-wrap sm:justify-center">
+      <h1 class="font-medium text-ink">{t.profile.name}</h1>
+      <span class="hidden text-muted sm:inline" aria-hidden="true">
+        ·
+      </span>
+      <p class="text-muted">{t.hero.intro}</p>
+    </div>
+    <p class="hero-headline max-w-4xl font-display text-display font-light text-balance">
+      {t.hero.headline}
+    </p>
+    <p class="max-w-2xl text-lead text-pretty text-muted">{t.hero.pitch}</p>
+    <div class="hero-actions flex flex-wrap justify-center gap-3">
+      <Button href="#projects" icon="arrow-right" size="lg">
+        {t.hero.primaryCta}
+      </Button>
+      <Button href="#contact" variant="secondary" size="lg">
+        {t.hero.secondaryCta}
+      </Button>
+    </div>
+    <ul
+      class="flex flex-wrap items-center justify-center gap-1 text-small"
+      aria-label={t.hero.elsewhere}
+    >
+      <li>
+        <Button
+          href={githubUrl}
+          variant="ghost"
+          icon="github"
+          external
+          externalLabel={t.a11y.external}
+        >
+          GitHub
+        </Button>
+      </li>
+      <li>
+        <Button
+          href={linkedinUrl}
+          variant="ghost"
+          icon="linkedin"
+          external
+          externalLabel={t.a11y.external}
+        >
+          LinkedIn
+        </Button>
+      </li>
+      <li>
+        <Button href={`mailto:${email}`} variant="ghost" icon="mail">
+          {email}
+        </Button>
+      </li>
+    </ul>
+    <a
+      href="#projects"
+      class="mt-4 hidden min-h-11 items-center gap-4 text-small text-muted transition-colors duration-150 hover:text-ink lg:flex"
+    >
+      <span>{t.hero.scrollLead}</span>
+      <span class="h-px w-28 bg-line-strong" aria-hidden="true"></span>
+      <Icon name="mouse" size={22} />
+      <span class="h-px w-28 bg-line-strong" aria-hidden="true"></span>
+      <span>{t.hero.scrollTail}</span>
+    </a>
+  </Container>
 </section>
 
 <style>
-  .hero-light {
-    background: radial-gradient(
-      50% 60% at 72% 48%,
-      color-mix(in srgb, var(--color-accent) 9%, transparent),
-      transparent 70%
-    );
+  /* The painting as a backdrop covering the hero. It always fills the height and grows towards
+     the full width, overflowing by at most 12 % of its height; the overflow is cut mostly from
+     the bottom, which fades into the page, so the head stays whole. On a phone the crop leans
+     to the left, where the head is. */
+  .hero-art {
+    --anchor-x: 0.5;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    container-type: size;
   }
 
-  /* From a laptop up the painting leaves the content column: it takes everything right of the
-     text (42 % of the content width) out to the edge of the screen, and the full height of the
-     hero, at the largest size whose proportions fit. */
-  @media (min-width: 64rem) {
-    .hero-art {
-      position: absolute;
-      inset-block: 0.75rem;
-      right: clamp(1rem, 2vw, 2rem);
-      /* The content box is at most 80rem wide with 2rem of padding on each side. */
-      --gutter: max(2rem, (100vw - 80rem) / 2 + 2rem);
-      --text: calc((min(100vw, 80rem) - 4rem) * 0.42);
-      left: calc(var(--gutter) + var(--text) + 2.5rem);
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      max-width: none;
-      margin: 0;
-      padding: 0;
-      container-type: size;
-    }
+  .hero-art :global(.ascii-art) {
+    /* --ratio is set on the figure itself, so the size is worked out here. */
+    --width: clamp(100cqh * var(--ratio), 100cqw, 112cqh * var(--ratio));
+    flex: none;
+    width: var(--width);
+    margin-inline-start: calc((100cqw - var(--width)) * var(--anchor-x));
+    margin-block-start: calc((100cqh - var(--width) / var(--ratio)) * 0.25);
+  }
 
-    .hero-art :global(.ascii-art) {
-      /* 4rem is the caption row under the drawing. */
-      width: min(100cqw, calc((100cqh - 4rem) * var(--ratio)));
+  @media (max-width: 40rem) {
+    .hero-art {
+      --anchor-x: 0.3;
     }
+  }
+
+  /* Behind the text the figure is a presence, not a picture: dimmer, fading into the ground at
+     its edges. The light (lamp or switch) brings it forward. */
+  .hero-art :global(.ascii-canvas) {
+    opacity: 0.55;
+    /* Fades at the sides and into the page below, where the water (the reflection) would be. */
+    mask-image:
+      linear-gradient(to bottom, black 62%, transparent 100%),
+      linear-gradient(to right, transparent, black 12% 88%, transparent);
+    mask-composite: intersect;
+    /* Keeps the lamp and flood transitions of the drawing and adds its own fade. */
+    transition:
+      --lamp 400ms var(--ease-out),
+      --flood 1400ms var(--ease-out),
+      opacity 1200ms var(--ease-out);
+  }
+
+  /* Lit, the painting stays behind the text: its colours come through, but not the glare that
+     the drawing has when it stands alone. */
+  .hero-art :global(.ascii-paint),
+  .hero-art :global(.ascii-canvas[data-lamp]:not([data-lit]) .ascii-paint) {
+    filter: brightness(1.5) saturate(1.25);
+  }
+
+  /* The caption and the switch sit on the bottom edge of the hero, aligned with the content. */
+  .hero-art :global(figcaption) {
+    position: absolute;
+    inset-inline: max(1rem, (100% - 80rem) / 2 + 2rem);
+    bottom: 0.75rem;
+    margin: 0;
+  }
+
+  .hero-veil {
+    background:
+      radial-gradient(
+        ellipse 40% 46% at 50% 48%,
+        color-mix(in srgb, var(--color-canvas) 70%, transparent),
+        transparent 100%
+      ),
+      radial-gradient(
+        50% 60% at 50% 42%,
+        color-mix(in srgb, var(--color-accent) 8%, transparent),
+        transparent 70%
+      );
+  }
+
+  /* The front layer lets clicks through to the painting between its blocks. Container renders
+     it, so the rule reaches it from the section. */
+  .hero :global(.hero-front) {
+    pointer-events: none;
+    /* A halo of the ground colour lifts the text off the glyphs behind it, in both themes. */
+    text-shadow:
+      0 0 0.35rem var(--color-canvas),
+      0 0 1.25rem var(--color-canvas);
+  }
+
+  .hero :global(.hero-front > *) {
+    pointer-events: auto;
+  }
+
+  /* The filled buttons carry their own ground; a dark halo on them would only lower contrast. */
+  .hero-actions {
+    text-shadow: none;
+  }
+
+  .hero-headline {
+    text-shadow: 0 0 2rem var(--color-canvas);
   }
 </style>

@@ -12,7 +12,7 @@ const SOURCE = join(ROOT, 'src', 'assets', 'art', 'narcissus.jpg');
 const OUT = join(ROOT, 'src', 'assets', 'art', 'narcissus.txt');
 
 /** Enough columns for the arms, the face and the reflection to keep their outline. */
-const COLUMNS = 160;
+const COLUMNS = 240;
 /** A monospace cell is about 0.6 wide for each 1 of height (line-height 1). */
 const CELL_ASPECT = 0.6;
 /**
