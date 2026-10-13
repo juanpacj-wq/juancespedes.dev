@@ -49,6 +49,9 @@ and corpus, prints each result and its cost, and writes `reports/chat-eval.json`
 prompt cache miss after the first question of each language. Run it after any change to `chat-instructions.ts`, the corpus format, the model
 or the effort.
 
+Results of each run worth keeping go in `docs/evals/` (first run: [2026-10-13](../evals/chat-evaluation-2026-10-13.md),
+30 of 30, USD 0.012 in total).
+
 ## Read what happened
 
 Cloudflare dashboard, Workers & Pages, `juancespedes-dev`, Logs, search `chat.answer`. Each line
