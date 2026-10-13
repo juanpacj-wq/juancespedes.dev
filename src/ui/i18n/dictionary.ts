@@ -212,6 +212,7 @@ const es = {
       'rate-limited': 'Hiciste varias preguntas seguidas. Espera un minuto e inténtalo de nuevo.',
       'verification-failed':
         'No pudimos verificar que eres una persona. Recarga la página e inténtalo de nuevo.',
+      paused: 'El asistente está en pausa por ahora. Escríbeme directamente a {email}.',
       'visitor-limit': 'Llegaste al límite de preguntas de hoy. Escríbeme directamente a {email}.',
       'daily-limit': 'El asistente llegó a su límite de hoy. Escríbeme directamente a {email}.',
       failed: 'Algo falló al responder. Inténtalo de nuevo o escríbeme a {email}.',
@@ -491,6 +492,7 @@ const en: Dictionary = {
       'rate-limited': 'You asked several questions in a row. Wait a minute and try again.',
       'verification-failed':
         'We could not verify that you are a person. Reload the page and try again.',
+      paused: 'The assistant is paused for now. Write to me directly at {email}.',
       'visitor-limit': 'You reached today’s question limit. Write to me directly at {email}.',
       'daily-limit': 'The assistant reached its limit for today. Write to me directly at {email}.',
       failed: 'Something went wrong answering. Try again or write to me at {email}.',

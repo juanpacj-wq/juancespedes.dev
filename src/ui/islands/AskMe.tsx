@@ -31,6 +31,7 @@ const KNOWN_ERRORS: readonly ErrorCode[] = [
   'invalid',
   'rate-limited',
   'verification-failed',
+  'paused',
   'visitor-limit',
   'daily-limit',
   'failed',

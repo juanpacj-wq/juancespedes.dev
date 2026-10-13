@@ -19,8 +19,8 @@ const TWO_DAYS = 2 * 24 * 60 * 60;
 /*
  * Daily question quotas on Workers KV (ADR 0017): one counter per anonymized visitor and one for
  * the whole site, both expiring after two days. KV is eventually consistent, so under bursts a
- * few extra questions can slip through; the per-minute rate limit and the monthly spending cap in
- * the Anthropic console bound that. A KV failure denies the question: this guard protects money.
+ * few extra questions can slip through; the per-minute rate limit and the provider balance guard
+ * (deepseek-budget.ts) bound that. A KV failure denies the question: this guard protects money.
  */
 export const makeKvChatQuota = ({
   kv,

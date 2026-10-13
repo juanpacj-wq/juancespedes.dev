@@ -147,3 +147,13 @@ test.describe('ask me', () => {
     );
   });
 });
+
+test('the status endpoint reports the chat on, without any balance detail', async ({ request }) => {
+  // The fake model has no prepaid balance to watch, so the chat is simply on.
+  const response = await request.get('/api/chat-status', {
+    headers: { 'cf-connecting-ip': '10.250.0.1' },
+  });
+  expect(response.status()).toBe(200);
+  expect(response.headers()['cache-control']).toBe('no-store');
+  expect(await response.json()).toEqual({ chat: 'on' });
+});

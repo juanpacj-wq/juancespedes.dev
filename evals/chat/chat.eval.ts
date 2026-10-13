@@ -6,10 +6,14 @@ import { describe, expect, it } from 'vitest';
 
 import type { ChatUsage } from '../../src/application/ports/chat';
 import {
+  ANTHROPIC_DEFAULT_MAX_TOKENS,
   makeAnthropicChatModel,
   type ChatEffort,
 } from '../../src/infrastructure/ai/anthropic-chat-model';
-import { makeDeepSeekChatModel } from '../../src/infrastructure/ai/deepseek-chat-model';
+import {
+  DEEPSEEK_DEFAULT_MAX_TOKENS,
+  makeDeepSeekChatModel,
+} from '../../src/infrastructure/ai/deepseek-chat-model';
 import { costOf, gradeAnswer, type EvalCase, type Provider } from './grade';
 
 /*
@@ -62,14 +66,14 @@ describe.skipIf(API_KEY === '')('"Ask me" evaluation set', () => {
           ? makeDeepSeekChatModel({
               apiKey: API_KEY,
               model: process.env.CHAT_MODEL_ID ?? 'deepseek-flash',
-              maxTokens: Number(process.env.CHAT_MAX_TOKENS ?? '4000'),
+              maxTokens: Number(process.env.CHAT_MAX_TOKENS ?? DEEPSEEK_DEFAULT_MAX_TOKENS),
               contactEmail: 'juanpablocespedesj@gmail.com',
             })
           : makeAnthropicChatModel({
               apiKey: API_KEY,
               model: process.env.CHAT_MODEL_ID ?? 'claude-opus-5-5',
               effort: (process.env.CHAT_EFFORT ?? 'high') as ChatEffort,
-              maxTokens: Number(process.env.CHAT_MAX_TOKENS ?? '4000'),
+              maxTokens: Number(process.env.CHAT_MAX_TOKENS ?? ANTHROPIC_DEFAULT_MAX_TOKENS),
               contactEmail: 'juanpablocespedesj@gmail.com',
             });
       const denylist = readDenylist();

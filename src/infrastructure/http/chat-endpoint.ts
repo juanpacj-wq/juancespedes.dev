@@ -21,6 +21,7 @@ const STATUS: Record<ChatProblemCode, number> = {
   invalid: 400,
   'rate-limited': 429,
   'verification-failed': 403,
+  paused: 503,
   'visitor-limit': 429,
   'daily-limit': 429,
   'too-large': 413,
