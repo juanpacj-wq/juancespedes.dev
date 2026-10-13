@@ -29,7 +29,8 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
   browser would only find after the stylesheet: fetch it with the HTML.
 -->
 <link rel="preload" href={monoFont} as="font" type="font/woff2" crossorigin />
-<section class="hero relative isolate overflow-hidden" data-ascii-stage>
+<!-- The hero slides up under the sticky bar (its height plus its border), so the painting fills the screen. -->
+<section class="hero relative isolate -mt-[calc(4rem+1px)] overflow-hidden" data-ascii-stage>
   <div class="hero-art">
     <AsciiArt
       locale={locale}
@@ -42,7 +43,7 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
   </div>
   <!-- A pool of shadow behind the text, so it reads over the brightest paint. -->
   <div class="hero-veil pointer-events-none absolute inset-0" aria-hidden="true"></div>
-  <Container class="hero-front relative flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center gap-7 pt-16 pb-28 text-center">
+  <Container class="hero-front relative flex min-h-svh flex-col items-center justify-center gap-7 pt-32 pb-28 text-center">
     <Badge tone="success" status>
       {t.availability.available}
     </Badge>
@@ -109,15 +110,15 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
 </section>
 
 <style>
-  /* The painting as a backdrop covering the hero. It always fills the first screen and grows
-     towards the full width, overflowing by at most 12 % of its height; the overflow is cut
-     mostly from the bottom, which fades into the page, so the head stays whole. On a phone the
-     crop leans to the left, where the head is. The size comes from the screen, not from the
-     section: on a phone the text sets the section's height, and it changes when the fonts
-     arrive, which would move the whole backdrop (a layout shift). */
+  /* The painting as a backdrop covering the whole screen, bar included. It is drawn 10 % wider
+     than the screen so the figure, not the painting's dark margins, reaches both edges; the
+     overflow is cut from the empty top band first and the rest from the bottom, which fades
+     into the page. On a phone the crop leans to the left, where the head is. The size comes
+     from the screen, not from the section: on a phone the text sets the section's height, and
+     it changes when the fonts arrive, which would move the whole backdrop (a layout shift). */
   .hero-art {
     --anchor-x: 0.5;
-    --stage: calc(100svh - 4rem);
+    --stage: 100svh;
     position: absolute;
     inset: 0;
     overflow: hidden;
@@ -129,11 +130,11 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
   .hero-art :global(.ascii-art) {
     /* --ratio is set on the figure itself, so the size is worked out here. Percentages are of
        the hero's width, in the width and in both margins alike. */
-    --width: clamp(var(--stage) * var(--ratio), 100%, var(--stage) * 1.12 * var(--ratio));
+    --width: max(var(--stage) * var(--ratio), 110%);
     flex: none;
     width: var(--width);
     margin-inline-start: calc((100% - var(--width)) * var(--anchor-x));
-    margin-block-start: calc((var(--stage) - var(--width) / var(--ratio)) * 0.25);
+    margin-block-start: calc((var(--stage) - var(--width) / var(--ratio)) * 0.35);
   }
 
   @media (max-width: 40rem) {
@@ -146,11 +147,8 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
      its edges. The lamp and the switch let its colours through. */
   .hero-art :global(.ascii-canvas) {
     opacity: 0.55;
-    /* Fades at the sides and into the page below, where the water (the reflection) would be. */
-    mask-image:
-      linear-gradient(to bottom, black 62%, transparent 100%),
-      linear-gradient(to right, transparent, black 12% 88%, transparent);
-    mask-composite: intersect;
+    /* Fades into the page below, where the water (the reflection) would be. */
+    mask-image: linear-gradient(to bottom, black 62%, transparent 100%);
   }
 
   /* The caption and the switch sit on the bottom edge of the hero, aligned with the content. */
@@ -161,8 +159,10 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
     margin: 0;
   }
 
+  /* The shade on top keeps the clear bar legible over the glyphs. */
   .hero-veil {
     background:
+      linear-gradient(color-mix(in srgb, var(--color-canvas) 75%, transparent), transparent 7rem),
       radial-gradient(
         ellipse 40% 46% at 50% 48%,
         color-mix(in srgb, var(--color-canvas) 70%, transparent),

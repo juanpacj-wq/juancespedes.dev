@@ -21,7 +21,7 @@ interface Props {
 const { t, homeHref, navItems = [], switchTo = null } = Astro.props;
 ---
 
-<header class="sticky top-0 z-40 border-b border-line/60 bg-canvas/80 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70">
+<header class="site-header sticky top-0 z-40 border-b border-line/60 bg-canvas/80 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70">
   <Container class="flex h-16 items-center justify-between gap-4">
     <a
       href={homeHref}
@@ -59,3 +59,23 @@ const { t, homeHref, navItems = [], switchTo = null } = Astro.props;
     </div>
   </Container>
 </header>
+
+<style>
+  /* Over the home backdrop the bar starts clear, so the painting reaches the top of the screen,
+     and turns solid as the page scrolls. Without scroll timelines it simply stays solid. */
+  @supports (animation-timeline: scroll()) {
+    :global(body:has([data-ascii-stage])) .site-header {
+      animation: header-solid linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 40vh;
+    }
+  }
+
+  @keyframes header-solid {
+    from {
+      border-color: transparent;
+      background-color: transparent;
+      backdrop-filter: none;
+    }
+  }
+</style>
