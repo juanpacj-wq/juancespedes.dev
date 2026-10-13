@@ -32,7 +32,8 @@ const columns = lines[0]?.length ?? 120;
 // Width over height of the drawing: cells are 0.6 wide for each 1 of height.
 const ratio = (columns * 0.6) / lines.length;
 // The colour layer only needs one pixel per character, so a tiny copy of the painting is enough.
-const colour = await getImage({ src: painting, width: columns * 2, format: 'webp' });
+// It is fetched on first use (see the script), never with the page.
+const colour = await getImage({ src: painting, width: columns, format: 'webp' });
 const countLabel = characters.replace('{count}', formatNumber(locale, count));
 ---
 
@@ -41,7 +42,8 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     class="ascii-canvas"
     role="img"
     aria-label={alt}
-    style={`--columns: ${String(columns)}; --painting: url('${colour.src}')`}
+    style={`--columns: ${String(columns)}`}
+    data-painting={colour.src}
   >
     <pre class="ascii-layer ascii-ink" aria-hidden="true">{text}</pre>
     <!-- Filled from the ink on first use, so the page carries the text once. -->
@@ -180,8 +182,11 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     const stage = figure.closest<HTMLElement>('[data-ascii-stage]') ?? canvas;
     const ink = canvas.querySelector('.ascii-ink');
     const paint = canvas.querySelector('.ascii-paint');
+    // The colour layer (its text and its image) loads the first time it is needed.
     const fillPaint = (): void => {
-      if (ink && paint && !paint.textContent) paint.textContent = ink.textContent;
+      if (!ink || !paint || paint.textContent) return;
+      paint.textContent = ink.textContent;
+      canvas.style.setProperty('--painting', `url('${canvas.dataset['painting'] ?? ''}')`);
     };
 
     const aim = (event: PointerEvent): void => {
