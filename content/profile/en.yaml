@@ -17,6 +17,14 @@ education:
     period: { start: '2020-01', end: '2024-11' }
 
 credentials:
+  - name: Claude Code in Action
+    issuer: Anthropic Academy
+    issued: '2026-10'
+    url: https://academy.claude.com/badges/1ec89fac-f353-4cef-84ce-6c0f080427fa
+  - name: 'Model Context Protocol: Advanced Topics'
+    issuer: Anthropic Academy
+    issued: '2026-10'
+    url: https://academy.claude.com/badges/702a959c-9084-4a62-93f2-f8b35e5672dd
   - name: Professional engineering license
     issuer: COPNIA (Colombia)
     issued: '2025-05'
