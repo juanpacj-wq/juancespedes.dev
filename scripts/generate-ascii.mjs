@@ -11,74 +11,107 @@ const ROOT = process.cwd();
 const SOURCE = join(ROOT, 'src', 'assets', 'art', 'narcissus.jpg');
 const OUT = join(ROOT, 'src', 'assets', 'art', 'narcissus.txt');
 
-const COLUMNS = 96;
+/** Enough columns for the arms, the face and the reflection to keep their outline. */
+const COLUMNS = 160;
 /** A monospace cell is about 0.6 wide for each 1 of height (line-height 1). */
 const CELL_ASPECT = 0.6;
 /**
- * Density classes, darkest to brightest: bright paint becomes dense characters. Each cell picks
- * one character of its class at random (seeded, so the output is stable between runs), which
- * keeps the texture alive instead of repeating one glyph per tone.
+ * Glyphs and the share of their cell that Geist Mono inks at weight 600 (the weight the hero
+ * draws the art with), measured by rendering each one to a canvas. A tone maps to the glyph whose
+ * coverage is nearest, so the drawing keeps the painting's values: a ramp ordered by eye puts
+ * light glyphs in dark places (the tilde inks less than the semicolon) and the silhouette blurs.
  */
-const RAMP = [
-  ' ',
-  ".,'`",
-  ':;-~',
-  '=+^*',
-  'ilrtvxz',
-  'cesnuao',
-  'CUJYQ0O',
-  'dbpqkhZ',
-  '#%&8BG',
-  '@WM$N',
+/** @type {ReadonlyArray<readonly [string, number]>} */
+const GLYPHS = [
+  [' ', 0],
+  ['.', 0.034],
+  ['-', 0.065],
+  [':', 0.068],
+  ['~', 0.087],
+  [';', 0.088],
+  ['^', 0.111],
+  ['!', 0.123],
+  ['=', 0.148],
+  ['+', 0.151],
+  ['*', 0.16],
+  ['<', 0.163],
+  ['(', 0.18],
+  ['v', 0.205],
+  ['r', 0.208],
+  ['x', 0.21],
+  ['t', 0.213],
+  ['c', 0.224],
+  ['n', 0.235],
+  ['s', 0.247],
+  ['o', 0.254],
+  ['a', 0.268],
+  ['e', 0.272],
+  ['k', 0.275],
+  ['w', 0.291],
+  ['X', 0.294],
+  ['Z', 0.302],
+  ['p', 0.312],
+  ['%', 0.314],
+  ['#', 0.318],
+  ['m', 0.321],
+  ['S', 0.338],
+  ['D', 0.344],
+  ['G', 0.351],
+  ['R', 0.357],
+  ['@', 0.366],
+  ['N', 0.37],
+  ['8', 0.371],
+  ['Q', 0.378],
+  ['B', 0.383],
+  ['&', 0.385],
+  ['$', 0.391],
+  ['W', 0.405],
+  ['M', 0.417],
 ];
-/** Mulberry32: a tiny deterministic generator. */
-let seed = 1599; // the year Caravaggio is thought to have finished the painting
-const random = () => {
-  seed = (seed + 0x6d2b79f5) | 0;
-  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+const DENSEST = 0.417;
+/** @param {number} level 0 (empty) to 1 (densest) */
+const glyphFor = (level) => {
+  const target = level * DENSEST;
+  let best = ' ';
+  let distance = Infinity;
+  for (const [glyph, coverage] of GLYPHS) {
+    if (Math.abs(coverage - target) < distance) {
+      best = glyph;
+      distance = Math.abs(coverage - target);
+    }
+  }
+  return best;
 };
-/**
- * Below this (equalized) luminance a cell stays empty: about half the canvas is Caravaggio's dark
- * ground, and leaving it as space is what makes the figure read.
- */
-const FLOOR = 0.5;
-const GAMMA = 1.1;
+/** Below this (stretched) luminance a cell stays empty: Caravaggio's ground is the page. */
+const FLOOR = 0.14;
+/** Under 1 lifts the half-lit paint (the face, the reflection) towards denser glyphs. */
+const GAMMA = 0.7;
+/** The darkest and brightest percentiles that the stretch maps to 0 and 1. */
+const LOW = 0.02;
+const HIGH = 0.995;
 
 const { width = 1, height = 1 } = await sharp(SOURCE).metadata();
 const rows = Math.round(((COLUMNS * height) / width) * CELL_ASPECT);
 
 const { data } = await sharp(SOURCE)
   .greyscale()
-  .sharpen({ sigma: 1.2 })
   .resize(COLUMNS, rows, { fit: 'fill', kernel: 'lanczos3' })
+  .sharpen({ sigma: 0.6 })
   .raw()
   .toBuffer({ resolveWithObject: true });
 
-// Histogram equalization over the grid: Caravaggio's ground is nearly black, so a linear map
-// would leave the figure in a handful of characters. Equalizing spreads the ramp over the paint.
-/** @type {number[]} */
-const histogram = new Array(256).fill(0);
-for (const value of data) histogram[value] = (histogram[value] ?? 0) + 1;
-/** @type {number[]} */
-const cumulative = [];
-let running = 0;
-for (const count of histogram) cumulative.push((running += count));
-/** @param {number} value */
-const equalized = (value) => (cumulative[value] ?? 0) / data.length;
+// A percentile stretch, so a few specular highlights don't decide where the ramp ends.
+const sorted = Uint8Array.from(data).sort();
+const low = sorted[Math.floor(sorted.length * LOW)] ?? 0;
+const high = sorted[Math.floor(sorted.length * HIGH)] ?? 255;
 
 const lines = [];
 for (let y = 0; y < rows; y += 1) {
   let line = '';
   for (let x = 0; x < COLUMNS; x += 1) {
-    // A soft elliptical vignette fades the canvas texture near the edges.
-    const radius = Math.hypot((x / COLUMNS - 0.5) * 2, (y / rows - 0.5) * 2) / Math.SQRT2;
-    const vignette = 1 - (0.6 * Math.max(0, radius - 0.55)) / 0.45;
-    const value = equalized(data[y * COLUMNS + x] ?? 0) * vignette;
+    const value = Math.min(1, Math.max(0, ((data[y * COLUMNS + x] ?? 0) - low) / (high - low)));
     const level = value < FLOOR ? 0 : ((value - FLOOR) / (1 - FLOOR)) ** GAMMA;
-    const glyphs = RAMP[Math.min(RAMP.length - 1, Math.floor(level * RAMP.length))] ?? ' ';
-    line += glyphs[Math.floor(random() * glyphs.length)];
+    line += glyphFor(level);
   }
   lines.push(line);
 }

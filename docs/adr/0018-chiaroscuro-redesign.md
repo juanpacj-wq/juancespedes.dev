@@ -46,12 +46,16 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
   Literata is OFL; it is instanced to the display optical size and weights 300 to 500 and
   subset to Latin: 43 kB instead of 110 kB, preloaded.
 - **The ASCII painting is text, not WebGL.** `scripts/generate-ascii.mjs` (sharp) turns a
-  1200 px copy of the painting into a 96 x 70 grid once: histogram equalization, an empty
-  floor for the dark ground, a soft vignette, and a random pick within each density class
-  (seeded, so the output is stable). The grid is committed. `AsciiArt.astro` stacks two copies
+  1200 px copy of the painting (its empty top band cropped) into a 160 x 107 grid once: a
+  percentile stretch, an empty floor for the dark ground, a gamma that lifts the half-lit paint,
+  and one glyph per tone chosen by the share of the cell that Geist Mono inks at weight 600,
+  measured on a canvas. The grid is committed. A first version (96 columns, histogram
+  equalization, a random glyph within each density class) lost the silhouette: the texture
+  read as noise, so it was replaced. `AsciiArt.astro` stacks two copies
   of the text: ochre ink, and the same characters filled with a 192 px copy of the painting
   (`background-clip: text`). A lamp follows a fine pointer and shows the true colours around
-  it; a click or the labelled switch floods the whole figure with them. Masks and registered
+  it; a click or the labelled switch floods the whole figure with them. Beside the text the figure is
+  as wide as its column allows while it and its caption fit in one screen. Masks and registered
   custom properties do the animation; the script is under 1 kB and inline. The ink develops
   outward on first paint unless the visitor prefers reduced motion. Screen readers get one
   image with a description, and the caption credits the painting.
@@ -80,7 +84,7 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
 
 - JavaScript stays at 72.4 kB of the 75 kB budget: the new behaviour is inline script and CSS.
 - Pages download one more font file (43 kB) and the home page a 192 px WebP; the ASCII text is
-  about 7 kB of HTML.
+  about 17 kB, drawn twice (ink and paint), which gzip reduces to a few kB.
 - The prices are public commitments to a floor. They are set in content, reviewed like any
   other copy, and must be kept current.
 - Changing the painting or the grid size means running `pnpm ascii` and committing the output;
