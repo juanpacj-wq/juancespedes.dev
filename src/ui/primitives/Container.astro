@@ -1,5 +1,5 @@
 ---
-/** Page-width wrapper: 16 px gutters on phones, generous on desktop, capped at 72 rem. */
+/** Page-width wrapper: 16 px gutters on phones, generous on desktop, capped at 80 rem. */
 interface Props {
   as?: 'div' | 'section' | 'header' | 'footer' | 'main';
   class?: string;
@@ -8,6 +8,6 @@ interface Props {
 const { as: Tag = 'div', class: className } = Astro.props;
 ---
 
-<Tag class:list={['mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8', className]}>
+<Tag class:list={['mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8', className]}>
   <slot />
 </Tag>

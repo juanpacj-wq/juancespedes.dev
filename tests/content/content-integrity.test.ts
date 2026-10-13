@@ -249,6 +249,20 @@ describe('profile', () => {
     },
   );
 
+  it('allows at most one featured service', () => {
+    const profile = profileOf('es');
+    const allFeatured = {
+      ...profile,
+      services: profile.services.map((service) => ({ ...service, featured: true })),
+    };
+    expect(profileSchema.safeParse(allFeatured).success).toBe(false);
+  });
+
+  it('prices each locale in its own currency', () => {
+    expect(profileOf('es').currency).toBe('COP');
+    expect(profileOf('en').currency).toBe('USD');
+  });
+
   it('keeps dates, counts and links identical across locales', () => {
     const shape = (locale: string) => {
       const profile = profileOf(locale);
@@ -256,7 +270,10 @@ describe('profile', () => {
         experience: profile.experience.map((job) => [job.period, job.highlights.length]),
         education: profile.education.map((item) => item.period),
         credentials: profile.credentials.map((item) => [item.issued, item.url]),
-        services: profile.services.map((service) => service.deliverables.length),
+        services: profile.services.map((service) => [
+          service.deliverables.length,
+          service.featured,
+        ]),
         process: profile.process.length,
       };
     };

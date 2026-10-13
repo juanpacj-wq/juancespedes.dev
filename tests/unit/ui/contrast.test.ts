@@ -56,6 +56,11 @@ const PAIRS: readonly (readonly [string, string, number])[] = [
   ['accent-ink', 'canvas', 4.5],
   ['accent-ink', 'surface', 4.5],
   ['on-accent', 'accent', 4.5],
+  // Frames carry a label row; the featured service inverts ink and canvas (ADR 0018).
+  ['ink', 'frame', 4.5],
+  ['subtle', 'frame', 4.5],
+  ['canvas', 'ink', 4.5],
+  ['success', 'surface-raised', 3],
   ['success', 'canvas', 3],
   ['success', 'surface', 3],
   ['line-strong', 'canvas', 1.3],

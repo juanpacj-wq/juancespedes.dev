@@ -65,6 +65,23 @@ const es = {
     primaryCta: 'Ver proyectos',
     secondaryCta: 'Cuéntame tu proyecto',
     elsewhere: 'También en',
+    intro: 'ingeniero de sistemas en Barranquilla',
+    headline: 'Software que la operación usa todos los días.',
+  },
+  art: {
+    alt: 'Narciso de Caravaggio dibujado con caracteres de texto: un joven se inclina sobre el agua y mira su reflejo.',
+    caption: 'Narciso · Caravaggio, hacia 1597-1599',
+    characters: '{count} caracteres',
+    lightOn: 'Encender la luz',
+    lightOff: 'Apagar la luz',
+  },
+  about: {
+    title: 'Quién está detrás',
+    paragraphs: [
+      'Escribo software desde 2020. Hoy construyo y opero los sistemas internos de una generadora de energía en el Caribe colombiano: portales, tableros y automatizaciones que la gente usa en cada turno.',
+      'Soy ingeniero de sistemas de la Universidad del Norte, con matrícula profesional COPNIA. Trabajo por entregables, a precio fijo y en remoto, y me gusta que el resultado se pueda medir: menos horas manuales, menos errores y datos a tiempo.',
+    ],
+    localTime: 'Hora local',
   },
   metrics: {
     eyebrow: 'En cifras',
@@ -97,9 +114,13 @@ const es = {
   },
   services: {
     eyebrow: 'Servicios',
-    title: 'Trabajemos juntos',
+    title: 'Servicios y precios',
     description:
-      'Proyectos a precio fijo por entregable, para empresas y equipos que necesitan resultados en producción.',
+      'Cuatro formas de trabajar conmigo, cada una con un precio de partida claro. Los detalles los ajustamos a tu proyecto en la primera conversación.',
+    from: 'desde',
+    scope: 'Alcance',
+    featured: 'Lo que más hago',
+    currencyNote: 'Valores en pesos colombianos (COP).',
     deliverables: 'Recibes',
     processTitle: 'Cómo trabajamos',
     cta: 'Cuéntame tu proyecto',
@@ -347,6 +368,23 @@ const en: Dictionary = {
     primaryCta: 'See projects',
     secondaryCta: 'Tell me about your project',
     elsewhere: 'Also on',
+    intro: 'systems engineer in Barranquilla, Colombia',
+    headline: 'Software that operations teams use every day.',
+  },
+  art: {
+    alt: "Caravaggio's Narcissus drawn with text characters: a young man leans over the water and looks at his reflection.",
+    caption: 'Narcissus · Caravaggio, about 1597-1599',
+    characters: '{count} characters',
+    lightOn: 'Turn on the light',
+    lightOff: 'Turn off the light',
+  },
+  about: {
+    title: "Who's behind the work",
+    paragraphs: [
+      'I have been writing software since 2020. Today I build and run the internal systems of a power generation company on the Colombian Caribbean coast: portals, dashboards and automations people use every shift.',
+      'I am a systems engineer from Universidad del Norte, with a professional license (COPNIA). I work per deliverable, at a fixed price and remotely, and I like results you can measure: fewer manual hours, fewer errors and data on time.',
+    ],
+    localTime: 'Local time',
   },
   metrics: {
     eyebrow: 'By the numbers',
@@ -379,9 +417,13 @@ const en: Dictionary = {
   },
   services: {
     eyebrow: 'Services',
-    title: "Let's work together",
+    title: 'Services and prices',
     description:
-      'Fixed-price projects per deliverable, for companies and teams that need results in production.',
+      'Four ways to work with me, each with a clear starting price. We adjust the details to your project in the first conversation.',
+    from: 'from',
+    scope: 'Scope',
+    featured: 'My core work',
+    currencyNote: 'Prices in US dollars (USD).',
     deliverables: 'You get',
     processTitle: 'How we work',
     cta: 'Tell me about your project',

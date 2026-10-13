@@ -251,7 +251,7 @@ export default function AskMe({ locale, endpoint, siteKey, email, text }: AskMeP
           <button
             type="submit"
             disabled={pending || !token}
-            className="min-h-12 rounded-control bg-accent px-6 font-medium text-on-accent transition-opacity disabled:opacity-60"
+            className="min-h-12 rounded-chip bg-accent px-6 font-medium text-on-accent shadow-bevel transition-[filter,scale] duration-500 ease-out hover:brightness-110 disabled:opacity-60 motion-safe:active:scale-97"
           >
             {text.submit}
           </button>

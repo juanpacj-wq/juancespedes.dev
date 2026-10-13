@@ -54,6 +54,8 @@ credentials:
     issued: '2022-11'
     url: null
 
+currency: USD
+
 services:
   - title: Custom web applications
     summary: Portals, internal platforms and systems with corporate sign-in, from the database to deployment.
@@ -61,24 +63,37 @@ services:
       - Application in production with automated tests
       - Source code and architecture documentation
       - Reproducible deployment and an operations guide
+    price:
+      from: 1500
+      scope: One module in production
+    featured: true
   - title: Data, dashboards and reports
     summary: Data models, ETL and Power BI dashboards that answer concrete business questions.
     deliverables:
       - Documented data model and SQL queries
       - Dashboard or report with agreed indicators
       - Automatic refresh process
+    price:
+      from: 650
+      scope: One dashboard and its sources
   - title: Automation and AI integration
     summary: Bots, document data extraction, integrations between systems and MCP servers for AI assistants.
     deliverables:
       - Automation running on your systems
       - Execution log and error handling
       - User and maintenance guide
+    price:
+      from: 400
+      scope: One automated process
   - title: Legacy system rescue
     summary: Diagnosis, tests and modernization of software nobody dares to touch, without stopping operations.
     deliverables:
       - Diagnosis report with prioritized risks
       - Test suite that protects what already works
       - Improvements delivered in stages
+    price:
+      from: 300
+      scope: Diagnosis and a staged plan
 
 process:
   - title: Conversation
@@ -90,4 +105,4 @@ process:
   - title: Handover and support
     description: Code, documentation and support so the system keeps running.
 
-pricing: Quoted from your requirements, with a fixed price per deliverable.
+pricing: 'Optional monthly support from $100. Every amount is a starting point: the final price is fixed in writing before any work begins.'

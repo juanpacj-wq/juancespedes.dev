@@ -28,6 +28,28 @@ const openContactForm = async (page: Page) => {
   return page.locator('#contact form');
 };
 
+test.describe('hero art', () => {
+  test('the painting is announced as one image and its light switch toggles', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByRole('img', { name: /Narciso de Caravaggio/ })).toBeVisible();
+    const toggle = page.getByRole('button', { name: 'Encender la luz' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await toggle.click();
+    await expect(page.getByRole('button', { name: 'Apagar la luz' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(page.locator('.ascii-canvas')).toHaveAttribute('data-lit', '');
+  });
+
+  test('prices start from a floor in each language and currency', async ({ page }) => {
+    await page.goto('/#services');
+    await expect(page.locator('#services').getByText(/^\$\s6\.000\.000$/)).toBeVisible();
+    await page.goto('/en#services');
+    await expect(page.locator('#services').getByText('$1,500', { exact: true })).toBeVisible();
+  });
+});
+
 test.describe('home sections', () => {
   test('renders every section in order with real content', async ({ page }) => {
     await page.goto('/');
@@ -35,9 +57,10 @@ test.describe('home sections', () => {
     await expect(headings).toHaveText([
       'Resultados que se pueden verificar',
       'Sistemas en producción y código abierto',
+      'Quién está detrás',
       'Cada habilidad, con el proyecto que la demuestra',
       'Experiencia y formación',
-      'Trabajemos juntos',
+      'Servicios y precios',
       'Formación y certificaciones',
       'Pregúntale a mi portafolio',
       'Cuéntame qué necesitas',
@@ -53,7 +76,7 @@ test.describe('home sections', () => {
       .getByRole('link', { name: 'Servicios' })
       .click();
     await expect(page).toHaveURL(/#services$/);
-    await expect(page.getByRole('heading', { name: 'Trabajemos juntos' })).toBeInViewport();
+    await expect(page.getByRole('heading', { name: 'Servicios y precios' })).toBeInViewport();
   });
 
   test('skill evidence links open the project that proves them', async ({ page }) => {

@@ -1,7 +1,8 @@
 ---
 /**
- * Bordered surface. `interactive` adds hover elevation for cards that are entirely a link;
- * the link itself goes inside the slot so the accessible name stays meaningful.
+ * Raised surface with a bevelled edge instead of a border (ADR 0018). `interactive` adds a
+ * slight scale for cards that are entirely a link; the link itself goes inside the slot so the
+ * accessible name stays meaningful.
  */
 interface Props {
   as?: 'div' | 'article' | 'li';
@@ -15,10 +16,10 @@ const { as: Tag = 'div', interactive = false, padding = 'md', class: className }
 
 <Tag
   class:list={[
-    'relative rounded-card border border-line bg-surface',
+    'relative rounded-card bg-surface shadow-bevel',
     padding === 'md' ? 'p-5 sm:p-6' : 'p-6 sm:p-8',
     interactive &&
-      'transition-[border-color,box-shadow,transform] duration-250 ease-out hover:-translate-y-0.5 hover:border-line-strong hover:shadow-lift focus-within:border-line-strong',
+      'transition-[background-color,scale] duration-500 ease-out hover:bg-surface-raised focus-within:bg-surface-raised motion-safe:hover:scale-101',
     className,
   ]}
 >

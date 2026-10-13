@@ -90,9 +90,10 @@ test.describe('bilingual site and SEO', () => {
     await expect(page.locator('main h2')).toHaveText([
       'Results you can verify',
       'Systems in production and open source',
+      "Who's behind the work",
       'Every skill, with the project that proves it',
       'Experience and education',
-      "Let's work together",
+      'Services and prices',
       'Education and certifications',
       'Ask my portfolio',
       'Tell me what you need',

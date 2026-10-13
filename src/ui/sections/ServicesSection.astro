@@ -1,51 +1,121 @@
 ---
-import type { ProcessStep, Service } from '../../domain/profile/profile';
+import type { Currency, ProcessStep, Service } from '../../domain/profile/profile';
+import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
+import { formatMoney } from '../i18n/format';
+import Icon from '../icons/Icon.astro';
 import Button from '../primitives/Button.astro';
-import Card from '../primitives/Card.astro';
+import Frame from '../primitives/Frame.astro';
 import Section from '../primitives/Section.astro';
 
+/**
+ * Services with their starting prices, so a visitor knows the order of magnitude at a glance
+ * without a rigid price list: every amount is a floor ("from"), each service names its scope
+ * in one human unit, and every card leads to the same conversation (ADR 0018).
+ */
 interface Props {
   t: Dictionary;
+  locale: Locale;
   services: readonly Service[];
   process: readonly ProcessStep[];
+  currency: Currency;
   pricing: string;
 }
 
-const { t, services, process, pricing } = Astro.props;
+const { t, locale, services, process, currency, pricing } = Astro.props;
 ---
 
-<Section id="services" eyebrow={t.services.eyebrow} title={t.services.title}>
+<Section id="services" title={t.services.title}>
   <p slot="description">{t.services.description}</p>
 
   <ul class="grid gap-4 md:grid-cols-2">
-    {services.map((service) => (
-      <li>
-        <Card class="h-full" padding="lg">
-          <h3 class="text-title font-medium">{service.title}</h3>
-          <p class="mt-2 text-muted">{service.summary}</p>
-          <p class="mt-6 mb-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
-            {t.services.deliverables}
+    {services.map((service, index) => (
+      <li class="reveal flex">
+        <Frame class="w-full" inverted={service.featured}>
+          <h3 slot="label" class="font-medium text-ink" id={`service-${String(index)}`}>
+            {service.title}
+          </h3>
+          {service.featured && (
+            <span
+              slot="badge"
+              class="inline-flex min-h-7 items-center rounded-chip bg-accent px-3 text-eyebrow font-medium text-on-accent"
+            >
+              {t.services.featured}
+            </span>
+          )}
+          <p class="flex items-baseline gap-2">
+            <span class:list={['text-small', service.featured ? 'text-canvas/70' : 'text-subtle']}>
+              {t.services.from}
+            </span>
+            <span class="text-price font-semibold tabular-nums">
+              {formatMoney(locale, service.price.from, currency)}
+            </span>
+            <span class:list={['text-small', service.featured ? 'text-canvas/70' : 'text-subtle']}>
+              {currency}
+            </span>
           </p>
-          <ul class="flex flex-col gap-2 text-small">
+          <p
+            class:list={[
+              'mt-4 text-small text-pretty',
+              service.featured ? 'text-canvas/80' : 'text-muted',
+            ]}
+          >
+            {service.summary}
+          </p>
+          <div
+            class:list={[
+              'mt-6 border-t pt-4',
+              service.featured ? 'border-canvas/15' : 'border-line',
+            ]}
+          >
+            <p class:list={['text-eyebrow', service.featured ? 'text-canvas/70' : 'text-subtle']}>
+              {t.services.scope}
+            </p>
+            <p class="mt-1 text-title font-semibold">{service.price.scope}</p>
+          </div>
+          <ul
+            class="mt-6 flex flex-1 flex-col gap-3 text-small"
+            aria-label={t.services.deliverables}
+          >
             {service.deliverables.map((deliverable) => (
-              <li class="flex gap-2">
-                <span class="text-accent-ink" aria-hidden="true">
-                  +
+              <li class="flex items-start gap-3">
+                <span
+                  class:list={[
+                    'mt-px inline-flex size-6 shrink-0 items-center justify-center rounded-chip',
+                    service.featured
+                      ? 'bg-accent text-on-accent'
+                      : 'bg-surface-raised text-success',
+                  ]}
+                  aria-hidden="true"
+                >
+                  <Icon name="check" size={14} />
                 </span>
                 {deliverable}
               </li>
             ))}
           </ul>
-        </Card>
+          <Button
+            href="#contact"
+            variant={service.featured ? 'primary' : 'secondary'}
+            class="mt-8 w-full"
+            aria-describedby={`service-${String(index)}`}
+          >
+            {t.services.cta}
+          </Button>
+        </Frame>
       </li>
     ))}
   </ul>
+  <p class="mt-6 text-center text-small text-pretty text-subtle">
+    {pricing} {t.services.currencyNote}
+  </p>
 
-  <h3 class="mt-16 mb-6 text-title font-medium">{t.services.processTitle}</h3>
-  <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+  <h3 class="mt-20 mb-8 font-display text-title font-light sm:text-heading">
+    {t.services.processTitle}
+  </h3>
+  <ol class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
     {process.map((step, index) => (
-      <li class="flex flex-col gap-2 border-t border-line-strong pt-4">
+      <li class="reveal flex flex-col gap-2 border-t border-line-strong pt-4">
         <span class="font-mono text-small text-accent-ink">
           {String(index + 1).padStart(2, '0')}
         </span>
@@ -54,11 +124,4 @@ const { t, services, process, pricing } = Astro.props;
       </li>
     ))}
   </ol>
-
-  <div class="mt-12 flex flex-col items-start gap-4 rounded-card border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
-    <p class="text-ink">{pricing}</p>
-    <Button href="#contact" icon="arrow-right">
-      {t.services.cta}
-    </Button>
-  </div>
 </Section>

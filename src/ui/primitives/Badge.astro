@@ -18,7 +18,7 @@ const { tone = 'neutral', status = false, class: className } = Astro.props;
     {
       neutral: 'border-line-strong text-muted',
       accent: 'border-accent-ink/40 text-accent-ink',
-      success: 'border-success/40 text-ink',
+      success: 'border-transparent ps-0 text-ink',
     }[tone],
     className,
   ]}
@@ -26,7 +26,7 @@ const { tone = 'neutral', status = false, class: className } = Astro.props;
   {status && (
     <span class="relative flex size-2" aria-hidden="true">
       <span class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
-      <span class="relative inline-flex size-2 rounded-full bg-success" />
+      <span class="relative inline-flex size-2 rounded-full bg-success shadow-glow" />
     </span>
   )}
   <slot />

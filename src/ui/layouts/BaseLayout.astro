@@ -1,6 +1,8 @@
 ---
 import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
+
+import displayFont from '../../assets/fonts/literata-display.woff2?url';
 import '../styles/global.css';
 
 import { PUBLIC_WEB_ANALYTICS_TOKEN } from 'astro:env/client';
@@ -93,6 +95,7 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
     <!-- tokens-allow: meta tags need a literal color; keep in sync with the dark --canvas token -->
     <meta name="theme-color" content="#0b0b0d" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="sitemap" href="/sitemap.xml" />
     {PUBLIC_WEB_ANALYTICS_TOKEN && (

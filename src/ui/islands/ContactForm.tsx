@@ -294,7 +294,7 @@ export default function ContactForm({
         <button
           type="submit"
           disabled={status.kind === 'submitting'}
-          className="inline-flex min-h-12 items-center justify-center rounded-control bg-accent px-6 font-medium text-on-accent transition-[filter,transform] duration-150 hover:brightness-110 active:translate-y-px disabled:opacity-60"
+          className="inline-flex min-h-12 items-center justify-center rounded-chip bg-accent px-6 font-medium text-on-accent shadow-bevel transition-[filter,scale] duration-500 ease-out hover:brightness-110 disabled:opacity-60 motion-safe:hover:scale-103 motion-safe:active:scale-97"
         >
           {status.kind === 'submitting' ? text.sending : text.submit}
         </button>
