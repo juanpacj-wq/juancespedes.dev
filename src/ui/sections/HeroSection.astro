@@ -1,6 +1,4 @@
 ---
-import monoFont from '@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url';
-
 import type { Locale } from '../../domain/shared/locale';
 import AsciiArt from '../art/AsciiArt.astro';
 import type { Dictionary } from '../i18n/dictionary';
@@ -24,8 +22,6 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
   Two layers: the painting fills the hero as a backdrop, the content stands centred in front of
   it. The lamp follows the pointer anywhere on the stage (data-ascii-stage).
 -->
-<!-- The backdrop text is the largest paint of the page: fetch its font with the HTML. -->
-<link rel="preload" href={monoFont} as="font" type="font/woff2" crossorigin />
 <section class="hero relative isolate overflow-hidden" data-ascii-stage>
   <div class="hero-art">
     <AsciiArt

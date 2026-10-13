@@ -90,7 +90,9 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
 
 - JavaScript stays at 72.4 kB of the 75 kB budget: the new behaviour is inline script and CSS.
 - Pages download one more font file (43 kB) and the home page a 192 px WebP; the ASCII text is
-  about 17 kB, drawn twice (ink and paint), which gzip reduces to a few kB.
+  about 22 kB and travels once: the colour layer copies it from the ink the first time the lamp
+  or the light is used. The home page has no slack in its performance budget, so the backdrop
+  text, which is its largest paint, must not grow without measuring again.
 - The prices are public commitments to a floor. They are set in content, reviewed like any
   other copy, and must be kept current.
 - Changing the painting or the grid size means running `pnpm ascii` and committing the output;

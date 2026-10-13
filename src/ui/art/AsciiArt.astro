@@ -44,7 +44,8 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     style={`--columns: ${String(columns)}; --painting: url('${colour.src}')`}
   >
     <pre class="ascii-layer ascii-ink" aria-hidden="true">{text}</pre>
-    <pre class="ascii-layer ascii-paint" aria-hidden="true">{text}</pre>
+    <!-- Filled from the ink on first use, so the page carries the text once. -->
+    <pre class="ascii-layer ascii-paint" aria-hidden="true"></pre>
   </div>
   <figcaption class="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 font-mono text-eyebrow text-subtle">
     <span>
@@ -184,6 +185,11 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     const label = button?.querySelector('.ascii-switch-label');
     if (!canvas || !button || !label) continue;
     const stage = figure.closest<HTMLElement>('[data-ascii-stage]') ?? canvas;
+    const ink = canvas.querySelector('.ascii-ink');
+    const paint = canvas.querySelector('.ascii-paint');
+    const fillPaint = (): void => {
+      if (ink && paint && !paint.textContent) paint.textContent = ink.textContent;
+    };
 
     const aim = (event: PointerEvent): void => {
       const box = canvas.getBoundingClientRect();
@@ -192,13 +198,17 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     };
 
     const setLit = (lit: boolean): void => {
+      fillPaint();
       canvas.toggleAttribute('data-lit', lit);
       button.setAttribute('aria-pressed', String(lit));
       label.textContent = (lit ? button.dataset['off'] : button.dataset['on']) ?? '';
     };
 
     if (window.matchMedia('(pointer: fine)').matches) {
-      stage.addEventListener('pointerenter', () => canvas.toggleAttribute('data-lamp', true));
+      stage.addEventListener('pointerenter', () => {
+        fillPaint();
+        canvas.toggleAttribute('data-lamp', true);
+      });
       stage.addEventListener('pointerleave', () => canvas.toggleAttribute('data-lamp', false));
       stage.addEventListener('pointermove', aim);
     }
