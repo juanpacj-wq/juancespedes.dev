@@ -1,0 +1,47 @@
+---
+import { container } from '../../composition/container';
+import type { Locale } from '../../domain/shared/locale';
+import { dictionaryFor } from '../../ui/i18n/dictionary';
+import { homePath, notePath, ogImagePath } from '../../ui/i18n/routes';
+import BaseLayout from '../../ui/layouts/BaseLayout.astro';
+import { noteGraph } from '../../ui/seo/structured-data';
+import NoteArticle from '../../ui/writing/NoteArticle.astro';
+import { siteNav } from './site-nav';
+
+/** A technical note in one language; the route files under src/pages render it. */
+interface Props {
+  locale: Locale;
+  slug: string;
+}
+
+const { locale, slug } = Astro.props;
+const t = dictionaryFor(locale);
+const found = await container.getNote(locale, slug);
+// getStaticPaths only lists visible notes, so this means the content changed mid-build.
+if (!found.ok) throw new Error(`Note "${slug}" is not published in "${locale}"`);
+const note = found.value;
+const { Content, headings } = await container.renderNoteBody(locale, slug);
+const route = { page: 'note', slug } as const;
+
+const jsonLd = noteGraph({
+  note,
+  authorName: t.profile.name,
+  url: notePath(locale, slug),
+  image: ogImagePath(locale, route),
+  homeUrl: homePath(locale),
+});
+---
+
+<BaseLayout
+  title={`${note.title} | ${t.meta.siteName}`}
+  description={note.summary}
+  locale={locale}
+  route={route}
+  navItems={siteNav(t, locale)}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <NoteArticle t={t} note={note} headings={headings}>
+    <Content />
+  </NoteArticle>
+</BaseLayout>

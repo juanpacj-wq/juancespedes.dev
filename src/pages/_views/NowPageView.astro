@@ -1,0 +1,27 @@
+---
+import { container } from '../../composition/container';
+import type { Locale } from '../../domain/shared/locale';
+import { dictionaryFor } from '../../ui/i18n/dictionary';
+import BaseLayout from '../../ui/layouts/BaseLayout.astro';
+import NowView from '../../ui/writing/NowView.astro';
+import { siteNav } from './site-nav';
+
+/** The "now" page in one language. */
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = dictionaryFor(locale);
+const page = await container.getNowPage(locale);
+---
+
+<BaseLayout
+  title={`${t.now.title} | ${t.meta.siteName}`}
+  description={t.now.description}
+  locale={locale}
+  route={{ page: 'now' }}
+  navItems={siteNav(t, locale)}
+>
+  <NowView t={t} locale={locale} page={page} />
+</BaseLayout>

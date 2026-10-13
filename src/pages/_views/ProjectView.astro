@@ -2,16 +2,11 @@
 import { container } from '../../composition/container';
 import type { Locale } from '../../domain/shared/locale';
 import { dictionaryFor } from '../../ui/i18n/dictionary';
-import {
-  homePath,
-  homeSectionPath,
-  ogImagePath,
-  projectPath,
-  projectsListPath,
-} from '../../ui/i18n/routes';
+import { homePath, ogImagePath, projectPath, projectsListPath } from '../../ui/i18n/routes';
 import BaseLayout from '../../ui/layouts/BaseLayout.astro';
 import ProjectArticle from '../../ui/project/ProjectArticle.astro';
 import { projectGraph } from '../../ui/seo/structured-data';
+import { siteNav } from './site-nav';
 
 /** A project page in one language; the route files under src/pages render it. */
 interface Props {
@@ -27,12 +22,7 @@ if (!page.ok) throw new Error(`Project "${slug}" is not published in "${locale}"
 const { project, previous, next } = page.value;
 const route = { page: 'project', slug } as const;
 
-const navItems = [
-  { href: homeSectionPath(locale, 'projects'), label: t.nav.projects },
-  { href: homeSectionPath(locale, 'capabilities'), label: t.nav.skills },
-  { href: homeSectionPath(locale, 'services'), label: t.nav.services },
-  { href: homeSectionPath(locale, 'contact'), label: t.nav.contact },
-];
+const navItems = siteNav(t, locale);
 
 const jsonLd = projectGraph({
   project,

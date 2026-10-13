@@ -1,0 +1,63 @@
+---
+title: A strict CSP in Astro on Cloudflare Workers, without unsafe-inline
+summary: How this site reached A+ on securityheaders.com with a policy that only allows the inline scripts its own build produced, and the WebKit detail that almost broke it.
+published: '2026-10-12'
+tags: [security, astro, cloudflare]
+status: published
+---
+
+A content security policy (CSP) is the most useful defense against script injection, and also
+the one that gets weakened most often in practice: a single `'unsafe-inline'` in `script-src` is
+enough for any injected script to run. This site needed one without that shortcut.
+
+## The problem: Astro writes inline scripts
+
+Astro produces static HTML, but not without JavaScript. Small scripts end up inline in the HTML:
+the one that applies the theme before the page paints, the one that defines the islands that
+hydrate, and the project filter. Forbidding every inline script breaks the site; allowing all of
+them defeats the policy.
+
+The way out is the one the standard defines: list the SHA-256 hash of each allowed script. The
+browser hashes every script it finds and only runs it if the hash matches.
+
+## Hashing after the build
+
+Scripts change with every Astro release and every component change, so the hashes cannot be
+written by hand. A step after `astro build` walks the generated HTML:
+
+```js
+const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script[^>]*>/gi)]
+  .filter(([, attributes]) => !/\bsrc\s*=/i.test(attributes))
+  .map(([, , body]) => body);
+
+const hash = (script) => `'sha256-${createHash('sha256').update(script, 'utf8').digest('base64')}'`;
+```
+
+Data blocks such as JSON-LD are left out: browsers do not execute them and the policy does not
+apply to them. The unique hashes become `script-src 'self' <hashes>`, plus the two external
+origins the site uses on purpose: Turnstile and Cloudflare's analytics.
+
+## Where the headers go
+
+On Cloudflare Workers with static assets, pages are served from the asset layer without running
+the Worker, so a middleware never sees them. That is why the same step writes the headers into
+`dist/client/_headers`, which Cloudflare applies to those files. Responses the Worker does
+produce, such as the API, get the same set from a middleware, with an even tighter policy because
+they are data, not documents.
+
+## The WebKit detail
+
+The first version included `upgrade-insecure-requests`. In production it does nothing, because
+everything already goes over HTTPS. In tests it did: WebKit applies the directive to
+`http://localhost` too, rewrites the stylesheet and scripts to `https` and cannot find them. The
+result was an unstyled page that axe reported as accessibility problems. Removing the directive
+fixed it at no cost.
+
+## Knowing it does not break
+
+A policy like this fails quietly: the browser blocks a script and the page looks almost fine. So
+the end-to-end tests load every page while listening for the `securitypolicyviolation` event and
+fail if one shows up, including with the contact form and its Turnstile challenge loaded.
+
+The result is A+ on securityheaders.com, and a policy that maintains itself: if a change adds an
+inline script, the build hashes it; if something injects one later, the browser blocks it.

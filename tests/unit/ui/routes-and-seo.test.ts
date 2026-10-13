@@ -9,7 +9,8 @@ import {
   type PageRoute,
 } from '../../../src/ui/i18n/routes';
 import { buildSitemap } from '../../../src/ui/seo/sitemap';
-import { homeGraph, projectGraph, toJsonLd } from '../../../src/ui/seo/structured-data';
+import { createNote } from '../../../src/domain/writing/note';
+import { homeGraph, noteGraph, projectGraph, toJsonLd } from '../../../src/ui/seo/structured-data';
 import { caseStudyContent, project } from '../../support/project-builders';
 
 describe('route table', () => {
@@ -21,6 +22,9 @@ describe('route table', () => {
       '/proyectos/plant-telemetry',
       '/en/projects/plant-telemetry',
     ],
+    [{ page: 'now' }, '/ahora', '/en/now'],
+    [{ page: 'notes' }, '/notas', '/en/notes'],
+    [{ page: 'note', slug: 'strict-csp' }, '/notas/strict-csp', '/en/notes/strict-csp'],
   ] satisfies [PageRoute, string, string][])('maps %o in both languages', (route, es, en) => {
     expect(pathFor('es', route)).toBe(es);
     expect(pathFor('en', route)).toBe(en);
@@ -36,6 +40,8 @@ describe('route table', () => {
   it('names one Open Graph card per page and language', () => {
     expect(ogImagePath('es', { page: 'home' })).toBe('/og/es/home.png');
     expect(ogImagePath('en', { page: 'project', slug: 'x' })).toBe('/og/en/projects/x.png');
+    expect(ogImagePath('es', { page: 'note', slug: 'y' })).toBe('/og/es/notes/y.png');
+    expect(ogImagePath('en', { page: 'now' })).toBe('/og/en/now.png');
   });
 });
 
@@ -132,6 +138,40 @@ describe('structured data', () => {
       projectsUrl: '/en#projects',
     });
     expect(JSON.stringify(graph)).not.toContain('sameAs');
+  });
+
+  it('describes a note as a blog post, modified when it was updated', () => {
+    const note = createNote(
+      { slug: 'strict-csp', locale: 'en' },
+      {
+        title: 'A strict CSP',
+        summary: 'How.',
+        published: '2026-10-12',
+        updated: null,
+        tags: ['security', 'astro'],
+        status: 'published',
+      },
+    );
+    if (!note.ok) throw new Error('invalid test note');
+    const graph = noteGraph({
+      note: note.value,
+      authorName: 'Juan Céspedes',
+      url: '/en/notes/strict-csp',
+      image: '/og/en/notes/strict-csp.png',
+      homeUrl: '/en',
+    });
+    expect(graph['@graph']).toMatchObject([
+      { '@type': 'Person', name: 'Juan Céspedes' },
+      {
+        '@type': 'BlogPosting',
+        headline: 'A strict CSP',
+        inLanguage: 'en-US',
+        datePublished: '2026-10-12',
+        dateModified: '2026-10-12',
+        keywords: 'security, astro',
+        mainEntityOfPage: 'https://juancespedes.dev/en/notes/strict-csp',
+      },
+    ]);
   });
 
   it('cannot close the script element it is embedded in', () => {

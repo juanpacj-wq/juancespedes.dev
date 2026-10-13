@@ -1,0 +1,19 @@
+# Página "Ahora" (nownownow.com): en qué estoy enfocado en este momento. Actualiza `updated`
+# cada vez que cambie algo; la fecha se muestra en la página.
+updated: '2026-10-12'
+sections:
+  - title: Trabajo
+    items:
+      - Opero y amplío sistemas en producción para una generadora de energía en Barranquilla, entre ellos la bitácora digital de operación, la telemetría de planta y el pipeline de facturación electrónica.
+      - Atiendo incidentes con expediente de causa raíz y llevo cada corrección a pruebas automatizadas antes de desplegarla.
+  - title: Construyendo
+    items:
+      - Este sitio, en público. Cada decisión de arquitectura está documentada en el repositorio y cada cambio pasa por las mismas puertas de calidad.
+      - Un asistente que responde preguntas sobre mi trabajo con base en los casos de estudio publicados aquí.
+  - title: Aprendiendo
+    items:
+      - Agentes de IA con Model Context Protocol aplicados a la operación, con simulación por defecto y confirmación humana antes de cualquier acción que cambie algo.
+      - Pruebas de mutación para medir qué tan bien protegen las pruebas las reglas del negocio, más allá de la cobertura.
+  - title: Disponible para
+    items:
+      - Proyectos de desarrollo web, datos e informes, y automatización, con cotización a partir del requerimiento.

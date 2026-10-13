@@ -9,6 +9,8 @@ import { normalizeTechnologyName } from '../../src/domain/project/technology';
 import { toProfile } from '../../src/infrastructure/content/profile-mapper';
 import {
   headlineMetricSchema,
+  noteFrontmatterSchema,
+  nowSchema,
   profileSchema,
   projectFrontmatterSchema,
   technologySchema,
@@ -99,6 +101,50 @@ describe('projects', () => {
       );
       for (const other of others) expect(other).toEqual(reference);
     });
+  });
+});
+
+const NOTES = join(CONTENT, 'notes');
+const noteSlugs = readdirSync(NOTES).filter((name) => statSync(join(NOTES, name)).isDirectory());
+
+describe('notes', () => {
+  describe.each(noteSlugs)('%s', (slug) => {
+    it('exists in every supported locale and nothing else sits next to it', () => {
+      const files = readdirSync(join(NOTES, slug)).filter((name) => name.endsWith('.mdx'));
+      expect(files.sort()).toEqual(SUPPORTED_LOCALES.map((locale) => `${locale}.mdx`).sort());
+    });
+
+    it('passes the schema and the domain rules in every locale', () => {
+      for (const locale of SUPPORTED_LOCALES) {
+        const result = noteFrontmatterSchema.safeParse(
+          frontmatterOf(join(NOTES, slug, `${locale}.mdx`)),
+        );
+        expect(result.error?.issues ?? [], locale).toEqual([]);
+      }
+    });
+
+    it('keeps dates, status and the number of topics identical across locales', () => {
+      const shape = (locale: string) => {
+        const note = noteFrontmatterSchema.parse(frontmatterOf(join(NOTES, slug, `${locale}.mdx`)));
+        return [note.published, note.updated, note.status, note.tags.length];
+      };
+      const [reference, ...others] = SUPPORTED_LOCALES.map(shape);
+      for (const other of others) expect(other).toEqual(reference);
+    });
+  });
+});
+
+describe('now page', () => {
+  const pageOf = (locale: string) =>
+    nowSchema.parse(readYaml(join(CONTENT, 'now', `${locale}.yaml`)));
+
+  it('has the same date and the same shape in every locale', () => {
+    const shape = (locale: string) => {
+      const page = pageOf(locale);
+      return [page.updated, page.sections.map((section) => section.items.length)];
+    };
+    const [reference, ...others] = SUPPORTED_LOCALES.map(shape);
+    for (const other of others) expect(other).toEqual(reference);
   });
 });
 
