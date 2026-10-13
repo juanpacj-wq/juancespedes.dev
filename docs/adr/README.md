@@ -20,5 +20,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0013](0013-launch-hardening-and-operations.md) | Launch: security headers, monitoring without third parties, releases    | Accepted |
 | [0014](0014-mutation-testing.md)                | Mutation testing of the domain with Stryker                             | Accepted |
 | [0015](0015-notes-and-now-page.md)              | Technical notes and a "now" page, as validated content                  | Accepted |
+| [0016](0016-command-palette.md)                 | Command palette without a UI framework                                  | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.
