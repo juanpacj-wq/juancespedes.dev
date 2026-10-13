@@ -58,8 +58,12 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
   the hero and the content stands centred in front of it, dimmed by a pool of shadow and a halo
   on the text. The copy is cropped at the waterline, without the reflection: Narcissus bends
   over the page, and the work below is what holds his gaze. Without the reflection the painting
-  is close to the shape of a screen (1.56 : 1), so it covers the hero, overflowing by at most
-  12 % of its height, cut from the bottom where it fades into the next section. Masks and registered
+  is close to the shape of a screen (1.56 : 1), so it covers the whole first screen, the header
+  included: the hero slides up under the sticky bar, which starts clear and turns solid as the
+  page scrolls (a CSS scroll timeline; without one it stays solid). The figure is drawn 10 %
+  wider than the screen so the arms, not the painting's dark margins, reach both edges; the
+  overflow is cut from the empty top band and from the bottom, where it fades into the next
+  section. Masks and registered
   custom properties do the animation; the script is under 1 kB and inline. At rest both layers are
   plain text: the masks apply only while the lamp or the light is in use, and the colour layer
   is not painted until then. An entrance animation that recomputed a mask on every frame over
