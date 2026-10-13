@@ -39,6 +39,7 @@ test.describe('home sections', () => {
       'Experiencia y formación',
       'Trabajemos juntos',
       'Formación y certificaciones',
+      'Pregúntale a mi portafolio',
       'Cuéntame qué necesitas',
     ]);
     await expect(page.getByText('Fuente:').first()).toBeVisible();

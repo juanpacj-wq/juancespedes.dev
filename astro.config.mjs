@@ -49,6 +49,42 @@ export default defineConfig({
         access: 'secret',
         optional: true,
       }),
+      // "Ask me" chat (ADR 0017). Off unless enabled; the fake model costs nothing and is what
+      // local runs, previews and tests use. Production sets CHAT_ENABLED and CHAT_MODEL.
+      CHAT_ENABLED: envField.boolean({ context: 'server', access: 'public', default: false }),
+      CHAT_MODEL: envField.enum({
+        context: 'server',
+        access: 'public',
+        values: ['fake', 'anthropic'],
+        default: 'fake',
+      }),
+      CHAT_MODEL_ID: envField.string({
+        context: 'server',
+        access: 'public',
+        default: 'claude-opus-5-5',
+      }),
+      CHAT_EFFORT: envField.enum({
+        context: 'server',
+        access: 'public',
+        values: ['low', 'medium', 'high', 'xhigh', 'max'],
+        default: 'high',
+      }),
+      CHAT_MAX_TOKENS: envField.number({ context: 'server', access: 'public', default: 4000 }),
+      CHAT_VISITOR_DAILY_LIMIT: envField.number({
+        context: 'server',
+        access: 'public',
+        default: 10,
+      }),
+      CHAT_DAILY_LIMIT: envField.number({ context: 'server', access: 'public', default: 150 }),
+      ANTHROPIC_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      CHAT_VISITOR_PEPPER: envField.string({ context: 'server', access: 'secret', optional: true }),
+      // Build-time switch for the chat section. On by default so local runs and tests have it; the
+      // production deploy sets it from a repository variable until the chat is live.
+      PUBLIC_CHAT_ENABLED: envField.boolean({
+        context: 'client',
+        access: 'public',
+        default: true,
+      }),
       CONTACT_FROM_EMAIL: envField.string({
         context: 'server',
         access: 'public',

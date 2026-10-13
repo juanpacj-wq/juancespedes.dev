@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+# Build artifacts for the chat and the command palette, not pages.
+Disallow: /chat-corpus/
+Disallow: /palette/
 
 Sitemap: https://juancespedes.dev/sitemap.xml

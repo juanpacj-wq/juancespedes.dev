@@ -1,0 +1,32 @@
+---
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+
+import type { Locale } from '../../domain/shared/locale';
+import type { Dictionary } from '../i18n/dictionary';
+import AskMe from '../islands/AskMe';
+import Card from '../primitives/Card.astro';
+import Section from '../primitives/Section.astro';
+
+/** "Ask me" (ADR 0017): an assistant that answers about the published work. */
+interface Props {
+  t: Dictionary;
+  locale: Locale;
+  email: string;
+}
+
+const { t, locale, email } = Astro.props;
+---
+
+<Section id="ask" eyebrow={t.chat.eyebrow} title={t.chat.title}>
+  <p slot="description">{t.chat.description}</p>
+  <Card padding="lg" class="max-w-3xl">
+    <AskMe
+      client:visible
+      locale={locale}
+      endpoint="/api/chat"
+      siteKey={PUBLIC_TURNSTILE_SITE_KEY}
+      email={email}
+      text={t.chat}
+    />
+  </Card>
+</Section>

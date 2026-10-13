@@ -39,6 +39,9 @@ jobs:
           PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
           # Page views are counted for production only; previews build without the beacon.
           PUBLIC_WEB_ANALYTICS_TOKEN: ${{ github.event_name == 'push' && vars.PUBLIC_WEB_ANALYTICS_TOKEN || '' }}
+          # "Ask me" (ADR 0017): previews always show it (with the free fake model); production
+          # shows it only when the repository variable CHAT_ENABLED is "true".
+          PUBLIC_CHAT_ENABLED: ${{ github.event_name == 'pull_request' && 'true' || vars.CHAT_ENABLED || 'false' }}
       - name: Upload preview version
         if: github.event_name == 'pull_request'
         id: preview
@@ -46,7 +49,8 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload --message "PR #${{ github.event.number }} ${{ github.sha }}"
+          # Previews never call the paid model, even though they share the Worker's secrets.
+          command: versions upload --message "PR #${{ github.event.number }} ${{ github.sha }}" --var CHAT_ENABLED:true --var CHAT_MODEL:fake
       - name: Comment preview URL
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v3
@@ -60,4 +64,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --message "main ${{ github.sha }}"
+          # The chat runs on the real model only when CHAT_ENABLED is "true" (the kill switch) and
+          # the ANTHROPIC_API_KEY secret exists; otherwise the endpoint answers "disabled".
+          command: deploy --message "main ${{ github.sha }}" --var CHAT_ENABLED:${{ vars.CHAT_ENABLED || 'false' }} --var CHAT_MODEL:anthropic

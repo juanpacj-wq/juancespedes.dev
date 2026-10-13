@@ -24,9 +24,21 @@ declare module 'cloudflare:workers' {
     limit(options: { key: string }): Promise<{ success: boolean }>;
   }
 
+  interface KvNamespace {
+    get(key: string): Promise<string | null>;
+    put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+  }
+
+  interface AssetsBinding {
+    fetch(input: Request | string): Promise<Response>;
+  }
+
   export const env: {
     readonly CONTACT_EMAIL: SendEmailBinding;
     readonly CONTACT_RATE_LIMITER: RateLimitBinding;
     readonly CLIENT_ERROR_RATE_LIMITER: RateLimitBinding;
+    readonly CHAT_RATE_LIMITER: RateLimitBinding;
+    readonly CHAT_QUOTA: KvNamespace;
+    readonly ASSETS: AssetsBinding;
   };
 }
