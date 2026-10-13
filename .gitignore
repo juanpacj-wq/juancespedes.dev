@@ -15,6 +15,7 @@ playwright-report/
 blob-report/
 .lighthouseci/
 reports/
+.stryker-tmp/
 
 # Logs
 *.log
