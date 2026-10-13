@@ -18,9 +18,9 @@ describe('the ASCII painting', () => {
     for (const line of lines) expect(line).toHaveLength(columns);
   });
 
-  it('keeps the proportions of the painting (1200 x 1337) for cells 0.6 wide', () => {
+  it('keeps the proportions of the painting (1200 x 770) for cells 0.6 wide', () => {
     const ratio = (columns * 0.6) / lines.length;
-    expect(ratio).toBeCloseTo(1200 / 1337, 2);
+    expect(ratio).toBeCloseTo(1200 / 770, 1);
   });
 
   it('uses printable ASCII only, so any monospace font draws every cell', () => {

@@ -46,7 +46,7 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
   Literata is OFL; it is instanced to the display optical size and weights 300 to 500 and
   subset to Latin: 43 kB instead of 110 kB, preloaded.
 - **The ASCII painting is text, not WebGL.** `scripts/generate-ascii.mjs` (sharp) turns a
-  1200 px copy of the painting (its empty top band cropped) into a 160 x 107 grid once: a
+  1200 px copy of the painting into a 240 x 92 grid once: a
   percentile stretch, an empty floor for the dark ground, a gamma that lifts the half-lit paint,
   and one glyph per tone chosen by the share of the cell that Geist Mono inks at weight 600,
   measured on a canvas. The grid is committed. A first version (96 columns, histogram
@@ -54,11 +54,16 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
   read as noise, so it was replaced. `AsciiArt.astro` stacks two copies
   of the text: ochre ink, and the same characters filled with a 192 px copy of the painting
   (`background-clip: text`). A lamp follows a fine pointer and shows the true colours around
-  it; a click or the labelled switch floods the whole figure with them. From a laptop up the figure
-  leaves the content column: it takes the whole height of the hero and everything right of the
-  text out to the edge of the screen, at the largest size whose proportions fit. Masks and registered
-  custom properties do the animation; the script is under 1 kB and inline. The ink develops
-  outward on first paint unless the visitor prefers reduced motion. Screen readers get one
+  it; a click or the labelled switch floods the whole figure with them. The figure is the backdrop of
+  the hero and the content stands centred in front of it, dimmed by a pool of shadow and a halo
+  on the text. The copy is cropped at the waterline, without the reflection: Narcissus bends
+  over the page, and the work below is what holds his gaze. Without the reflection the painting
+  is close to the shape of a screen (1.56 : 1), so it covers the hero, overflowing by at most
+  12 % of its height, cut from the bottom where it fades into the next section. Masks and registered
+  custom properties do the animation; the script is under 1 kB and inline. At rest both layers are
+  plain text: the masks apply only while the lamp or the light is in use, and the colour layer
+  is not painted until then. An entrance animation that recomputed a mask on every frame over
+  the full-screen backdrop cost the home page its Lighthouse budget, so it was removed. Screen readers get one
   image with a description, and the caption credits the painting.
 - **Portrait in its own section.** "Quién está detrás" holds the portrait, a short first-person
   text, the location and the live local time in Barranquilla (an idea from the status bar of
@@ -85,7 +90,11 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
 
 - JavaScript stays at 72.4 kB of the 75 kB budget: the new behaviour is inline script and CSS.
 - Pages download one more font file (43 kB) and the home page a 192 px WebP; the ASCII text is
-  about 17 kB, drawn twice (ink and paint), which gzip reduces to a few kB.
+  about 22 kB and travels once: the colour layer copies it from the ink the first time the lamp
+  or the light is used. The home page has no slack in its performance budget, so the backdrop
+  text, which is its largest paint, must not grow without measuring again. Its scoped styles
+  (hero and art) must also stay under 4 kB, the limit below which Astro inlines them: above it
+  they become one more render-blocking stylesheet, which alone cost 0.3 s of first paint.
 - The prices are public commitments to a floor. They are set in content, reviewed like any
   other copy, and must be kept current.
 - Changing the painting or the grid size means running `pnpm ascii` and committing the output;
