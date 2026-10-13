@@ -53,12 +53,15 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     </span>
     <button
       type="button"
-      class="ascii-switch inline-flex min-h-11 items-center gap-2 rounded-chip text-muted transition-colors duration-150 hover:text-ink"
+      class="ascii-switch group inline-flex min-h-11 items-center gap-2 rounded-chip text-muted transition-colors duration-150 hover:text-ink"
       aria-pressed="false"
       data-on={lightOn}
       data-off={lightOff}
     >
-      <span class="ascii-bulb size-2 rounded-chip bg-line-strong" aria-hidden="true"></span>
+      <span
+        class="ascii-bulb size-2 rounded-chip bg-line-strong group-aria-pressed:bg-accent"
+        aria-hidden="true"
+      ></span>
       <span class="ascii-switch-label">{lightOn}</span>
     </button>
   </figcaption>
@@ -128,8 +131,9 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     background-size: 100% 100%;
     background-clip: text;
     color: transparent;
-    /* Caravaggio's ground is near black: lift the paint so the lit figure reads on the page. */
-    filter: brightness(2.5) saturate(1.2);
+    /* Caravaggio's ground is near black: lift the paint so the lit figure reads, without the
+       glare that would compete with the text in front of it. */
+    filter: brightness(1.5) saturate(1.25);
     /* Light where the lamp is, plus the flood that a click sends across the figure. */
     mask-image:
       radial-gradient(circle var(--lamp) at var(--x) var(--y), black 35%, transparent),
@@ -153,20 +157,9 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     --lamp: 11rem;
   }
 
-  /* A lamp held close burns brighter than the room light. */
-  .ascii-canvas[data-lamp]:not([data-lit]) .ascii-paint {
-    filter: brightness(3) saturate(1.2);
-  }
-
   /* On the light ground the paint needs depth, not light: brightened, it fades into the page. */
-  :global(:root[data-theme='light']) .ascii-paint,
-  :global(:root[data-theme='light']) .ascii-canvas[data-lamp]:not([data-lit]) .ascii-paint {
+  :global(:root[data-theme='light']) .ascii-paint {
     filter: brightness(0.85) contrast(1.25) saturate(1.4);
-  }
-
-  .ascii-canvas[data-lit] + figcaption .ascii-bulb {
-    background-color: var(--color-accent);
-    box-shadow: 0 0 10px var(--color-accent);
   }
 
   @media (prefers-reduced-motion: reduce) {

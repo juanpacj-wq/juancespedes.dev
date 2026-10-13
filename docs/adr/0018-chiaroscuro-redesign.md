@@ -92,7 +92,9 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
 - Pages download one more font file (43 kB) and the home page a 192 px WebP; the ASCII text is
   about 22 kB and travels once: the colour layer copies it from the ink the first time the lamp
   or the light is used. The home page has no slack in its performance budget, so the backdrop
-  text, which is its largest paint, must not grow without measuring again.
+  text, which is its largest paint, must not grow without measuring again. Its scoped styles
+  (hero and art) must also stay under 4 kB, the limit below which Astro inlines them: above it
+  they become one more render-blocking stylesheet, which alone cost 0.3 s of first paint.
 - The prices are public commitments to a floor. They are set in content, reviewed like any
   other copy, and must be kept current.
 - Changing the painting or the grid size means running `pnpm ascii` and committing the output;

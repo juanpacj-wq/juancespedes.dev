@@ -133,7 +133,7 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
   }
 
   /* Behind the text the figure is a presence, not a picture: dimmer, fading into the ground at
-     its edges. The light (lamp or switch) brings it forward. */
+     its edges. The lamp and the switch let its colours through. */
   .hero-art :global(.ascii-canvas) {
     opacity: 0.55;
     /* Fades at the sides and into the page below, where the water (the reflection) would be. */
@@ -141,18 +141,6 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
       linear-gradient(to bottom, black 62%, transparent 100%),
       linear-gradient(to right, transparent, black 12% 88%, transparent);
     mask-composite: intersect;
-    /* Keeps the lamp and flood transitions of the drawing and adds its own fade. */
-    transition:
-      --lamp 400ms var(--ease-out),
-      --flood 1400ms var(--ease-out),
-      opacity 1200ms var(--ease-out);
-  }
-
-  /* Lit, the painting stays behind the text: its colours come through, but not the glare that
-     the drawing has when it stands alone. */
-  .hero-art :global(.ascii-paint),
-  .hero-art :global(.ascii-canvas[data-lamp]:not([data-lit]) .ascii-paint) {
-    filter: brightness(1.5) saturate(1.25);
   }
 
   /* The caption and the switch sit on the bottom edge of the hero, aligned with the content. */
