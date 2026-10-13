@@ -60,8 +60,10 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
   over the page, and the work below is what holds his gaze. Without the reflection the painting
   is close to the shape of a screen (1.56 : 1), so it covers the hero, overflowing by at most
   12 % of its height, cut from the bottom where it fades into the next section. Masks and registered
-  custom properties do the animation; the script is under 1 kB and inline. The ink develops
-  outward on first paint unless the visitor prefers reduced motion. Screen readers get one
+  custom properties do the animation; the script is under 1 kB and inline. At rest both layers are
+  plain text: the masks apply only while the lamp or the light is in use, and the colour layer
+  is not painted until then. An entrance animation that recomputed a mask on every frame over
+  the full-screen backdrop cost the home page its Lighthouse budget, so it was removed. Screen readers get one
   image with a description, and the caption credits the painting.
 - **Portrait in its own section.** "Quién está detrás" holds the portrait, a short first-person
   text, the location and the live local time in Barranquilla (an idea from the status bar of

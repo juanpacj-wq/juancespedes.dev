@@ -12,7 +12,7 @@ for headlines and section titles, Geist Sans for text, Geist Mono for data, capt
 ASCII painting. Surfaces are bevelled rather than bordered; the `Frame` primitive nests a stage
 inside a frame with concentric corners. Buttons are pills. Motion is quiet and switches off with
 `prefers-reduced-motion`: pills scale slightly, sections rise and clear a small blur on scroll
-where the browser supports view timelines, and the hero painting develops from the dark.
+where the browser supports view timelines.
 
 ## Tokens
 

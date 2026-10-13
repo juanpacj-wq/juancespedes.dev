@@ -1,4 +1,6 @@
 ---
+import monoFont from '@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url';
+
 import type { Locale } from '../../domain/shared/locale';
 import AsciiArt from '../art/AsciiArt.astro';
 import type { Dictionary } from '../i18n/dictionary';
@@ -22,6 +24,8 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
   Two layers: the painting fills the hero as a backdrop, the content stands centred in front of
   it. The lamp follows the pointer anywhere on the stage (data-ascii-stage).
 -->
+<!-- The backdrop text is the largest paint of the page: fetch its font with the HTML. -->
+<link rel="preload" href={monoFont} as="font" type="font/woff2" crossorigin />
 <section class="hero relative isolate overflow-hidden" data-ascii-stage>
   <div class="hero-art">
     <AsciiArt
@@ -46,9 +50,7 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
       </span>
       <p class="text-muted">{t.hero.intro}</p>
     </div>
-    <p class="hero-headline max-w-4xl font-display text-display font-light text-balance">
-      {t.hero.headline}
-    </p>
+    <p class="max-w-4xl font-display text-display font-light text-balance">{t.hero.headline}</p>
     <p class="max-w-2xl text-lead text-pretty text-muted">{t.hero.pitch}</p>
     <div class="hero-actions flex flex-wrap justify-center gap-3">
       <Button href="#projects" icon="arrow-right" size="lg">
@@ -196,9 +198,5 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
   /* The filled buttons carry their own ground; a dark halo on them would only lower contrast. */
   .hero-actions {
     text-shadow: none;
-  }
-
-  .hero-headline {
-    text-shadow: 0 0 2rem var(--color-canvas);
   }
 </style>

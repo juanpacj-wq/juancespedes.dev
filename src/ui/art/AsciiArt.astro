@@ -77,12 +77,6 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     initial-value: 0%;
   }
 
-  @property --dawn {
-    syntax: '<percentage>';
-    inherits: true;
-    initial-value: 160%;
-  }
-
   /* --ratio (width over height) lets a parent size the figure by the height it has. The size
      container is the drawing, not the figure, so a parent can also place the caption. */
 
@@ -110,11 +104,15 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
   }
 
   /* The ink steps aside wherever the painting shows through: under the lamp, and everywhere
-     once the light is on. */
+     once the light is on. Masks cost a repaint of every glyph, so they only apply while the lamp
+     or the light is in use; at rest both layers are plain text. */
   .ascii-ink {
     color: var(--color-ascii);
-    mask-image: radial-gradient(circle var(--lamp) at var(--x) var(--y), transparent 35%, black);
     transition: opacity 1200ms var(--ease-out);
+  }
+
+  .ascii-canvas[data-lamp] .ascii-ink {
+    mask-image: radial-gradient(circle var(--lamp) at var(--x) var(--y), transparent 35%, black);
   }
 
   .ascii-canvas[data-lit] .ascii-ink {
@@ -124,6 +122,7 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
   .ascii-paint {
     position: absolute;
     inset: 0;
+    visibility: hidden;
     background-image: var(--painting);
     background-size: 100% 100%;
     background-clip: text;
@@ -138,6 +137,11 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
         black var(--flood),
         transparent calc(var(--flood) + 12%)
       );
+  }
+
+  .ascii-canvas[data-lamp] .ascii-paint,
+  .ascii-canvas[data-lit] .ascii-paint {
+    visibility: visible;
   }
 
   .ascii-canvas[data-lit] {
@@ -162,27 +166,6 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
   .ascii-canvas[data-lit] + figcaption .ascii-bulb {
     background-color: var(--color-accent);
     box-shadow: 0 0 10px var(--color-accent);
-  }
-
-  /* First paint: the ink develops outward from the head, like a figure leaving the dark. */
-  @media (prefers-reduced-motion: no-preference) {
-    .ascii-ink {
-      mask-image:
-        radial-gradient(circle var(--lamp) at var(--x) var(--y), transparent 35%, black),
-        radial-gradient(circle at 30% 30%, black var(--dawn), transparent calc(var(--dawn) + 20%));
-      mask-composite: intersect;
-      animation: dawn 2.4s var(--ease-out) 150ms both;
-    }
-  }
-
-  @keyframes dawn {
-    from {
-      --dawn: 0%;
-    }
-
-    to {
-      --dawn: 160%;
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
