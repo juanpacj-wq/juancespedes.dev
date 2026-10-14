@@ -1,0 +1,170 @@
+---
+import { CHAT_LIMITS } from '../../domain/chat/question';
+import type { Locale } from '../../domain/shared/locale';
+import type { Dictionary } from '../i18n/dictionary';
+import Icon from '../icons/Icon.astro';
+
+/**
+ * "Ask me" (ADR 0017) as a floating assistant on every page, modelled on the reference's: a glass
+ * sphere in the bottom-right corner opens a side panel (a sheet on phones) with a greeting,
+ * suggested questions, streamed answers and cards for the case studies an answer names.
+ *
+ * The markup is static; chat-drawer.ts adds the behaviour. Turnstile loads the first time the
+ * panel opens, so pages that never open it pay nothing for it. The conversation is kept in this
+ * tab's sessionStorage so it follows the visitor from page to page; the server stores nothing.
+ */
+interface Props {
+  t: Dictionary;
+  locale: Locale;
+  email: string;
+  siteKey: string;
+}
+
+const { t, locale, email, siteKey } = Astro.props;
+const text = t.chat;
+const examples = [text.example1, text.example2, text.example3];
+// Only the strings the script needs travel to the browser.
+const scriptText = {
+  thinking: text.thinking,
+  verifying: text.verifying,
+  refused: text.refused,
+  truncated: text.truncated,
+  you: text.you,
+  assistant: text.assistant,
+  caseLink: text.caseLink,
+  errors: Object.fromEntries(
+    Object.entries(text.errors).map(([code, message]) => [code, message.replace('{email}', email)]),
+  ),
+};
+---
+
+<div
+  data-chat
+  data-locale={locale}
+  data-endpoint="/api/chat"
+  data-site-key={siteKey}
+  data-text={JSON.stringify(scriptText)}
+  data-min={String(CHAT_LIMITS.question.min)}
+  data-max={String(CHAT_LIMITS.question.max)}
+>
+  <button
+    type="button"
+    class="chat-trigger"
+    data-chat-open
+    aria-expanded="false"
+    aria-controls="chat-panel"
+  >
+    <span class="chat-orb" aria-hidden="true" data-chat-orb></span>
+    <span class="sr-only">{text.open}</span>
+  </button>
+  <span class="chat-tooltip" aria-hidden="true" data-chat-tooltip>
+    {text.tooltip}
+  </span>
+
+  <aside
+    id="chat-panel"
+    class="chat-panel"
+    role="dialog"
+    aria-modal="false"
+    aria-labelledby="chat-title"
+    inert
+    data-chat-panel
+  >
+    <header class="chat-header">
+      <div class="flex min-w-0 items-center gap-2">
+        <span class="chat-avatar" aria-hidden="true">
+          JC
+        </span>
+        <h2 id="chat-title" class="truncate font-medium text-ink">
+          {text.name}
+        </h2>
+        <button
+          type="button"
+          class="chat-icon-button"
+          aria-expanded="false"
+          aria-controls="chat-info"
+          data-chat-info-toggle
+        >
+          <Icon name="info" size={16} label={text.about} />
+        </button>
+      </div>
+      <div class="flex items-center gap-1">
+        <button type="button" class="chat-icon-button" data-chat-reset>
+          <Icon name="rotate-ccw" size={18} label={text.clear} />
+        </button>
+        <button type="button" class="chat-icon-button" data-chat-close>
+          <Icon name="close" size={18} label={text.close} />
+        </button>
+      </div>
+    </header>
+
+    <p id="chat-info" class="chat-info" hidden data-chat-info>
+      {text.disclaimer}
+    </p>
+
+    <div
+      class="chat-messages"
+      role="log"
+      aria-live="polite"
+      aria-label={text.title}
+      data-chat-messages
+    >
+      <div class="chat-intro" data-chat-intro>
+        <p class="font-display text-title font-light text-ink">{text.greeting}</p>
+        <p class="text-small text-muted">{text.intro}</p>
+        <ul class="flex flex-col gap-2">
+          {examples.map((example) => (
+            <li>
+              <button type="button" class="chat-chip" data-chat-example disabled>
+                <Icon name="corner-down-right" size={14} />
+                <span>{example}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <form class="chat-footer flex flex-col gap-2" data-chat-form novalidate>
+      <label for="chat-question" class="sr-only">
+        {text.label}
+      </label>
+      <div class="relative">
+        <input
+          id="chat-question"
+          name="question"
+          class="chat-input"
+          maxlength={CHAT_LIMITS.question.max}
+          placeholder={text.placeholder}
+          autocomplete="off"
+          data-chat-input
+        />
+        <button type="submit" class="chat-send" disabled data-chat-send>
+          <Icon name="arrow-up" size={18} label={text.send} />
+        </button>
+      </div>
+      <div data-chat-turnstile></div>
+      <p role="status" class="min-h-5 text-eyebrow text-subtle" data-chat-status></p>
+    </form>
+  </aside>
+
+  <!-- Cloned by the script for the case-study cards under an answer. -->
+  <template data-chat-link-template>
+    <a class="chat-link-card" href="/">
+      <span class="chat-link-icon" aria-hidden="true">
+        <Icon name="arrow-up-right" size={18} />
+      </span>
+      <span class="flex min-w-0 flex-col">
+        <span class="text-eyebrow text-subtle" data-hint></span>
+        <span class="truncate text-small font-medium text-ink" data-label></span>
+      </span>
+    </a>
+  </template>
+</div>
+
+<script>
+  import { initChatDrawer } from './chat-drawer';
+
+  const root = document.querySelector<HTMLElement>('[data-chat]');
+  if (root) initChatDrawer(root);
+</script>

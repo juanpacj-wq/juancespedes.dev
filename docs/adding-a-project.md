@@ -72,7 +72,16 @@ A published project gets two pages, `/proyectos/<slug>` and `/en/projects/<slug>
 Graph card per language and its place in `sitemap.xml`, all without touching code.
 
 Set `status: published` (and `featured: true` plus `order` if it belongs on the home page).
-`pnpm test` refuses a published project that still contains `TODO`.
+`pnpm test` refuses a published project that still contains `TODO`. Featured projects get the
+wide card on the home page; the rest share the grid of smaller cards.
+
+## 5. Add its images (optional)
+
+Drop them in `src/assets/projects/<slug>/`: `card.*` for the screenshot on the home page card,
+`cover.*` for the wide image on the project page and `gallery-1.*`, `gallery-2.*`... for more.
+They are found by name, no code or front matter to touch; a card without `card.*` draws a
+placeholder. Screenshots of internal systems follow the anonymization policy above. Details and
+the stock-photo convention: `src/assets/projects/README.md`.
 
 ## What checks it
 

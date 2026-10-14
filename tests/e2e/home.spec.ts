@@ -56,13 +56,12 @@ test.describe('home sections', () => {
     const headings = page.locator('main h2');
     await expect(headings).toHaveText([
       'Resultados que se pueden verificar',
-      'Sistemas en producción y código abierto',
+      'Casos de estudio destacados',
       'Quién está detrás',
       'Cada habilidad, con el proyecto que la demuestra',
       'Experiencia y formación',
       'Servicios y precios',
       'Formación y certificaciones',
-      'Pregúntale a mi portafolio',
       'Cuéntame qué necesitas',
     ]);
     await expect(page.getByText('Fuente:').first()).toBeVisible();
@@ -93,26 +92,52 @@ test.describe('home sections', () => {
   });
 });
 
-test.describe('project filter', () => {
-  test('narrows the list by capability and announces the count', async ({ page }) => {
+test.describe('hero headline', () => {
+  test('is read once, whole, while the visible role rotates', async ({ page }) => {
+    await page.goto('/');
+    const heading = page.getByRole('heading', { level: 1 });
+    await expect(heading).toHaveAccessibleName(
+      'Hola, soy Juan, ingeniero full-stack, de datos, backend, de automatización y de IA aplicada.',
+    );
+    const ticker = page.locator('[data-role-ticker]');
+    // The rotation moves on by itself, one role at a time.
+    await expect(ticker).toHaveAttribute('style', /--role: ?1(;|$)/, { timeout: 6000 });
+  });
+
+  test('stays on the first role when the visitor prefers less motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await page.waitForTimeout(3500);
+    const first = page.locator('[data-role-ticker] > *').first();
+    await expect(first).toHaveText('full-stack');
+    await expect(first).toBeInViewport();
+    await expect(page.locator('[data-role-ticker]')).not.toHaveAttribute('style', /--role/);
+  });
+});
+
+test.describe('project cards', () => {
+  test('featured cases get the wide card and the rest share a grid', async ({ page }) => {
     await page.goto('/#projects');
-    const filter = page.getByRole('group', { name: 'Filtrar por capacidad' });
-    const rows = page.locator('#projects li[data-capabilities]');
-    await expect(rows).toHaveCount(7);
+    await expect(page.locator('#projects .project-card--feature')).toHaveCount(4);
+    await expect(page.locator('#projects .project-card--compact')).toHaveCount(3);
+    // One link per card, named by the project's title.
+    const card = page.locator('#project-operations-logbook');
+    await expect(card.getByRole('link')).toHaveCount(1);
+    await expect(card.getByRole('link')).toHaveAccessibleName(/Bitácora digital de operación/);
+  });
 
-    const legacy = filter.getByRole('button', { name: 'Sistemas heredados' });
-    await legacy.click();
-    await expect(legacy).toHaveAttribute('aria-pressed', 'true');
-    await expect(rows.filter({ visible: true })).toHaveCount(1);
-    await expect(page.locator('[data-filter-status]')).toHaveText('1 proyecto');
-
-    await filter.getByRole('button', { name: 'Frontend' }).click();
-    await expect(rows.filter({ visible: true })).toHaveCount(3);
-    await expect(page.locator('[data-filter-status]')).toHaveText('3 proyectos');
-
-    await filter.getByRole('button', { name: 'Todos' }).click();
-    await expect(rows.filter({ visible: true })).toHaveCount(7);
-    await expect(page.locator('[data-filter-status]')).toHaveText('7 proyectos');
+  test('a click anywhere on a card opens its case study', async ({ page }) => {
+    await page.goto('/#projects');
+    // On the screen drawing, away from the title: the link covers the whole card.
+    const stage = page.locator('#project-plant-telemetry .project-card-stage');
+    await stage.scrollIntoViewIfNeeded();
+    const box = await stage.boundingBox();
+    if (!box) throw new Error('card not laid out');
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(page).toHaveURL(/\/proyectos\/plant-telemetry$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Telemetría de generación eléctrica en tiempo real',
+    );
   });
 });
 

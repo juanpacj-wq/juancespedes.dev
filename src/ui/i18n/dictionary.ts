@@ -60,15 +60,17 @@ const es = {
     to: 'a',
   },
   hero: {
+    greeting: 'Hola, soy Juan,',
+    rolePrefix: 'ingeniero',
+    /** Rotated in the headline after `rolePrefix`; the first one is what shows without motion. */
+    roles: ['full-stack', 'de datos', 'backend', 'de automatización', 'de IA aplicada'],
+    /** The whole headline for screen readers and search, read once instead of the rotation. */
+    headlineText:
+      'Hola, soy Juan, ingeniero full-stack, de datos, backend, de automatización y de IA aplicada.',
     pitch:
-      'Diseño, construyo y opero software en producción: aplicaciones web, datos y automatizaciones que hoy usan operación, compras y finanzas de una generadora de energía.',
+      'Desde 2020 construyo aplicaciones web, flujos de datos y automatizaciones. Hoy opero los sistemas internos de una generadora de energía. Vivo en Barranquilla, Colombia.',
     primaryCta: 'Ver proyectos',
-    secondaryCta: 'Cuéntame tu proyecto',
-    elsewhere: 'También en',
-    intro: 'ingeniero de sistemas en Barranquilla',
-    headline: 'Software que la operación usa todos los días.',
-    scrollLead: 'Desliza',
-    scrollTail: 'para ver los proyectos',
+    secondaryCta: 'Hablemos',
   },
   art: {
     alt: 'Narciso de Caravaggio dibujado con caracteres de texto: un joven se inclina sobre el borde del agua para mirar su reflejo.',
@@ -94,13 +96,13 @@ const es = {
     title: 'Sistemas en producción y código abierto',
     description:
       'Casos reales. El código de los sistemas internos es privado, así que cada caso cuenta el problema, las decisiones y los resultados.',
-    filterLabel: 'Filtrar por capacidad',
-    filterAll: 'Todos',
-    count: '{count} proyectos',
-    countOne: '1 proyecto',
     empty: 'Todavía no hay proyectos publicados con esa capacidad.',
     stack: 'Tecnologías',
     anonymized: 'Anonimizado',
+    featuredTitle: 'Casos de estudio destacados',
+    moreTitle: 'Más proyectos',
+    viewCase: 'Ver caso de estudio',
+    viewProject: 'Ver proyecto',
   },
   capabilities: {
     eyebrow: 'Capacidades',
@@ -138,6 +140,7 @@ const es = {
     description:
       'Escríbeme por el formulario o directamente al correo. Respondo en menos de 24 horas hábiles.',
     emailLabel: 'Correo directo',
+    elsewhere: 'También en',
   },
   form: {
     name: 'Nombre',
@@ -175,6 +178,8 @@ const es = {
   },
   project: {
     back: 'Todos los proyectos',
+    gallery: 'Imágenes del proyecto',
+    stockNote: 'Imagen ilustrativa (Unsplash) mientras preparo las capturas reales.',
     facts: 'Ficha del proyecto',
     role: 'Rol',
     period: 'Periodo',
@@ -208,18 +213,13 @@ const es = {
     next: 'Siguiente',
   },
   chat: {
-    eyebrow: 'Pregúntame',
     title: 'Pregúntale a mi portafolio',
-    description:
-      'Un asistente responde con base en lo publicado en este sitio: proyectos, experiencia y servicios, con enlace al caso.',
     label: 'Tu pregunta',
     placeholder: '¿Ha trabajado con Oracle?',
-    submit: 'Preguntar',
     thinking: 'Pensando...',
     verifying: 'Verificando que eres una persona...',
     you: 'Tú',
     assistant: 'Asistente',
-    suggestions: 'Ideas para empezar',
     example1: '¿Ha trabajado con Oracle?',
     example2: '¿Qué hizo en el portal corporativo?',
     example3: '¿Cómo trabaja en un proyecto freelance?',
@@ -228,6 +228,15 @@ const es = {
     refused: 'No puedo responder esa pregunta. Prueba con otra sobre mi trabajo o escríbeme.',
     truncated: '(respuesta recortada)',
     clear: 'Nueva conversación',
+    open: 'Pregúntame',
+    tooltip: 'Pregúntale a mi portafolio',
+    name: 'Pregúntame',
+    about: 'Sobre el asistente',
+    close: 'Cerrar',
+    greeting: '👋 Hola, soy el asistente de Juan.',
+    intro: 'Respondo con lo que está publicado en este sitio. Prueba con una de estas:',
+    send: 'Enviar',
+    caseLink: 'Caso de estudio',
     errors: {
       disabled:
         'El asistente no está disponible en este momento. Escríbeme directamente a {email}.',
@@ -365,15 +374,21 @@ const en: Dictionary = {
     to: 'to',
   },
   hero: {
+    greeting: "Hi, I'm Juan,",
+    // The article changes with the role (a / an), so it lives in each role.
+    rolePrefix: '',
+    roles: [
+      'a full-stack engineer',
+      'a data engineer',
+      'a backend engineer',
+      'an automation engineer',
+      'an applied AI engineer',
+    ],
+    headlineText: "Hi, I'm Juan, a full-stack, data, backend, automation and applied AI engineer.",
     pitch:
-      'I design, build and run software in production: web applications, data and automations used today by the operations, procurement and finance teams of a power generation company.',
+      'Building web applications, data pipelines and automations since 2020. Today I run the internal systems of a power generation company. Based in Barranquilla, Colombia.',
     primaryCta: 'See projects',
-    secondaryCta: 'Tell me about your project',
-    elsewhere: 'Also on',
-    intro: 'systems engineer in Barranquilla, Colombia',
-    headline: 'Software that operations teams use every day.',
-    scrollLead: 'Scroll down',
-    scrollTail: 'to see the projects',
+    secondaryCta: "Let's talk",
   },
   art: {
     alt: "Caravaggio's Narcissus drawn with text characters: a young man leans over the edge of the water to look at his reflection.",
@@ -399,13 +414,13 @@ const en: Dictionary = {
     title: 'Systems in production and open source',
     description:
       'Real cases. Internal systems are closed source, so each case explains the problem, the decisions and the results.',
-    filterLabel: 'Filter by capability',
-    filterAll: 'All',
-    count: '{count} projects',
-    countOne: '1 project',
     empty: 'No published projects with that capability yet.',
     stack: 'Technologies',
     anonymized: 'Anonymized',
+    featuredTitle: 'Featured case studies',
+    moreTitle: 'More projects',
+    viewCase: 'View case study',
+    viewProject: 'View project',
   },
   capabilities: {
     eyebrow: 'Capabilities',
@@ -442,6 +457,7 @@ const en: Dictionary = {
     title: 'Tell me what you need',
     description: 'Use the form or write to me directly. I reply within one business day.',
     emailLabel: 'Direct email',
+    elsewhere: 'Also on',
   },
   form: {
     name: 'Name',
@@ -479,6 +495,8 @@ const en: Dictionary = {
   },
   project: {
     back: 'All projects',
+    gallery: 'Project images',
+    stockNote: 'Illustrative image (Unsplash) while I prepare the real screenshots.',
     facts: 'Project facts',
     role: 'Role',
     period: 'Period',
@@ -512,18 +530,13 @@ const en: Dictionary = {
     next: 'Next',
   },
   chat: {
-    eyebrow: 'Ask me',
     title: 'Ask my portfolio',
-    description:
-      'An assistant answers from what is published on this site: projects, experience and services, with a link to the case.',
     label: 'Your question',
     placeholder: 'Has he worked with Oracle?',
-    submit: 'Ask',
     thinking: 'Thinking...',
     verifying: 'Checking that you are a person...',
     you: 'You',
     assistant: 'Assistant',
-    suggestions: 'Ideas to start',
     example1: 'Has he worked with Oracle?',
     example2: 'What did he do on the corporate portal?',
     example3: 'How does he work on a freelance project?',
@@ -532,6 +545,15 @@ const en: Dictionary = {
     refused: 'I cannot answer that question. Try another one about my work, or write to me.',
     truncated: '(answer cut short)',
     clear: 'New conversation',
+    open: 'Ask me',
+    tooltip: 'Ask my portfolio',
+    name: 'Ask me',
+    about: 'About the assistant',
+    close: 'Close',
+    greeting: "👋 Hi, I'm Juan's assistant.",
+    intro: 'I answer from what is published on this site. Try one of these:',
+    send: 'Send',
+    caseLink: 'Case study',
     errors: {
       disabled: 'The assistant is not available right now. Write to me directly at {email}.',
       invalid: 'Write a question between 3 and 500 characters.',

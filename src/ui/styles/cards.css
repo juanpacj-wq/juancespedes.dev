@@ -1,0 +1,216 @@
+/*
+ * Project cards (src/ui/project/ProjectCard.astro). Kept in the shared stylesheet, not in the
+ * component: the home page's own styles must stay under the 4 kB that Astro inlines (CLAUDE.md).
+ *
+ * Each effect owns one property, so they never fight: the scroll reveal moves the card with
+ * `translate` (the .reveal utility), the pointer tilts the surface with `transform`, and the
+ * screen rises on scroll with `translate`/`rotate` on its wrapper while hover moves the screen
+ * itself with `transform`.
+ */
+
+@layer components {
+  .project-card {
+    --mx: 0.5;
+    --my: 0.5;
+    --rx: 0deg;
+    --ry: 0deg;
+    --glow: var(--color-accent);
+  }
+
+  .project-card[data-tone='success'] {
+    --glow: var(--color-success);
+  }
+
+  .project-card-surface {
+    transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+    transition:
+      transform 400ms var(--ease-out),
+      box-shadow 400ms var(--ease-out);
+  }
+
+  /* A glow behind the screen, in the card's tone. */
+  .project-card-stage {
+    background: radial-gradient(
+      70% 70% at 70% 60%,
+      color-mix(in srgb, var(--glow) 16%, transparent),
+      transparent 75%
+    );
+  }
+
+  /* The light that follows the pointer. */
+  .project-card-surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at calc(var(--mx) * 100%) calc(var(--my) * 100%),
+      color-mix(in srgb, var(--color-ink) 9%, transparent) 0%,
+      color-mix(in srgb, var(--color-ink) 2%, transparent) 25%,
+      transparent 45%
+    );
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  /* The screen leans like a sheet on a desk and straightens a little on hover. */
+  .project-card-screen {
+    transform: rotate(-4deg) translate(0, 0);
+    transform-origin: 0 100%;
+    box-shadow: var(--shadow-lift);
+    border-radius: var(--radius-card);
+    transition: transform 700ms var(--ease-out);
+  }
+
+  .project-card--compact .project-card-screen {
+    transform: rotate(-2.5deg);
+  }
+
+  /* One focus ring around the whole card; the stretched link carries the focus. */
+  .project-card-link:focus-visible {
+    outline: none;
+  }
+
+  .project-card:has(.project-card-link:focus-visible) .project-card-surface {
+    outline: 2px solid var(--color-accent-ink);
+    outline-offset: 4px;
+  }
+
+  /* The call to action fills from below and its words roll up (the reference's ripple). */
+  .project-card-cta {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 0.5rem;
+    overflow: hidden;
+    min-height: 2.75rem;
+    border-radius: var(--radius-chip);
+    background-color: var(--color-ink);
+    padding-inline: 1.25rem;
+    color: var(--color-canvas);
+    font-size: var(--text-small);
+    font-weight: 500;
+  }
+
+  .project-card-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50% 50% 0 0;
+    background-color: var(--color-accent);
+    translate: 0 101%;
+    transition:
+      translate 500ms var(--ease-out),
+      border-radius 900ms var(--ease-out);
+  }
+
+  .project-card-cta--quiet {
+    min-height: 0;
+    background-color: transparent;
+    padding-inline: 0;
+    color: var(--color-ink);
+  }
+
+  .project-card-cta--quiet::before {
+    display: none;
+  }
+
+  .project-card-cta-clip {
+    display: inline-block;
+    height: 1lh;
+    overflow: clip;
+  }
+
+  .project-card-cta-text {
+    position: relative;
+    display: inline-block;
+    transition: translate 500ms var(--ease-out);
+  }
+
+  .project-card-cta-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
+
+  .project-card-cta svg {
+    transition: translate 500ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .project-card:hover .project-card-surface {
+      box-shadow: var(--shadow-bevel), var(--shadow-lift);
+    }
+
+    .project-card:hover .project-card-surface::before {
+      opacity: 1;
+    }
+
+    .project-card:hover .project-card-screen {
+      transform: rotate(-1.5deg) translate(-0.5rem, -0.75rem);
+    }
+
+    .project-card--compact:hover .project-card-screen {
+      transform: rotate(-0.5deg) translate(0, -0.5rem);
+    }
+
+    .project-card:hover .project-card-cta::before {
+      border-radius: 0;
+      translate: 0 0;
+    }
+
+    .project-card:hover .project-card-cta {
+      color: var(--color-on-accent);
+    }
+
+    .project-card:hover .project-card-cta--quiet {
+      color: var(--color-accent-ink);
+    }
+
+    .project-card:hover .project-card-cta-text {
+      translate: 0 -100%;
+    }
+
+    .project-card:hover .project-card-cta svg {
+      translate: 0.25rem 0;
+    }
+  }
+
+  /* Cross-document view transition: the card's screen becomes the project page's cover. */
+  @media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+      navigation: auto;
+    }
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 450ms;
+    animation-timing-function: var(--ease-out);
+  }
+}
+
+/* The screen rises into place as the card scrolls in. Content stays visible without support. */
+@layer utilities {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .project-card-rise {
+        animation: screen-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 40%;
+      }
+    }
+  }
+}
+
+@keyframes screen-rise {
+  from {
+    translate: 0 4rem;
+    rotate: 5deg;
+  }
+}
