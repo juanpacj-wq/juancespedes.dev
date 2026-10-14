@@ -1,5 +1,6 @@
 ---
 import { SUPPORTED_LOCALES } from '../domain/shared/locale';
+import NotFoundField from '../ui/art/NotFoundField.astro';
 import { dictionaryFor } from '../ui/i18n/dictionary';
 import { homePath } from '../ui/i18n/routes';
 import BaseLayout from '../ui/layouts/BaseLayout.astro';
@@ -9,6 +10,9 @@ import Container from '../ui/primitives/Container.astro';
 /*
  * One static page answers every unknown address, so it cannot know the reader's language: it
  * speaks both, Spanish first. Each block declares its language for screen readers.
+ *
+ * The anatomy follows the reference (ADR 0020): the first screen is a stage with the "404"
+ * field behind a scrim, and the words stand at its foot, over the reflection.
  */
 const es = dictionaryFor('es');
 ---
@@ -19,28 +23,71 @@ const es = dictionaryFor('es');
   locale="es"
   noindex
 >
-  <Container class="flex max-w-3xl flex-col gap-16 py-24 sm:py-32">
-    {SUPPORTED_LOCALES.map((locale, index) => {
-      const t = dictionaryFor(locale);
-      const Heading = index === 0 ? 'h1' : 'h2';
-      return (
-        <section lang={locale} class="flex flex-col gap-6">
-          <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
-            {t.notFound.eyebrow}
-          </p>
-          <Heading class="text-heading font-semibold text-balance">{t.notFound.title}</Heading>
-          <p class="text-lead text-muted">{t.notFound.description}</p>
-          <Button
-            href={homePath(locale)}
-            icon="arrow-right"
-            size="lg"
-            variant={index === 0 ? 'primary' : 'secondary'}
-            class="w-fit"
-          >
-            {t.notFound.back}
-          </Button>
-        </section>
-      );
-    })}
-  </Container>
+  <div class="not-found relative isolate overflow-hidden">
+    <NotFoundField class="absolute inset-0 -z-10" />
+    <div
+      class="not-found-scrim pointer-events-none absolute inset-0 -z-10"
+      aria-hidden="true"
+    ></div>
+    <!-- The stage is the first screen below the sticky bar (its height plus its border). The
+         solid stands on the top edge of the words (data-field-floor), its reflection under them. -->
+    <Container class="flex min-h-[calc(100svh-4rem-1px)] flex-col justify-end py-12 sm:py-16">
+      <div
+        class="grid gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-end lg:gap-16"
+        data-field-floor
+      >
+        {SUPPORTED_LOCALES.map((locale, index) => {
+          const t = dictionaryFor(locale);
+          const first = index === 0;
+          const Heading = first ? 'h1' : 'h2';
+          return (
+            <section lang={locale} class="flex flex-col items-start gap-6">
+              <div class="flex flex-col gap-3">
+                <Heading
+                  class:list={
+                    first
+                      ? 'font-display text-heading font-light text-balance text-accent-ink'
+                      : 'text-lead font-medium text-accent-ink'
+                  }
+                >
+                  {t.notFound.title}
+                </Heading>
+                <p
+                  class:list={['max-w-xl text-pretty', first ? 'text-lead text-ink' : 'text-muted']}
+                >
+                  {t.notFound.description}
+                </p>
+              </div>
+              <Button
+                href={homePath(locale)}
+                icon="arrow-right"
+                size={first ? 'lg' : 'md'}
+                variant={first ? 'primary' : 'secondary'}
+              >
+                {t.notFound.back}
+              </Button>
+            </section>
+          );
+        })}
+      </div>
+    </Container>
+  </div>
 </BaseLayout>
+
+<style>
+  /* A candle glow behind the solid, and a fall to the ground where the words stand, so the
+     reflection never competes with the text (the reference's scrim, in this palette). */
+  .not-found-scrim {
+    background-image:
+      radial-gradient(
+        80% 55% at 50% 30%,
+        color-mix(in srgb, var(--color-accent) 9%, transparent),
+        transparent 72%
+      ),
+      linear-gradient(
+        transparent 45%,
+        color-mix(in srgb, var(--color-canvas) 55%, transparent) 70%,
+        var(--color-canvas)
+      );
+  }
+</style>

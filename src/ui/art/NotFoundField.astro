@@ -1,0 +1,45 @@
+---
+/**
+ * The 404 backdrop (src/ui/art/not-found-field.ts): the digits "404" as a turning solid of
+ * points drawn in the painting's ASCII ink, and its reflection under a waterline. Decorative:
+ * the page says the same thing in words. Without script or canvas, the stage is plain dark.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<canvas
+  class:list={['not-found-field font-mono text-ascii', className]}
+  aria-hidden="true"
+></canvas>
+
+<style>
+  .not-found-field {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+
+  .not-found-field[data-ready] {
+    opacity: 1;
+    transition: opacity 1200ms var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .not-found-field[data-ready] {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountNotFoundField } from './not-found-field';
+
+  for (const canvas of document.querySelectorAll<HTMLCanvasElement>('.not-found-field')) {
+    void mountNotFoundField(canvas);
+  }
+</script>

@@ -1,7 +1,7 @@
 import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /** Every project folder in content/ must have a page; a new project is covered automatically. */
 const PROJECTS_DIR = join(process.cwd(), 'content', 'projects');
@@ -107,5 +107,36 @@ test.describe('not found', () => {
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
     await page.getByRole('link', { name: 'Volver al inicio' }).click();
     await expect(page).toHaveURL(/\/$/);
+  });
+
+  // The "404" field is decoration: hidden from assistive technology, drawn once its fonts load.
+  const inkedPixels = (page: Page) =>
+    page.locator('canvas.not-found-field').evaluate((canvas: HTMLCanvasElement) => {
+      const pixels = canvas.getContext('2d')?.getImageData(0, 0, canvas.width, canvas.height).data;
+      return pixels ? pixels.filter((value, index) => index % 4 === 3 && value > 0).length : 0;
+    });
+
+  test('the 404 draws its field behind the words and keeps it out of the accessibility tree', async ({
+    page,
+  }) => {
+    await page.goto('/proyectos/no-existe');
+    const field = page.locator('canvas.not-found-field');
+    await expect(field).toHaveAttribute('aria-hidden', 'true');
+    await expect(field).toHaveAttribute('data-ready', '');
+    await expect.poll(() => inkedPixels(page)).toBeGreaterThan(1000);
+  });
+
+  test('with reduced motion the 404 field is drawn once and stays still', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/proyectos/no-existe');
+    await expect(page.locator('canvas.not-found-field')).toHaveAttribute('data-ready', '');
+    await expect.poll(() => inkedPixels(page)).toBeGreaterThan(1000);
+    const snapshot = () =>
+      page
+        .locator('canvas.not-found-field')
+        .evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
+    const first = await snapshot();
+    await page.waitForTimeout(500);
+    expect(await snapshot()).toBe(first);
   });
 });

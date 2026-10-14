@@ -49,7 +49,9 @@ without breakpoints.
 
 Art (`src/ui/art`): `AsciiArt` renders the committed ASCII grid of Caravaggio's _Narcissus_
 (`pnpm ascii` regenerates it) with a lamp that follows the pointer and a switch that floods the
-painting's real colours.
+painting's real colours. `NotFoundField` is the 404 backdrop: the display font's "404" as a
+turning solid of points, drawn in the same ink and glyph ramp on a canvas, mirrored under a
+waterline ([ADR 0020](adr/0020-not-found-reflection.md)).
 
 Site chrome (`src/ui/chrome`): `SiteHeader`, `SiteFooter`, `ThemeToggle`. Page layout:
 `src/ui/layouts/BaseLayout.astro` (meta, theme bootstrap, skip link, header, footer).
