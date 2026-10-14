@@ -166,21 +166,47 @@ const scriptText = {
 
 <script>
   import chatStyles from '../styles/chat.css?url';
-  import { initChatDrawer } from './chat-drawer';
 
   /*
-   * The chat's styles stay out of the stylesheet that blocks the first paint (CLAUDE.md, the
-   * performance budget): they load now, and the chat shows itself once they are in.
+   * Nothing of the chat competes with the first paint (CLAUDE.md, the performance budget): its
+   * code and styles are fetched once the page has loaded and the browser is idle, and the chat
+   * shows itself when both are in. A click on a header opener before then loads it at once and
+   * opens it.
    */
   const root = document.querySelector<HTMLElement>('[data-chat]');
   if (root) {
-    const sheet = document.createElement('link');
-    sheet.rel = 'stylesheet';
-    sheet.href = chatStyles;
-    sheet.addEventListener('load', () => {
-      root.hidden = false;
-      initChatDrawer(root);
-    });
-    document.head.append(sheet);
+    let started = false;
+    let openWhenReady = false;
+    const openers = [...document.querySelectorAll<HTMLElement>('[data-chat-open]')];
+
+    const start = () => {
+      if (started) return;
+      started = true;
+      const sheet = document.createElement('link');
+      sheet.rel = 'stylesheet';
+      sheet.href = chatStyles;
+      const styled = new Promise((resolve) => {
+        sheet.addEventListener('load', resolve, { once: true });
+      });
+      document.head.append(sheet);
+      void Promise.all([import('./chat-drawer'), styled]).then(([{ initChatDrawer }]) => {
+        root.hidden = false;
+        initChatDrawer(root);
+        if (openWhenReady) root.querySelector<HTMLElement>('.chat-trigger')?.click();
+      });
+    };
+
+    const early = () => {
+      openWhenReady = true;
+      start();
+    };
+    for (const opener of openers) opener.addEventListener('click', early, { once: true });
+
+    const whenIdle = () => {
+      if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 2000 });
+      else setTimeout(start, 200);
+    };
+    if (document.readyState === 'complete') whenIdle();
+    else addEventListener('load', whenIdle, { once: true });
   }
 </script>

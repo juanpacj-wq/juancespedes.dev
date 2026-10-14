@@ -1,9 +1,12 @@
 ---
 /**
  * A drawn app window that stands in for a project screenshot until the real one is dropped in
- * src/assets/projects/<slug>/card.* (see media.ts). Pure markup on design tokens: it costs no
- * request and looks the same in both themes. The bar heights come from the slug, so each project
- * gets its own chart. Decorative: the card around it carries the meaning.
+ * src/assets/projects/<slug>/card.* (see media.ts). It costs no request and looks the same in
+ * both themes. The bar heights come from the slug, so each project gets its own chart.
+ * Decorative: the card around it carries the meaning.
+ *
+ * Short classes styled in cards.css (the deferred card sheet), not Tailwind utilities: seven of
+ * these sit in the home page's HTML, and every byte of it is on the way to the first paint.
  */
 interface Props {
   slug: string;
@@ -23,62 +26,53 @@ const next = () => {
 };
 const bars = Array.from({ length: compact ? 9 : 14 }, () => Math.round(28 + next() * 68));
 const rows = Array.from({ length: compact ? 2 : 4 }, () => Math.round(40 + next() * 45));
+const tiles = compact ? 2 : 3;
 ---
 
-<div class="screen-placeholder flex size-full flex-col overflow-hidden rounded-card border border-line-strong bg-surface">
-  <div class="flex h-9 shrink-0 items-center gap-3 border-b border-line bg-frame px-4">
-    <span class="flex gap-1.5">
-      <span class="size-2.5 rounded-full bg-line-strong"></span>
-      <span class="size-2.5 rounded-full bg-line-strong"></span>
-      <span class="size-2.5 rounded-full bg-line-strong"></span>
-    </span>
-    <span class="truncate rounded-chip bg-surface-raised px-3 py-0.5 font-mono text-eyebrow text-subtle">
-      /{slug}
-    </span>
+<div class:list={['sp', compact && 'sp-compact']}>
+  <div class="sp-top">
+    <i></i>
+    <i></i>
+    <i></i>
+    <span>/{slug}</span>
   </div>
-  <div class="flex min-h-0 flex-1">
+  <div class="sp-body">
     {!compact && (
-      <div class="hidden w-28 shrink-0 flex-col gap-3 border-r border-line p-4 sm:flex">
-        <span class="h-2 w-14 rounded-chip sp-accent"></span>
-        {[70, 55, 80, 50, 65].map((width) => (
-          <span class="h-1.5 rounded-chip bg-line-strong" style={`width:${String(width)}%`}></span>
-        ))}
+      <div class="sp-side">
+        <b />
+        <i style="width:70%" />
+        <i style="width:55%" />
+        <i style="width:80%" />
+        <i style="width:50%" />
+        <i style="width:65%" />
       </div>
     )}
-    <div class="flex min-w-0 flex-1 flex-col gap-4 p-4 sm:p-5">
-      <div class="flex items-center justify-between gap-4">
-        <span class="h-2.5 w-32 rounded-chip bg-line-strong"></span>
-        <span class="h-5 w-16 rounded-chip sp-accent-soft"></span>
+    <div class="sp-main">
+      <div class="sp-head">
+        <i></i>
+        <b></b>
       </div>
-      <div class:list={['grid gap-3', compact ? 'grid-cols-2' : 'grid-cols-3']}>
-        {Array.from({ length: compact ? 2 : 3 }, (_, index) => (
-          <div class="flex flex-col gap-2 rounded-control border border-line bg-surface-raised p-3">
-            <span class="h-1.5 w-1/2 rounded-chip bg-line-strong"></span>
-            <span
-              class:list={['h-3 w-3/4 rounded-chip', index === 0 ? 'sp-accent' : 'sp-ink']}
-            ></span>
+      <div class="sp-tiles">
+        {Array.from({ length: tiles }, (_, index) => (
+          <div>
+            <i />
+            <b class:list={[index === 0 && 'sp-hot']} />
           </div>
         ))}
       </div>
-      <div class="flex min-h-24 flex-1 items-end gap-1.5 rounded-control border border-line bg-surface-raised p-3">
+      <div class="sp-chart">
         {bars.map((height, index) => (
-          <span
-            class:list={[
-              'flex-1 rounded-t-xs',
-              index === bars.length - 3 ? 'bg-accent' : 'sp-success-soft',
-            ]}
+          <i
+            class:list={[index === bars.length - 3 && 'sp-hot']}
             style={`height:${String(height)}%`}
-          ></span>
+          />
         ))}
       </div>
-      <div class="flex flex-col gap-2">
+      <div class="sp-rows">
         {rows.map((width) => (
-          <div class="flex items-center gap-3">
-            <span class="size-2 shrink-0 rounded-full sp-success"></span>
-            <span
-              class="h-1.5 rounded-chip bg-line-strong"
-              style={`width:${String(width)}%`}
-            ></span>
+          <div>
+            <b />
+            <i style={`width:${String(width)}%`} />
           </div>
         ))}
       </div>

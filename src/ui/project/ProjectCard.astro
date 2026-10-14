@@ -162,11 +162,16 @@ const sizes =
 <script>
   import cardStyles from '../styles/cards.css?url';
 
-  // The effects load after the first paint; the cards sit below the first screen (CLAUDE.md).
-  const sheet = document.createElement('link');
-  sheet.rel = 'stylesheet';
-  sheet.href = cardStyles;
-  document.head.append(sheet);
+  // The effects load once the page has loaded, so they never compete with the first paint; the
+  // cards sit below the first screen (CLAUDE.md, the performance budget).
+  const addStyles = () => {
+    const sheet = document.createElement('link');
+    sheet.rel = 'stylesheet';
+    sheet.href = cardStyles;
+    document.head.append(sheet);
+  };
+  if (document.readyState === 'complete') addStyles();
+  else addEventListener('load', addStyles, { once: true });
 
   /*
    * Tilt and light follow a fine pointer (the reference's holographic card). One update per

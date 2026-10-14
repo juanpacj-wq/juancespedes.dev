@@ -3,8 +3,8 @@
  * a glass sphere in the bottom-right corner opens a side panel that pushes the page on wide
  * screens and covers it on phones. The reference's teal and magenta glows become the palette's
  * candle ochre and verdigris. Not part of the stylesheet every page waits for: the chat script
- * loads this file after the page renders and only then shows the sphere, which appears 1.8 s in
- * anyway (CLAUDE.md, the home page's performance budget).
+ * loads this file once the page has loaded and only then shows the sphere
+ * (CLAUDE.md, the home page's performance budget).
  */
 
 @layer components {
@@ -43,7 +43,7 @@
       scale 250ms ease,
       box-shadow 250ms ease,
       opacity 200ms ease;
-    animation: chat-trigger-in 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 1.8s backwards;
+    animation: chat-trigger-in 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
   }
 
   /* Primary specular highlight, top left. */

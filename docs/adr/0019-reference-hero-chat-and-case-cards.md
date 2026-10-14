@@ -74,16 +74,19 @@ Take the interactions, not the libraries.
   request, both themes). Until the real screenshots arrive, covers and galleries are Unsplash
   photos marked `.stock` in the file name, labelled as illustrative on the page; a real file with
   the same name wins.
-- **Weight.** Nothing new waits in the first paint's way. The ticker's few rules are in the
+- **Weight.** Nothing new competes with the first paint. The ticker's few rules are in the
   shared stylesheet (in the home page's own styles they pushed them past the 4 kB that Astro
-  inlines). The chat (9.3 kB) and card (3.7 kB) styles are separate files that their scripts
-  load after the page renders: the chat stays hidden until its sheet arrives, which is before
-  its 1.8 s entrance, and the cards sit below the first screen. The drawn screen's tints are
-  plain classes in the card sheet, since Tailwind's opacity modifiers write two rules each into
-  the shared one. The first version shipped all of it in the shared stylesheet (48 kB to 68 kB):
-  Lighthouse in CI measured FCP 2.4 s instead of 2.0 s on the home page and 2.0 s instead of
-  1.5 s on a project page, and the home page fell to 0.92. JavaScript is at 73.0 kB of the 75 kB
-  budget (the React island it replaces is gone).
+  inlines). The chat (9.3 kB) and card (5.7 kB) styles are separate files, fetched once the page
+  has loaded; the chat's code too, when the browser is idle, and the chat shows itself when both
+  are in (a header opener clicked earlier loads it at once). The cards sit below the first
+  screen. The drawn screen is a few short elements styled from the card sheet, not Tailwind
+  utilities, so the seven of them stay light in the HTML. The first version shipped all of it
+  with the page: the shared stylesheet went from 48 kB to 68 kB and the home page HTML from 149
+  kB to 167 kB, and the chat's script, Turnstile and both sheets were requested before the first
+  paint. Lighthouse in CI measured FCP 2.4 s instead of 2.0 s on the home page and 2.0 s instead
+  of 1.5 s on a project page, and the home page fell to 0.92. Now the shared stylesheet is 50 kB
+  and the home page HTML 148 kB. JavaScript is at 74.2 kB of the 75 kB budget: the React island
+  is gone, and the chat is split into a 1 kB starter and the code it loads later.
 
 ## Consequences
 
@@ -91,7 +94,7 @@ Take the interactions, not the libraries.
   editorial list. The e2e suite covers the rotation (and its absence under reduced motion), the
   cards, the floating chat (streaming, link cards, persistence across pages, rate limits, focus
   return on Escape, axe) and the image convention (unit tests).
-- The stylesheet every page waits for is 51 kB (48 kB before). Styles for anything that is not
-  on the first screen belong in a deferred sheet, like the chat's and the cards'.
+- Styles and code for anything that is not on the first screen load after the page, like the
+  chat's and the cards'. JavaScript has 0.8 kB of headroom left.
 - Swapping a placeholder for a real screenshot is a file drop; the README in
   `src/assets/projects/` lists the stock photos and their authors.
