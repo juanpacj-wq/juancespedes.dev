@@ -1,0 +1,132 @@
+---
+import { getImage, Picture } from 'astro:assets';
+
+import type { Locale } from '../../domain/shared/locale';
+import type { Dictionary } from '../i18n/dictionary';
+import Icon from '../icons/Icon.astro';
+import { captionFor, frameFor, type ProjectImage } from './media';
+
+/**
+ * The product in screenshots (ADR 0022). Each image sits in the frame of where it runs: a browser
+ * window for wide screenshots, a phone for tall ones, none for images that bring their own window
+ * (a terminal). The slides form a row that snaps into place,
+ * so it scrolls by swipe or keyboard without JavaScript; the case study script adds the tabs with
+ * an auto-advancing progress bar and the enlarged view. The caption is the text alternative.
+ */
+interface Props {
+  t: Dictionary;
+  slug: string;
+  locale: Locale;
+  images: readonly ProjectImage[];
+  /** Shown in the browser frame's address bar. */
+  address: string;
+}
+
+const { t, slug, locale, images, address } = Astro.props;
+const two = (n: number) => String(n + 1).padStart(2, '0');
+const slides = await Promise.all(
+  images.map(async (image) => ({
+    image,
+    frame: frameFor(slug, image),
+    tall: image.src.height > image.src.width,
+    caption: captionFor(slug, image.slot, locale) ?? '',
+    // The enlarged view loads one large WebP only when it is opened.
+    large: (await getImage({ src: image.src, width: 2000, format: 'webp' })).src,
+  })),
+);
+---
+
+<div class="cs-gallery" data-gallery>
+  <ol class="cs-gallery-track" aria-label={t.project.gallery} data-gallery-track>
+    {slides.map(({ image, frame, tall, caption, large }, index) => (
+      <li class:list={['cs-slide', tall && 'cs-slide--tall']} data-slide={index}>
+        <figure class="flex flex-col gap-4">
+          <a
+            href={large}
+            class:list={['cs-frame', `cs-frame--${frame}`]}
+            data-zoom={index}
+            data-caption={caption}
+          >
+            {frame === 'browser' && (
+              <span class="cs-frame-bar" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+                <span>{address}</span>
+              </span>
+            )}
+            <Picture
+              src={image.src}
+              alt={caption}
+              formats={['avif', 'webp']}
+              widths={tall ? [360, 540, 720] : [640, 960, 1280, 1600]}
+              sizes={tall ? '(min-width: 640px) 22rem, 70vw' : '(min-width: 1280px) 1000px, 85vw'}
+              class="block h-auto w-full"
+            />
+            <span class="cs-frame-zoom" aria-hidden="true">
+              <Icon name="search" size={16} />
+            </span>
+            <span class="sr-only">{t.project.enlarge}</span>
+          </a>
+          <figcaption class="flex gap-3 text-small text-pretty text-muted">
+            <span class="font-mono text-eyebrow text-accent-ink" aria-hidden="true">
+              {two(index)}
+            </span>
+            {caption}
+          </figcaption>
+        </figure>
+      </li>
+    ))}
+  </ol>
+
+  {slides.length > 1 && (
+    <div class="cs-gallery-tabs" hidden data-gallery-tabs>
+      {slides.map(({ caption }, index) => (
+        <button type="button" class="cs-gallery-tab" data-go={index} aria-label={caption}>
+          <span class="cs-gallery-tab-bar" aria-hidden="true">
+            <span />
+          </span>
+          <span class="font-mono text-eyebrow text-subtle" aria-hidden="true">
+            {two(index)}
+          </span>
+          <span class="line-clamp-2 text-left text-small max-sm:hidden">{caption}</span>
+        </button>
+      ))}
+    </div>
+  )}
+
+  <dialog class="cs-lightbox" aria-label={t.project.gallery} data-lightbox>
+    <div class="cs-lightbox-inner">
+      <img alt="" data-lightbox-image />
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <p class="max-w-2xl text-small text-pretty text-ink" data-lightbox-caption></p>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="cs-step"
+            data-lightbox-step="-1"
+            aria-label={t.project.previousImage}
+          >
+            <Icon name="arrow-right" size={16} class="rotate-180" />
+          </button>
+          <button
+            type="button"
+            class="cs-step"
+            data-lightbox-step="1"
+            aria-label={t.project.nextImage}
+          >
+            <Icon name="arrow-right" size={16} />
+          </button>
+          <button
+            type="button"
+            class="cs-step"
+            data-lightbox-close
+            aria-label={t.project.closeImage}
+          >
+            <Icon name="close" size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</div>

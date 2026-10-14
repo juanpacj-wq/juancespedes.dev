@@ -1,0 +1,14 @@
+{
+  "cover": {
+    "es": "El tablero en vivo: generación de cada unidad, despacho por periodo y desviación del periodo en curso (datos y nombres ficticios en esta captura).",
+    "en": "The live dashboard: each unit's output, dispatch per period and the current period's deviation (fictitious data and names in this capture)."
+  },
+  "gallery-1": {
+    "es": "Vista por periodos: despacho, generación integrada, proyección y desviación hora a hora, con la curva de desviación por minuto.",
+    "en": "Period view: dispatch, integrated generation, projection and deviation hour by hour, with the per-minute deviation curve."
+  },
+  "gallery-2": {
+    "es": "Las cuatro unidades con su lectura actual del medidor y su capacidad instalada.",
+    "en": "The four units with their current meter reading and installed capacity."
+  }
+}

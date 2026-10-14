@@ -34,9 +34,21 @@ markers. Drafts show up in `pnpm dev` and never in a build.
 
 ### Case studies
 
-The page follows a fixed template, in this order: summary, problem, my role (`responsibilities`),
-constraints, decisions (each with the `alternatives` that were ruled out), architecture, results
-(`outcomes`, with the figures in `metrics`), what I would do differently (`lessons`) and stack.
+The page follows a fixed template, in this order: summary, at a glance (`story.hook` and the
+`metrics`), problem (with the `story.shifts`), my role (`responsibilities`), constraints,
+decisions (each with the `alternatives` that were ruled out), architecture, results (`outcomes`),
+what I would do differently (`lessons`) and stack ([ADR 0021](adr/0021-case-study-redesign.md)).
+
+`story` tells the problem for a reader who is not an engineer. Write it as the people who lived
+the problem would say it, with facts already in the file and no jargon:
+
+```yaml
+story:
+  hook: Every shift ended with someone copying Excel cells by hand to put together the report.
+  shifts: # one to four; each "before" pairs with its "after"
+    - before: The official daily report was assembled by copying cells.
+      after: The report comes straight from the data, in the template's exact format.
+```
 
 The architecture diagram is data, not an image:
 
@@ -80,8 +92,11 @@ wide card on the home page; the rest share the grid of smaller cards.
 Drop them in `src/assets/projects/<slug>/`: `card.*` for the screenshot on the home page card,
 `cover.*` for the wide image on the project page and `gallery-1.*`, `gallery-2.*`... for more.
 They are found by name, no code or front matter to touch; a card without `card.*` draws a
-placeholder. Screenshots of internal systems follow the anonymization policy above. Details and
-the stock-photo convention: `src/assets/projects/README.md`.
+placeholder, and a project page without a real `cover.*` draws the same app window. Gallery
+images get a caption in both languages in `captions.json`, and the page adds a "solution" chapter
+with them ([ADR 0022](adr/0022-real-screenshots-and-gallery.md)). Screenshots
+of internal systems follow the anonymization policy above. Details and the stock-photo
+convention: `src/assets/projects/README.md`.
 
 ## What checks it
 

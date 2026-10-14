@@ -27,6 +27,15 @@ featured: false
 order: 6
 status: published
 confidentiality: anonymized
+story:
+  hook: 'Every billing cycle, someone keyed in dozens of PDF invoices by hand and compared them one by one against the database.'
+  shifts:
+    - before: 'Keying in invoices one by one.'
+      after: 'Pick a folder and review only the differences the Excel file flags.'
+    - before: 'Comparing by hand against the corporate database.'
+      after: 'Differences come out field by field in a comparison sheet.'
+    - before: 'Four scripts that each did part of the job.'
+      after: 'One desktop application that runs without installing Python.'
 problem: Every billing cycle, dozens of PDF energy invoices from two counterparties with completely different formats had to be keyed in and checked by hand, then compared with the values stored in the corporate database. It was slow, error-prone and spread across four scripts that each did part of the job.
 responsibilities:
   - Analyzed each counterparty's templates, including the reliquidation credit note.
@@ -46,12 +55,12 @@ decisions:
     rationale: In the tabular format, text is rebuilt by grouping lines by their vertical position, which keeps together the columns that a flat extraction mixes up.
     alternatives:
       - Extract plain text and split it with regular expressions only
-  - title: A golden corpus before touching any pattern
+  - title: A regression corpus before touching any pattern
     rationale: 73 real invoices frozen in a snapshot make the suite fail on any value change, and the snapshot is only regenerated after a manual check.
     alternatives:
       - Test with a handful of sample invoices
   - title: Fields that were not extracted are data too
-    rationale: Every invoice carries the list of concepts its template did not include, so a new template shows up in the Excel file instead of turning into silent zeros.
+    rationale: Every invoice carries the list of concepts its template did not include. When a new template arrives, the Excel file shows it in that list, and missing concepts never appear as zeros.
     alternatives:
       - Fill anything not found with zero
 architecture:
@@ -97,7 +106,7 @@ outcomes:
   - A Windows executable runs without installing Python or any dependency.
 lessons:
   - I would separate the extraction core from the interface from the start, so it could also run from the command line or on a schedule on a server.
-  - I would build the golden corpus before merging the earlier projects; it would have made the merge faster and safer.
+  - I would build the regression corpus before merging the earlier projects, so the merge would have had tests from the start.
 ---
 
 {/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

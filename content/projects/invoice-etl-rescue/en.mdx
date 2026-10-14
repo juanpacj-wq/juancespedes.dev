@@ -1,7 +1,7 @@
 ---
 kind: case-study
-title: Rescuing an e-invoicing ETL that failed silently
-summary: I inherited a pipeline that lost invoices while reporting success. I audited it against production and put it under tests, CI and tag-based deployment; today it fails loudly, alerts on its own and can be audited invoice by invoice.
+title: Rescuing an e-invoicing ETL that lost invoices without reporting an error
+summary: I inherited a pipeline that lost invoices and reported success. I audited it against production and put it under tests, CI and tag-based deployment. Today, if it fails, it ends in error and sends an email.
 role: Data engineer in charge of the rescue and of running the system
 period: { start: '2026-08', end: null }
 capabilities: [legacy-systems, data-bi, automation-ai]
@@ -31,9 +31,18 @@ featured: true
 order: 4
 status: published
 confidentiality: anonymized
+story:
+  hook: 'A process that loaded supplier invoices into the accounting system could lose invoices and still report that everything went fine.'
+  shifts:
+    - before: 'It lost invoices and the run finished as successful.'
+      after: 'If a task does not load what it should, the run ends in error and sends an email.'
+    - before: 'Nothing compared what was downloaded with what reached the ERP.'
+      after: 'About 1,050 invoices from one month were checked one by one against the destination.'
+    - before: 'It arrived with no version control and no tests.'
+      after: 'Every change goes through automated tests and every run says which version ran.'
 problem: A pipeline built by a third party downloaded supplier e-invoices from the invoicing operator's portal, converted them and loaded them into the financial ERP of two companies, three times a day. It arrived with no version control, no tests and a serious defect, because it could lose invoices and still finish green.
 responsibilities:
-  - Audited the system end to end and documented 74 findings, with a summary written in the business team's language.
+  - Audited the whole system and documented 74 findings, with a summary for the business team.
   - Put it under git, tests, CI with branch protection and tag-based deployment, without stopping the daily runs.
   - Fixed the failures that lost invoices and migrated the primary key of the target tables, rehearsed first in development.
   - Run the system, including incidents, reconciliations, deployments and communication with the finance team.
@@ -44,14 +53,14 @@ constraints:
   - The orchestrator is shared with six other workflows.
 decisions:
   - title: Audit and measure before fixing
-    rationale: A baseline measured against production made it possible to prioritize by business impact and prove each improvement with numbers, instead of rewriting on instinct.
+    rationale: A baseline measured against production made it possible to prioritize by business impact and prove each improvement with numbers.
     alternatives:
       - Rewrite the pipeline from scratch
   - title: Extract a pure, tested domain from the scraping code
     rationale: Calendar, pagination and classification rules moved into modules with no network or secrets, with doctests as the contract. They run in under a second without touching the portal.
     alternatives:
       - Test only end to end against the real portal
-  - title: A run that did nothing finishes red
+  - title: A run that loaded nothing ends in error
     rationale: The original defect was reporting success without loading anything. Now every task verifies its result and, if the count does not add up, fails and sends an email alert.
     alternatives:
       - Add more retries and leave the status green
@@ -105,12 +114,12 @@ architecture:
     - { from: reconciler, to: oracle, label: 'Verifies invoice by invoice' }
     - { from: mcp-server, to: download, label: 'Reads runs and logs through the orchestrator API' }
 outcomes:
-  - The process that reported success while losing invoices now fails red and sends an alert.
+  - If a run does not load what it downloaded, it ends in error and sends an email.
   - A month-change incident was sized the same day, with exactly 63 pending invoices, a reply to the business team before noon and a root fix tested live.
   - About 1,050 invoices from one month were verified one by one against the target database.
   - Every production log maps to its commit, because deployment is tag-based and each run prints its version.
 lessons:
-  - I would build the cross-store reconciler before any fix; it is the tool that turns a suspicion into a number.
+  - I would build the cross-store reconciler before any fix. It is what made it possible to count the invoices affected by each incident.
   - I would negotiate a test environment for the source portal from the start, because much of the risk came from not being able to rehearse downloads without touching the real process.
 ---
 

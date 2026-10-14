@@ -48,6 +48,13 @@ const architecture = z.strictObject({
 const caseStudy = z.strictObject({
   kind: z.literal('case-study'),
   ...common,
+  story: z.strictObject({
+    hook: text.max(160),
+    shifts: z
+      .array(z.strictObject({ before: text.max(140), after: text.max(140) }))
+      .min(1)
+      .max(4),
+  }),
   problem: text,
   responsibilities: z.array(text).default([]),
   constraints: z.array(text).min(1),

@@ -25,5 +25,8 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0018](0018-chiaroscuro-redesign.md)               | Chiaroscuro: a visual identity with an ASCII painting and visible prices | Accepted |
 | [0019](0019-reference-hero-chat-and-case-cards.md) | Rotating role in the hero, floating chat, case-study cards               | Accepted |
 | [0020](0020-not-found-reflection.md)               | The 404 as a reflection: an ASCII "404" solid mirrored under a waterline | Accepted |
+| [0021](0021-case-study-redesign.md)                | Case studies as a told story: plain-language problem, live diagram       | Accepted |
+| [0022](0022-real-screenshots-and-gallery.md)       | Real screenshots in case studies, shown in a framed gallery              | Accepted |
+| [0023](0023-technology-logo-band.md)               | Technologies as one draggable band of logos                              | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.

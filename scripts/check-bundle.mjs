@@ -7,9 +7,11 @@ import { gzipSync } from 'node:zlib';
 
 const DIR = join(process.cwd(), 'dist', 'client', '_astro');
 const BUDGET_KB = {
-  // React runtime plus every island. Islands hydrate on visibility, so none of this blocks the
-  // first paint; the budget keeps it from growing unnoticed.
-  total: 75,
+  // React runtime plus every island and page script. Islands hydrate on visibility and page
+  // scripts are deferred modules, so none of this blocks the first paint; the budget keeps it
+  // from growing unnoticed. Raised from 75 to 80 for the case study motion (about 3 kB, loaded
+  // on project pages only, ADR 0021).
+  total: 80,
   // Any single chunk other than the shared React runtime.
   chunk: 10,
 };

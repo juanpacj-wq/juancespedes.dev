@@ -1,25 +1,32 @@
 ---
+import { Picture } from 'astro:assets';
+
 import type { Project } from '../../domain/project/project';
 import type { Dictionary } from '../i18n/dictionary';
-import { formatPeriod } from '../i18n/format';
-import { projectPath, projectsListPath } from '../i18n/routes';
-import { Picture } from 'astro:assets';
+import { formatPeriod, formatYears } from '../i18n/format';
+import { homeSectionPath, projectPath, projectsListPath } from '../i18n/routes';
 import Icon from '../icons/Icon.astro';
-import Badge from '../primitives/Badge.astro';
-import Card from '../primitives/Card.astro';
+import Button from '../primitives/Button.astro';
 import Container from '../primitives/Container.astro';
-import Stat from '../primitives/Stat.astro';
-import Tag from '../primitives/Tag.astro';
 import TextLink from '../primitives/TextLink.astro';
 import ArchitectureDiagram from './ArchitectureDiagram.astro';
 import DetailSection from './DetailSection.astro';
-import { mediaFor } from './media';
+import { captionFor, mediaFor } from './media';
+import ProjectGallery from './ProjectGallery.astro';
+import ScreenPlaceholder from './ScreenPlaceholder.astro';
+import TechBand from './TechBand.astro';
+import '../styles/case-study.css';
 
 /**
- * A project page. Case studies follow the fixed template (problem, role, constraints, decisions,
- * architecture, results, what I would do differently); the other kinds show their own fields.
- * Every block comes from validated content, so a missing section is a content error, not a
- * layout one.
+ * A project page, told as a case study (ADR 0011, redesigned in ADR 0021): a hero with the
+ * product on a stage, the problem in plain words with what changed for the people involved,
+ * then the engineering chapters (role, constraints, decisions, architecture, results, hindsight)
+ * and a way to the next case. Every block comes from validated content, so a missing section is
+ * a content error, not a layout one.
+ *
+ * The page reads complete without JavaScript or motion. The motion layer is progressive: CSS
+ * scroll-driven animations where the browser supports them, and one small script
+ * (case-study-motion.ts) for the chapter nav, the counting figures and the diagram wires.
  */
 interface Props {
   t: Dictionary;
@@ -32,194 +39,391 @@ const { t, project, previous, next } = Astro.props;
 const { locale } = project;
 const two = (n: number) => String(n + 1).padStart(2, '0');
 const media = mediaFor(project.slug);
+// A stock photo says nothing about the product; the drawn screen at least matches the home card.
+const cover = media.cover && !media.cover.stock ? media.cover : null;
+const nextMedia = next ? mediaFor(next.slug) : null;
+// Same rule for the gallery: only real images; stock stand-ins wait in the folder for their swap.
+const gallery = media.gallery.filter((image) => !image.stock);
+const words = (text: string) => text.split(/\s+/).filter(Boolean);
+
+const kindChapters: Record<Project['kind'], [string, string][]> = {
+  'case-study': [
+    ['overview', t.project.overview],
+    ['problem', t.project.problem],
+    ...(gallery.length > 0 ? ([['solution', t.project.solution]] as [string, string][]) : []),
+    ['role', t.project.responsibilities],
+    ['constraints', t.project.constraints],
+    ['decisions', t.project.decisions],
+    ['architecture', t.project.architecture],
+    ['results', t.project.results],
+    ['lessons', t.project.lessons],
+  ],
+  report: [['report', t.project.businessQuestions]],
+  'open-source': [['repository', t.project.repository]],
+  tool: [['tool', t.project.automates]],
+};
+const galleryChapter: [string, string][] =
+  project.kind !== 'case-study' && gallery.length > 0 ? [['solution', t.project.solution]] : [];
+const chapters = [
+  ...kindChapters[project.kind],
+  ...galleryChapter,
+  ['stack', t.project.stack],
+] as const;
+// The address in the browser frame: the public site when there is one, otherwise a neutral path.
+const address = project.links[0] ? new URL(project.links[0].url).host : `/${project.slug}`;
+const numberOf = (id: string) => two(chapters.findIndex(([chapter]) => chapter === id));
+const titleOf = (id: string) => chapters.find(([chapter]) => chapter === id)?.[1] ?? id;
+const hookWords = project.kind === 'case-study' ? words(project.story.hook) : [];
 ---
 
-<article>
-  <Container as="header" class="flex flex-col gap-8 pt-10 pb-12 sm:pt-16 sm:pb-16">
-    <a
-      href={projectsListPath(locale)}
-      class="inline-flex w-fit items-center gap-2 text-small text-muted transition-colors hover:text-ink"
-    >
-      <Icon name="arrow-right" size={16} class="rotate-180" />
-      {t.project.back}
-    </a>
+<div class="cs-progress" aria-hidden="true"></div>
 
-    <div class="flex max-w-4xl flex-col gap-5">
-      <div class="flex flex-wrap items-center gap-2">
-        <Badge tone="accent">{t.kindLabels[project.kind]}</Badge>
-        {project.confidentiality === 'anonymized' && <Badge>{t.projects.anonymized}</Badge>}
-      </div>
-      <h1 class="text-heading font-semibold text-balance sm:text-display">{project.title}</h1>
-      <p class="max-w-3xl text-lead text-muted">{project.summary}</p>
-    </div>
+<article class="cs-article">
+  <header data-cs-hero class="relative flex flex-col gap-12 pb-16 sm:gap-16 sm:pb-24">
+    <Container class="flex flex-col gap-8 pt-10 sm:pt-16">
+      <a
+        href={projectsListPath(locale)}
+        class="group inline-flex w-fit items-center gap-2 text-small text-muted transition-colors hover:text-ink"
+      >
+        <Icon
+          name="arrow-right"
+          size={16}
+          class="rotate-180 transition-transform duration-500 ease-out group-hover:-translate-x-1"
+        />
+        {t.project.back}
+      </a>
 
-    {media.cover && (
-      <figure class="flex flex-col gap-3">
-        {/* The home page card's screen turns into this cover (cross-document view transition). */}
-        <div
-          class="overflow-hidden rounded-panel bg-surface-raised shadow-bevel"
-          style={`view-transition-name: project-screen-${project.slug}`}
-        >
-          <Picture
-            src={media.cover.src}
-            alt=""
-            formats={['avif', 'webp']}
-            widths={[640, 960, 1280, 1600]}
-            sizes="(min-width: 1280px) 1216px, calc(100vw - 2rem)"
-            loading="eager"
-            fetchpriority="high"
-            class="aspect-[16/7] w-full object-cover"
-          />
-        </div>
-        {media.cover.stock && (
-          <figcaption class="text-small text-subtle">{t.project.stockNote}</figcaption>
-        )}
-      </figure>
-    )}
+      <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+        {t.kindLabels[project.kind]} · {formatYears(project.period, t)}
+        {project.confidentiality === 'anonymized' && <> · {t.projects.anonymized}</>}
+      </p>
 
-    <section aria-labelledby="facts-title" class="flex flex-col gap-4">
-      <h2 id="facts-title" class="sr-only">
-        {t.project.facts}
-      </h2>
-      <dl class="grid gap-6 border-y border-line py-6 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr]">
-        <div class="flex flex-col gap-1">
-          <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
-            {t.project.role}
-          </dt>
-          <dd class="text-ink">{project.role}</dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
-            {t.project.period}
-          </dt>
-          <dd class="text-ink">{formatPeriod(locale, project.period, t)}</dd>
-        </div>
-        <div class="flex flex-col gap-1">
-          <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
-            {t.project.links}
-          </dt>
-          <dd class="flex flex-col gap-1">
-            {project.links.length > 0
-              ? project.links.map((link) => (
-                  <TextLink href={link.url} external externalLabel={t.a11y.external}>
-                    {link.label}
-                  </TextLink>
-                ))
-              : project.kind === 'open-source' && (
-                  <TextLink href={project.repository} external externalLabel={t.a11y.external}>
-                    {t.project.repository}
-                  </TextLink>
-                )}
-            {project.confidentiality === 'anonymized' && (
-              <span class="text-small text-muted">{t.project.anonymizedNote}</span>
-            )}
-          </dd>
-        </div>
-      </dl>
-    </section>
-
-    {project.metrics.length > 0 && (
-      <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label={t.project.results}>
-        {project.metrics.map((metric) => (
-          <li>
-            <Card class="h-full">
-              <Stat
-                value={metric.value}
-                label={metric.label}
-                source={metric.source}
-                sourceLabel={t.metric.source}
-              />
-            </Card>
-          </li>
+      <h1 class="cs-title max-w-6xl font-display text-display font-light text-balance text-ink">
+        {words(project.title).map((word, index) => (
+          <>
+            <span class="cs-word" style={`--i:${String(index)}`}>
+              {word}
+            </span>{' '}
+          </>
         ))}
-      </ul>
-    )}
-  </Container>
+      </h1>
 
-  <Container class="flex flex-col gap-16 pb-16 sm:gap-20 sm:pb-24">
+      <div class="grid items-end gap-8 lg:grid-cols-12">
+        <p class="cs-fade text-lead text-pretty text-muted lg:col-span-7">{project.summary}</p>
+        <div class="cs-fade flex flex-col gap-3 lg:col-span-5 lg:items-end">
+          <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+            {t.project.howIHelped}
+          </p>
+          <ul class="flex flex-wrap gap-2 lg:justify-end">
+            {project.capabilities.map((capability) => (
+              <li class="rounded-chip bg-surface-raised px-4 py-2 text-small text-ink shadow-bevel">
+                {t.capabilityLabels[capability]}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </Container>
+
+    <Container>
+      <figure class="flex flex-col gap-3">
+        <div class="cs-stage" data-tone={project.order % 2 === 0 ? 'success' : 'accent'}>
+          <div class="cs-stage-rise">
+            <div
+              class="cs-stage-screen"
+              style={`view-transition-name: project-screen-${project.slug}`}
+            >
+              {cover ? (
+                <Picture
+                  src={cover.src}
+                  alt={captionFor(project.slug, 'cover', locale) ?? ''}
+                  formats={['avif', 'webp']}
+                  widths={[640, 960, 1280, 1600]}
+                  sizes="(min-width: 1280px) 1100px, 90vw"
+                  loading="eager"
+                  fetchpriority="high"
+                  class="size-full rounded-card object-cover object-top-left"
+                />
+              ) : (
+                <ScreenPlaceholder slug={project.slug} />
+              )}
+            </div>
+          </div>
+          {project.metrics.slice(0, 2).map((metric, index) => (
+            <p
+              class:list={['cs-badge', index === 0 ? 'cs-badge--one' : 'cs-badge--two']}
+              aria-hidden="true"
+            >
+              <span class="text-title font-light tracking-tight text-ink">{metric.value}</span>
+              <span class="line-clamp-2 text-small text-muted">{metric.label}</span>
+            </p>
+          ))}
+        </div>
+      </figure>
+    </Container>
+
+    <Container>
+      <section aria-labelledby="facts-title">
+        <h2 id="facts-title" class="sr-only">
+          {t.project.facts}
+        </h2>
+        <dl class="grid gap-x-8 gap-y-6 border-y border-line py-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="flex flex-col gap-2">
+            <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+              {t.project.role}
+            </dt>
+            <dd class="text-pretty text-ink">{project.role}</dd>
+          </div>
+          <div class="flex flex-col gap-2">
+            <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+              {t.project.period}
+            </dt>
+            <dd class="text-ink">{formatPeriod(locale, project.period, t)}</dd>
+          </div>
+          <div class="flex flex-col gap-2">
+            <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+              {t.project.stack}
+            </dt>
+            <dd class="text-pretty text-ink">{project.stack.slice(0, 5).join(' · ')}</dd>
+          </div>
+          <div class="flex flex-col gap-2">
+            <dt class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+              {t.project.links}
+            </dt>
+            <dd class="flex flex-col gap-1">
+              {project.links.length > 0
+                ? project.links.map((link) => (
+                    <TextLink href={link.url} external externalLabel={t.a11y.external}>
+                      {link.label}
+                    </TextLink>
+                  ))
+                : project.kind === 'open-source' && (
+                    <TextLink href={project.repository} external externalLabel={t.a11y.external}>
+                      {t.project.repository}
+                    </TextLink>
+                  )}
+              {project.confidentiality === 'anonymized' && (
+                <span class="text-small text-pretty text-muted">{t.project.anonymizedNote}</span>
+              )}
+            </dd>
+          </div>
+        </dl>
+      </section>
+    </Container>
+  </header>
+
+  <Container class="flex flex-col gap-24 pb-24 sm:gap-32 sm:pb-32">
     {project.kind === 'case-study' && (
       <>
-        <DetailSection id="problem" title={t.project.problem}>
-          <p class="text-lead text-muted">{project.problem}</p>
-        </DetailSection>
-
-        <DetailSection id="role" title={t.project.responsibilities}>
-          {project.responsibilities.length > 0 && (
-            <ul class="flex flex-col gap-3">
-              {project.responsibilities.map((item) => (
-                <li class="flex gap-3 text-muted">
-                  <span
-                    class="mt-2.5 size-1.5 shrink-0 rounded-chip bg-accent"
-                    aria-hidden="true"
-                  />
-                  {item}
+        <DetailSection
+          id="overview"
+          title={titleOf('overview')}
+          number={numberOf('overview')}
+          wide
+          quiet
+        >
+          <p class="cs-hook max-w-5xl font-display text-heading font-light text-balance">
+            {hookWords.map((word, index) => (
+              <>
+                <span
+                  class="cs-w"
+                  style={`--p:${(index / Math.max(hookWords.length - 1, 1)).toFixed(3)}`}
+                >
+                  {word}
+                </span>{' '}
+              </>
+            ))}
+          </p>
+          {project.metrics.length > 0 && (
+            <ul
+              class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              aria-label={t.project.results}
+            >
+              {project.metrics.map((metric, index) => (
+                <li
+                  class:list={[
+                    'cs-stat reveal',
+                    // One figure gets the whole row, laid out sideways; an odd one out leads.
+                    project.metrics.length === 1
+                      ? 'cs-stat--solo sm:col-span-2 lg:col-span-3'
+                      : project.metrics.length % 2 === 1 &&
+                        index === 0 &&
+                        'sm:col-span-2 lg:col-span-1',
+                  ]}
+                  data-glow
+                >
+                  <p
+                    class="cs-figure text-heading font-extralight text-balance tabular-nums text-ink"
+                    data-count={metric.value}
+                  >
+                    {metric.value}
+                  </p>
+                  <p class="text-pretty text-muted">{metric.label}</p>
+                  <p class="mt-auto border-t border-line pt-4 font-mono text-eyebrow text-pretty text-subtle">
+                    {t.metric.source}: {metric.source}
+                  </p>
                 </li>
               ))}
             </ul>
           )}
         </DetailSection>
 
-        <DetailSection id="constraints" title={t.project.constraints}>
-          <ul class="flex flex-col gap-3">
-            {project.constraints.map((item) => (
-              <li class="flex gap-3 text-muted">
-                <span class="mt-2.5 size-1.5 shrink-0 rounded-chip bg-accent" aria-hidden="true" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </DetailSection>
-
-        <DetailSection id="decisions" title={t.project.decisions} wide>
-          <ol class="grid gap-4 lg:grid-cols-2">
-            {project.decisions.map((decision, index) => (
-              <li>
-                <Card class="flex h-full flex-col gap-3">
-                  <span class="font-mono text-eyebrow text-accent-ink">{two(index)}</span>
-                  <h3 class="text-title font-medium text-balance">{decision.title}</h3>
-                  <p class="text-muted">{decision.rationale}</p>
-                  {decision.alternatives.length > 0 && (
-                    <div class="mt-auto flex flex-col gap-1 border-t border-line pt-3">
-                      <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
-                        {t.project.discarded}
-                      </p>
-                      <ul class="flex flex-col gap-1">
-                        {decision.alternatives.map((alternative) => (
-                          <li class="text-small text-muted">{alternative}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </Card>
+        <DetailSection id="problem" title={titleOf('problem')} number={numberOf('problem')}>
+          <p class="text-lead text-pretty text-muted">{project.problem}</p>
+          <ol class="cs-shifts mt-12 flex flex-col gap-3">
+            <li class="hidden grid-cols-[1fr_2.5rem_1fr] gap-3 px-1 sm:grid" aria-hidden="true">
+              <span class="flex items-center gap-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+                <Icon name="close" size={14} />
+                {t.project.before}
+              </span>
+              <span />
+              <span class="flex items-center gap-2 font-mono text-eyebrow tracking-widest text-success uppercase">
+                <Icon name="check" size={14} />
+                {t.project.after}
+              </span>
+            </li>
+            {project.story.shifts.map((shift) => (
+              <li class="cs-shift reveal grid items-stretch gap-3 sm:grid-cols-[1fr_2.5rem_1fr]">
+                <p class="cs-before">
+                  <span class="font-mono text-eyebrow tracking-widest text-subtle uppercase sm:sr-only">
+                    {t.project.before}
+                    <span class="sr-only">:</span>
+                  </span>
+                  {shift.before}
+                </p>
+                <span class="cs-shift-arrow" aria-hidden="true">
+                  <Icon name="arrow-right" size={16} />
+                </span>
+                <p class="cs-after">
+                  <span class="font-mono text-eyebrow tracking-widest text-success uppercase sm:sr-only">
+                    {t.project.after}
+                    <span class="sr-only">:</span>
+                  </span>
+                  {shift.after}
+                </p>
               </li>
             ))}
           </ol>
         </DetailSection>
 
-        <DetailSection id="architecture" title={t.project.architecture} wide>
-          <ArchitectureDiagram t={t} architecture={project.architecture} />
+        {gallery.length > 0 && (
+          <DetailSection
+            id="solution"
+            title={titleOf('solution')}
+            number={numberOf('solution')}
+            wide
+          >
+            <ProjectGallery
+              t={t}
+              slug={project.slug}
+              locale={locale}
+              images={gallery}
+              address={address}
+            />
+          </DetailSection>
+        )}
+
+        <DetailSection id="role" title={titleOf('role')} number={numberOf('role')}>
+          <p class="font-display text-quote font-light text-pretty text-ink">{project.role}</p>
+          {project.responsibilities.length > 0 && (
+            <ol class="cs-rail mt-12 flex flex-col gap-10">
+              {project.responsibilities.map((item, index) => (
+                <li class="relative flex gap-6 reveal">
+                  <span class="cs-rail-dot" aria-hidden="true">
+                    {two(index)}
+                  </span>
+                  <p class="pt-1.5 text-pretty text-muted">{item}</p>
+                </li>
+              ))}
+            </ol>
+          )}
         </DetailSection>
 
-        <DetailSection id="results" title={t.project.results}>
-          <ul class="flex flex-col gap-3">
-            {project.outcomes.map((item) => (
-              <li class="flex gap-3 text-muted">
-                <span class="mt-2.5 size-1.5 shrink-0 rounded-chip bg-success" aria-hidden="true" />
-                {item}
+        <DetailSection
+          id="constraints"
+          title={titleOf('constraints')}
+          number={numberOf('constraints')}
+        >
+          <ul class="grid gap-4 sm:grid-cols-2">
+            {project.constraints.map((item, index) => (
+              <li class="cs-tile reveal" data-glow>
+                <span class="font-mono text-eyebrow text-accent-ink" aria-hidden="true">
+                  R{String(index + 1)}
+                </span>
+                <p class="text-pretty text-ink">{item}</p>
               </li>
             ))}
           </ul>
         </DetailSection>
 
-        <DetailSection id="lessons" title={t.project.lessons}>
-          <ul class="flex flex-col gap-3">
+        <DetailSection
+          id="decisions"
+          title={titleOf('decisions')}
+          number={numberOf('decisions')}
+          wide
+        >
+          <ol class="cs-decisions flex flex-col gap-6">
+            {project.decisions.map((decision, index) => (
+              <li class="cs-decision" style={`--i:${String(index)}`}>
+                <div class="flex flex-col gap-4 lg:col-span-5">
+                  <span
+                    class="font-display text-display leading-none font-light text-accent-ink"
+                    aria-hidden="true"
+                  >
+                    {two(index)}
+                  </span>
+                  <h3 class="font-display text-title font-light text-balance text-ink sm:text-quote">
+                    {decision.title}
+                  </h3>
+                </div>
+                <div class="flex flex-col gap-6 lg:col-span-7">
+                  <p class="text-lead text-pretty text-muted">{decision.rationale}</p>
+                  {decision.alternatives.length > 0 && (
+                    <div class="cs-choice">
+                      <p class="flex items-center gap-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+                        <Icon name="close" size={14} />
+                        {t.project.discarded}
+                      </p>
+                      <ul class="flex flex-col gap-1">
+                        {decision.alternatives.map((alternative) => (
+                          <li class="text-pretty text-muted">{alternative}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </DetailSection>
+
+        <DetailSection
+          id="architecture"
+          title={titleOf('architecture')}
+          number={numberOf('architecture')}
+          wide
+        >
+          <ArchitectureDiagram t={t} architecture={project.architecture} />
+        </DetailSection>
+
+        <DetailSection id="results" title={titleOf('results')} number={numberOf('results')}>
+          <ul class="flex flex-col">
+            {project.outcomes.map((item) => (
+              <li class="cs-outcome reveal">
+                <span class="cs-outcome-check" aria-hidden="true">
+                  <Icon name="check" size={16} />
+                </span>
+                <p class="text-lead text-pretty text-ink">{item}</p>
+              </li>
+            ))}
+          </ul>
+        </DetailSection>
+
+        <DetailSection id="lessons" title={titleOf('lessons')} number={numberOf('lessons')}>
+          <ul class="flex flex-col gap-12">
             {project.lessons.map((item) => (
-              <li class="flex gap-3 text-muted">
-                <span
-                  class="mt-2.5 size-1.5 shrink-0 rounded-chip bg-line-strong"
-                  aria-hidden="true"
-                />
-                {item}
+              <li class="cs-lesson reveal">
+                <p class="font-display text-quote font-light text-pretty text-ink">{item}</p>
               </li>
             ))}
           </ul>
@@ -228,7 +432,7 @@ const media = mediaFor(project.slug);
     )}
 
     {project.kind === 'report' && (
-      <DetailSection id="report" title={t.project.businessQuestions}>
+      <DetailSection id="report" title={titleOf('report')} number={numberOf('report')}>
         <ul class="mb-8 flex flex-col gap-3 text-muted">
           {project.businessQuestions.map((item) => (
             <li>{item}</li>
@@ -264,7 +468,7 @@ const media = mediaFor(project.slug);
     )}
 
     {project.kind === 'open-source' && (
-      <DetailSection id="repository" title={t.project.repository}>
+      <DetailSection id="repository" title={titleOf('repository')} number={numberOf('repository')}>
         <dl class="grid gap-6 sm:grid-cols-2">
           <div>
             <dt class="mb-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
@@ -299,7 +503,7 @@ const media = mediaFor(project.slug);
     )}
 
     {project.kind === 'tool' && (
-      <DetailSection id="tool" title={t.project.automates}>
+      <DetailSection id="tool" title={titleOf('tool')} number={numberOf('tool')}>
         <p class="mb-6 text-lead text-muted">{project.automates}</p>
         <p class="font-mono text-small text-subtle">
           {t.project.platform}: {project.platform}
@@ -307,78 +511,116 @@ const media = mediaFor(project.slug);
       </DetailSection>
     )}
 
-    {media.gallery.length > 0 && (
-      <figure class="flex flex-col gap-3">
-        <ul class="grid gap-4 sm:grid-cols-2" aria-label={t.project.gallery}>
-          {media.gallery.map((image, index) => (
-            <li
-              class:list={[
-                'reveal overflow-hidden rounded-panel bg-surface-raised shadow-bevel',
-                media.gallery.length % 2 === 1 && index === 0 && 'sm:col-span-2',
-              ]}
-            >
-              <Picture
-                src={image.src}
-                alt=""
-                formats={['avif', 'webp']}
-                widths={[480, 800, 1200]}
-                sizes="(min-width: 640px) 50vw, 100vw"
-                class="aspect-[4/3] size-full object-cover transition-transform duration-700 ease-out hover:scale-103"
-              />
-            </li>
-          ))}
-        </ul>
-        {media.gallery.some((image) => image.stock) && (
-          <figcaption class="text-small text-subtle">{t.project.stockNote}</figcaption>
-        )}
-      </figure>
+    {project.kind !== 'case-study' && gallery.length > 0 && (
+      <DetailSection id="solution" title={titleOf('solution')} number={numberOf('solution')} wide>
+        <ProjectGallery
+          t={t}
+          slug={project.slug}
+          locale={locale}
+          images={gallery}
+          address={address}
+        />
+      </DetailSection>
     )}
 
-    <DetailSection id="stack" title={t.project.stack}>
-      <ul class="flex flex-wrap gap-2">
-        {project.stack.map((name) => (
-          <li>
-            <Tag>{name}</Tag>
-          </li>
-        ))}
-      </ul>
+    <DetailSection id="stack" title={titleOf('stack')} number={numberOf('stack')} wide>
+      <div class="cs-bleed">
+        <TechBand label={t.project.stack} stack={project.stack} />
+      </div>
     </DetailSection>
+  </Container>
+
+  <Container class="flex flex-col gap-6 pt-24 pb-24 sm:pt-32">
+    <aside class="cs-cta" aria-labelledby="cs-cta-title">
+      <h2
+        id="cs-cta-title"
+        class="max-w-3xl font-display text-heading font-light text-balance text-ink"
+      >
+        {t.project.ctaTitle}
+      </h2>
+      <p class="max-w-xl text-lead text-pretty text-muted">{t.project.ctaBody}</p>
+      <div class="flex flex-wrap gap-3">
+        <Button href={homeSectionPath(locale, 'contact')} size="lg" icon="arrow-right">
+          {t.project.ctaContact}
+        </Button>
+      </div>
+    </aside>
 
     {(previous ?? next) && (
-      <nav aria-label={t.project.more} class="border-t border-line pt-10">
-        <ul class="grid gap-4 sm:grid-cols-2">
-          {previous && (
-            <li>
-              <Card interactive class="h-full">
-                <a
-                  href={projectPath(locale, previous.slug)}
-                  class="flex flex-col gap-2 after:absolute after:inset-0 after:rounded-card"
-                >
-                  <span class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
-                    {t.project.previous}
-                  </span>
-                  <span class="text-title font-medium text-balance">{previous.title}</span>
-                </a>
-              </Card>
-            </li>
-          )}
-          {next && (
-            <li class="sm:col-start-2">
-              <Card interactive class="h-full sm:text-right">
-                <a
-                  href={projectPath(locale, next.slug)}
-                  class="flex flex-col gap-2 after:absolute after:inset-0 after:rounded-card"
-                >
-                  <span class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
-                    {t.project.next}
-                  </span>
-                  <span class="text-title font-medium text-balance">{next.title}</span>
-                </a>
-              </Card>
-            </li>
-          )}
-        </ul>
+      <nav aria-label={t.project.more} class="flex flex-col gap-4">
+        {next && (
+          <a href={projectPath(locale, next.slug)} class="cs-next group">
+            <span class="relative z-10 flex flex-col gap-5 p-6 sm:p-10 lg:w-[58%] lg:p-12">
+              <span class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
+                {t.project.nextCase}
+              </span>
+              <span class="font-display text-heading font-light text-balance text-ink">
+                {next.title}
+              </span>
+              <span class="line-clamp-3 text-pretty text-muted">{next.summary}</span>
+              <span class="cs-next-cta">
+                {t.projects.viewCase}
+                <Icon name="arrow-right" size={16} />
+              </span>
+            </span>
+            <span class="cs-next-stage" aria-hidden="true">
+              <span class="cs-next-screen">
+                {nextMedia?.card ? (
+                  <Picture
+                    src={nextMedia.card.src}
+                    alt=""
+                    formats={['avif', 'webp']}
+                    widths={[480, 800]}
+                    sizes="(min-width: 1024px) 40vw, 90vw"
+                    class="size-full rounded-card object-cover object-top-left"
+                  />
+                ) : (
+                  <ScreenPlaceholder slug={next.slug} />
+                )}
+              </span>
+            </span>
+          </a>
+        )}
+        {previous && (
+          <a
+            href={projectPath(locale, previous.slug)}
+            class="group flex w-fit items-center gap-3 text-small text-muted transition-colors hover:text-ink"
+          >
+            <Icon
+              name="arrow-right"
+              size={16}
+              class="rotate-180 transition-transform duration-500 ease-out group-hover:-translate-x-1"
+            />
+            <span>
+              <span class="font-mono text-eyebrow tracking-widest uppercase">
+                {t.project.previous}
+              </span>
+              <span class="mx-2 text-subtle" aria-hidden="true">
+                ·
+              </span>
+              {previous.title}
+            </span>
+          </a>
+        )}
       </nav>
     )}
   </Container>
+
+  <nav class="cs-chapters" aria-label={t.project.chapters} data-chapters hidden>
+    <ul class="cs-chapters-list">
+      {chapters.map(([id, title]) => (
+        <li>
+          <a href={`#${id}`} class="cs-chapters-link" data-chapter-link={id}>
+            {title}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
 </article>
+
+<script>
+  import { startCaseStudy } from './case-study-motion';
+
+  startCaseStudy();
+</script>

@@ -1,0 +1,55 @@
+---
+import { logoFor } from './tech-logos';
+
+/**
+ * The technologies of a case study as one band of logos (ADR 0023). The window is as wide as one
+ * round of the stack (up to the screen), so a short stack makes a short band and each logo shows
+ * once until the loop comes back. It moves on its own and the
+ * reader can grab it and drag it either way (case-study-motion.ts); it is also a scrollable row,
+ * so it works by keyboard and without JavaScript. The first list is the readable one; the copy
+ * that closes the loop is hidden from assistive technology.
+ */
+interface Props {
+  label: string;
+  stack: readonly string[];
+}
+
+const { label, stack } = Astro.props;
+const items = stack.map((name) => ({ name, logo: logoFor(name) }));
+---
+
+<div class="cs-band" data-band>
+  <div class="cs-band-track" data-band-track>
+    {[0, 1].map((round) => (
+      <ul
+        class="cs-band-row"
+        aria-label={round === 0 ? label : undefined}
+        aria-hidden={round === 0 ? undefined : 'true'}
+      >
+        {items.map(({ name, logo }) => (
+          <li class="cs-band-item">
+            {logo ? (
+              <svg
+                viewBox="0 0 24 24"
+                role="img"
+                aria-label={name}
+                class="cs-band-logo"
+                style={`--brand:#${logo.hex}`}
+                data-on-dark={logo.onDark ? '' : undefined}
+                data-on-light={logo.onLight ? '' : undefined}
+              >
+                <title>{name}</title>
+                <path d={logo.path} fill="currentColor" />
+              </svg>
+            ) : (
+              <span class="cs-band-word">{name}</span>
+            )}
+            <span class="cs-band-name" aria-hidden="true">
+              {name}
+            </span>
+          </li>
+        ))}
+      </ul>
+    ))}
+  </div>
+</div>

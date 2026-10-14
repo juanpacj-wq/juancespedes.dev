@@ -1,24 +1,55 @@
 ---
 /**
- * One block of a project page: a rule, a heading and its content. `wide` lets a block (the
- * architecture diagram) use the full page width instead of the reading column.
+ * One chapter of a project page. On wide screens the number and title stay pinned in a narrow
+ * left column while the content scrolls on the right; `wide` puts the title above the content
+ * and gives the content the full width (the architecture diagram, the decisions).
+ * The section is what the floating chapter nav (`data-chapter`) tracks.
  */
 interface Props {
   id: string;
   title: string;
+  /** Chapter number, already formatted ("01"). */
+  number: string;
   wide?: boolean;
+  /** A small label instead of a big title, for a chapter whose content is the headline. */
+  quiet?: boolean;
 }
 
-const { id, title, wide = false } = Astro.props;
+const { id, title, number, wide = false, quiet = false } = Astro.props;
 ---
 
 <section
   id={id}
   aria-labelledby={`${id}-title`}
-  class:list={['scroll-mt-24 border-t border-line pt-10', !wide && 'max-w-3xl']}
+  data-chapter
+  class:list={[
+    'cs-chapter grid scroll-mt-24 gap-x-12 gap-y-8 border-t border-line pt-12 sm:pt-16',
+    !wide && 'lg:grid-cols-12',
+  ]}
 >
-  <h2 id={`${id}-title`} class="mb-6 text-heading font-semibold text-balance">
-    {title}
-  </h2>
-  <slot />
+  <header
+    class:list={[
+      'flex gap-4',
+      quiet ? 'items-baseline' : 'flex-col',
+      !wide && 'lg:sticky lg:top-28 lg:col-span-4 lg:self-start',
+    ]}
+  >
+    <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase" aria-hidden="true">
+      {number}
+    </p>
+    <h2
+      id={`${id}-title`}
+      class:list={[
+        quiet
+          ? 'font-mono text-eyebrow tracking-widest text-muted uppercase'
+          : 'cs-heading font-display text-heading font-light text-balance text-ink',
+      ]}
+    >
+      {title}
+    </h2>
+    <slot name="aside" />
+  </header>
+  <div class:list={['min-w-0', !wide && 'lg:col-span-8 lg:pt-8']}>
+    <slot />
+  </div>
 </section>

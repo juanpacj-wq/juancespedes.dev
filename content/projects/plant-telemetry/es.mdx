@@ -32,6 +32,13 @@ featured: true
 order: 2
 status: published
 confidentiality: anonymized
+story:
+  hook: 'No había una pantalla con la generación real de cada unidad junto a lo despachado, y la lectura dependía de un sistema central.'
+  shifts:
+    - before: 'Lo generado y lo despachado no se veían juntos.'
+      after: 'Una pantalla en vivo muestra las cuatro unidades frente a lo despachado, con la proyección del periodo.'
+    - before: 'La lectura pasaba por un sistema central, y si ese sistema fallaba no había datos.'
+      after: 'El servicio lee los medidores directamente, en 15 a 25 ms en vez de cerca de 1,1 s.'
 problem: La operación necesitaba ver en una sola pantalla la generación real de cuatro unidades frente a lo despachado por el operador del mercado, y la lectura existente dependía de un sistema centralizado que era un punto único de falla.
 responsibilities:
   - Diseñé la lectura directa de los medidores, la integración de energía por periodo y el cruce con el despacho del mercado.
@@ -48,7 +55,7 @@ decisions:
     alternatives:
       - Seguir raspando la interfaz web del sistema centralizado
   - title: Nulo significa sin lectura, nunca cero
-    rationale: Distinguir la ausencia de dato del valor cero permite detectar un medidor caído en lugar de reportar generación nula. La regla vive en un módulo de dominio que comparten el backend y el tablero.
+    rationale: Distinguir la ausencia de dato del valor cero permite detectar un medidor caído. Sin esa distinción, el tablero mostraría generación nula. La regla vive en un módulo de dominio que comparten el backend y el tablero.
     alternatives:
       - Rellenar con cero las lecturas faltantes
   - title: Validación estadística antes de usar los medidores de respaldo
@@ -56,7 +63,7 @@ decisions:
     alternatives:
       - Asumir que los medidores de respaldo leen igual
   - title: Un solo build para dos plantas, configurado al cargar
-    rationale: La identidad visual y el orden de las unidades de cada planta se leen de un archivo de configuración en tiempo de ejecución, así una corrección se despliega una vez y sirve a ambas.
+    rationale: La identidad visual y el orden de las unidades de cada planta se leen de un archivo de configuración al arrancar. Una corrección se despliega una sola vez para las dos plantas.
     alternatives:
       - Compilar una versión del tablero por planta
 architecture:
@@ -110,10 +117,10 @@ outcomes:
   - La operación ve en una sola pantalla la generación real de cuatro unidades frente a lo despachado, con la proyección del periodo en curso.
   - Desapareció el punto único de falla y la latencia de lectura bajó de cerca de 1,1 s a entre 15 y 25 ms (p50).
   - Tras un reinicio, el servicio recupera los periodos cerrados desde la base de datos y no pierde energía integrada.
-  - La misma telemetría alimenta un reporte corporativo de Power BI sin tocar el tablero.
+  - La misma telemetría alimenta un reporte corporativo de Power BI, independiente del tablero.
 lessons:
   - Mediría la latencia y la tasa de lecturas nulas desde el primer día; esas cifras justificaron el cambio de protocolo y habrían adelantado la decisión.
-  - Dejaría un único servicio de lectura de medidores que publique para ambos consumidores, en lugar de mantener la misma topología en Node.js y en Python.
+  - Hoy la lectura de medidores existe dos veces, en Node.js y en Python. Dejaría un único servicio que publique para ambos consumidores.
 ---
 
 {/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

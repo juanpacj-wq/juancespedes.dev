@@ -19,6 +19,10 @@ const minimalCaseStudy = {
   capabilities: ['backend'],
   stack: ['Node.js'],
   confidentiality: 'anonymized',
+  story: {
+    hook: 'Every shift ended with someone copying cells by hand.',
+    shifts: [{ before: 'One workbook per shift', after: 'One shared live record' }],
+  },
   problem: 'Excel logbooks.',
   constraints: ['Shifts cross midnight'],
   decisions: [{ title: 'Shifts as entities', rationale: 'History is immutable' }],
@@ -84,6 +88,24 @@ describe('projectFrontmatterSchema', () => {
     expect(result.error?.issues.map((issue) => issue.path.join('.'))).toEqual([
       'architecture.flows[0].to',
     ]);
+  });
+
+  it('keeps the plain-language story short: one hook and one to four changes', () => {
+    const shift = { before: 'By hand', after: 'From the data' };
+    const withShifts = (count: number) =>
+      projectFrontmatterSchema.safeParse({
+        ...minimalCaseStudy,
+        story: { ...minimalCaseStudy.story, shifts: Array.from({ length: count }, () => shift) },
+      }).success;
+    expect(withShifts(0)).toBe(false);
+    expect(withShifts(4)).toBe(true);
+    expect(withShifts(5)).toBe(false);
+    expect(
+      projectFrontmatterSchema.safeParse({
+        ...minimalCaseStudy,
+        story: { ...minimalCaseStudy.story, hook: 'x'.repeat(161) },
+      }).success,
+    ).toBe(false);
   });
 
   it('rejects non-https links', () => {

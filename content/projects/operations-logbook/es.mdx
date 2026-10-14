@@ -1,7 +1,7 @@
 ---
 kind: case-study
 title: Bitácora digital de operación para dos plantas térmicas
-summary: Reemplacé los libros de Excel de los turnos de operación por una aplicación web en tiempo real, con turnos como entidad de negocio, reportes oficiales generados desde los datos y más de 1.400 pruebas automatizadas.
+summary: Reemplacé los libros de Excel de los turnos de operación por una aplicación web en tiempo real. Los reportes oficiales se generan desde los datos y el código tiene más de 1.400 pruebas automatizadas.
 role: Ingeniero full-stack, único desarrollador (diseño, backend, frontend, base de datos, despliegue)
 period: { start: '2026-03', end: null }
 capabilities: [backend, frontend, data-bi, infrastructure]
@@ -32,6 +32,15 @@ featured: true
 order: 1
 status: published
 confidentiality: anonymized
+story:
+  hook: 'Los turnos se registraban en libros de Excel, y el reporte oficial de cada día se armaba copiando celdas a mano.'
+  shifts:
+    - before: 'Cada bitácora de turno estaba en su propio libro de Excel.'
+      after: 'El equipo registra todo en una sola aplicación y ve los cambios de los demás en tiempo real.'
+    - before: 'Cerrar el turno dependía de la disciplina de cada persona.'
+      after: 'Al cerrar el turno, la aplicación guarda quiénes lo conformaban y ese registro ya no cambia.'
+    - before: 'El reporte oficial del día se armaba copiando celdas.'
+      after: 'El reporte se genera desde los datos, con el formato de la plantilla oficial.'
 problem: El personal de operación de dos plantas térmicas llevaba sus bitácoras de turno en libros de Excel. La información quedaba repartida entre archivos, el cierre de turno dependía de la disciplina de cada persona y los reportes oficiales del día se armaban a mano copiando celdas.
 responsibilities:
   - Levanté los requisitos con jefes de turno, ingenieros de operación y químicos, y los convertí en un modelo de dominio con turnos, bitácoras y permisos por cargo.
@@ -45,11 +54,11 @@ constraints:
   - Mínimas dependencias de terceros para facilitar la auditoría y el mantenimiento.
 decisions:
   - title: Turnos como entidad de negocio, con cierre atómico
-    rationale: El cierre de turno congela la conformación del equipo en una instantánea inmutable, así el historial no cambia si después cambia el personal.
+    rationale: El cierre de turno guarda una instantánea inmutable de la conformación del equipo. Si después cambia el personal, el historial no se altera.
     alternatives:
       - Registrar eventos sueltos y reconstruir los turnos al consultar
   - title: Tiempo real con WebSockets validando el origen
-    rationale: Varias personas trabajan sobre el mismo turno a la vez; los cambios llegan al instante y la validación de origen evita el secuestro de la conexión.
+    rationale: Varias personas trabajan sobre el mismo turno a la vez y necesitan ver los cambios de las demás sin recargar. El servidor valida el origen de cada conexión para que otro sitio no pueda abrirla con la sesión del usuario.
     alternatives:
       - Consultar al servidor cada pocos segundos
   - title: Lector y escritor de .xlsx propios sobre zlib
@@ -118,10 +127,10 @@ architecture:
     - { from: dashboard, to: api, label: 'Consulta eventos por periodo' }
 outcomes:
   - Las dos plantas registran sus turnos en la aplicación, con el historial de cada turno congelado al cerrarlo.
-  - El reporte oficial del día sale de los datos con el formato de la plantilla, sin copiar celdas a mano.
+  - El reporte oficial del día se genera desde los datos con el formato de la plantilla.
   - El tablero de generación consume los eventos de la bitácora por un contrato con pruebas, sin acceder a sus tablas.
 lessons:
-  - Priorizaría desde el primer día las pruebas que protegen invariantes peligrosas, como no borrar nunca datos de una planta real, por encima de la cobertura total.
+  - Desde el primer día priorizaría las pruebas de las reglas que no se pueden romper, como no borrar nunca datos de una planta real, por encima de la cobertura total.
   - Sacaría antes los procesos programados a un servicio aparte, para poder reiniciar la API sin pausar la ingesta de datos de planta.
 ---
 

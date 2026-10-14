@@ -1,7 +1,7 @@
 ---
 kind: case-study
 title: A corporate forum platform, from registration to certificate
-summary: I designed, built and single-handedly ran the platform for an energy-sector forum, with the agenda, a digital badge with a QR code, surveys, 156 audited PDF certificates and event memories, all behind corporate sign-in.
+summary: I was the only developer and operator of the platform for an energy-sector forum, with the agenda, a digital badge with a QR code, surveys, 156 audited PDF certificates and event memories, all behind corporate sign-in.
 role: Full-stack developer and sole operator, from design to on-call duty on event day
 period: { start: '2026-07', end: '2026-09' }
 capabilities: [frontend, backend, infrastructure]
@@ -32,6 +32,15 @@ featured: false
 order: 5
 status: published
 confidentiality: anonymized
+story:
+  hook: "Communications was organizing the company's first forum and needed one tool for the whole event, from the invitation to the certificate."
+  shifts:
+    - before: 'There was no tool for the whole event cycle.'
+      after: 'One platform with the agenda, a QR badge, surveys, certificates and memories.'
+    - before: 'Every guest had to be registered and badged.'
+      after: '163 guests received their personal QR code, each one verified before sending.'
+    - before: 'After the forum, certificates and memories still had to be delivered.'
+      after: '156 certificates and 77 photos went out, with memory downloads of up to 1.33 GB.'
 problem: The communications team of a power generation company was organizing its first corporate forum and needed one tool for the whole event cycle, from publishing the agenda and speakers to registering and badging guests, measuring satisfaction and delivering certificates and memories.
 responsibilities:
   - Designed the experience from the official graphic pieces, measuring colors and dimensions straight from the PDFs.
@@ -53,10 +62,10 @@ decisions:
     alternatives:
       - Store names and ID numbers in the server database
   - title: The survey unlocks on the server clock
-    rationale: The satisfaction survey link only reaches the browser once the server clock passes the closing time, so nobody answers it before the forum ends.
+    rationale: The satisfaction survey link only reaches the browser once the server clock passes the closing time. Nobody can answer it before the forum ends.
     alternatives:
       - Hide it behind a timer in the browser
-  - title: Two keys for dangerous operations
+  - title: Bulk send enabled only by two variables
     rationale: The bulk send has a dry-run mode, a recipient cap and resume support, and opening it to every guest requires changing two variables at once.
     alternatives:
       - A script that sends straight to the whole list
@@ -106,7 +115,7 @@ outcomes:
   - 156 certificates and 77 photos were published, with streamed downloads of the event memories (the largest package was 1.33 GB).
   - Production incidents were resolved and documented with their root cause.
 lessons:
-  - I would load-test event day with simulated traffic from a single IP, instead of sizing only with calculations.
+  - Before the event I would load-test with simulated traffic from a single IP. Capacity was sized with calculations only.
   - I would separate from the start what had to outlive the event, such as the business cards, from what was ephemeral.
 ---
 

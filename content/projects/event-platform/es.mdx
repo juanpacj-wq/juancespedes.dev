@@ -1,7 +1,7 @@
 ---
 kind: case-study
 title: Plataforma de un foro corporativo, del registro al certificado
-summary: Diseñé, construí y operé en solitario la plataforma de un foro del sector energético, con agenda, credencial digital con QR, encuestas, 156 certificados PDF auditados y memorias del evento, todo con inicio de sesión corporativo.
+summary: Fui el único desarrollador y operador de la plataforma de un foro del sector energético, con agenda, credencial digital con QR, encuestas, 156 certificados PDF auditados y memorias, todo con inicio de sesión corporativo.
 role: Desarrollador full-stack y operador único, del diseño a la guardia el día del evento
 period: { start: '2026-07', end: '2026-09' }
 capabilities: [frontend, backend, infrastructure]
@@ -32,6 +32,15 @@ featured: false
 order: 5
 status: published
 confidentiality: anonymized
+story:
+  hook: 'Comunicaciones organizaba el primer foro de la empresa y necesitaba una sola herramienta para todo el evento, desde la invitación hasta el certificado.'
+  shifts:
+    - before: 'No había una herramienta para el ciclo completo del evento.'
+      after: 'Una plataforma con agenda, credencial con QR, encuestas, certificados y memorias.'
+    - before: 'Había que registrar y acreditar a cada invitado.'
+      after: '163 invitados recibieron su QR personal, verificado uno a uno antes del envío.'
+    - before: 'Después del foro quedaban certificados y memorias por entregar.'
+      after: 'Se publicaron 156 certificados y 77 fotos, con descargas de memorias de hasta 1,33 GB.'
 problem: El área de comunicaciones de una generadora organizaba su primer foro corporativo y necesitaba resolver todo el ciclo del evento en una sola herramienta, desde difundir la agenda y los ponentes hasta registrar y acreditar a los invitados, medir la satisfacción y entregar certificados y memorias.
 responsibilities:
   - Diseñé la experiencia a partir de las piezas gráficas oficiales, midiendo colores y medidas directamente de los PDF.
@@ -53,10 +62,10 @@ decisions:
     alternatives:
       - Guardar nombres y documentos en la base de datos del servidor
   - title: La encuesta se libera con el reloj del servidor
-    rationale: La dirección de la encuesta de satisfacción solo llega al navegador cuando el reloj del servidor pasa la hora de cierre, así nadie la responde antes de que termine el foro.
+    rationale: La dirección de la encuesta de satisfacción solo llega al navegador cuando el reloj del servidor pasa la hora de cierre. Nadie puede responderla antes de que termine el foro.
     alternatives:
       - Ocultarla con un temporizador en el navegador
-  - title: Operaciones peligrosas con dos llaves
+  - title: Envío masivo habilitado solo con dos variables
     rationale: El envío masivo tiene modo simulacro, tope de destinatarios y reanudación, y abrirlo a todos los invitados exige cambiar dos variables a la vez.
     alternatives:
       - Un script que envía directamente a toda la lista
@@ -110,7 +119,7 @@ outcomes:
   - Se publicaron 156 certificados y 77 fotos, con descargas de memorias en streaming (el paquete más grande pesaba 1,33 GB).
   - Los incidentes de producción quedaron resueltos y documentados con su causa.
 lessons:
-  - Ensayaría la carga del día del evento con tráfico simulado desde una sola IP, en lugar de dimensionar solo con cálculos.
+  - Antes del evento ensayaría la carga con tráfico simulado desde una sola IP. La capacidad se dimensionó solo con cálculos.
   - Separaría desde el inicio lo que debía seguir vivo después del evento, como las tarjetas de presentación, de lo que era efímero.
 ---
 

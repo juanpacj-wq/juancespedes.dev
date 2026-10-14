@@ -118,9 +118,24 @@ describe('validateProjectContent', () => {
 
   it('enforces case-study sections', () => {
     const issues = validateProjectContent(
-      caseStudyContent({ problem: ' ', constraints: [], decisions: [], outcomes: [], lessons: [] }),
+      caseStudyContent({
+        story: { hook: ' ', shifts: [] },
+        problem: ' ',
+        constraints: [],
+        decisions: [],
+        outcomes: [],
+        lessons: [],
+      }),
     );
-    expect(fields(issues)).toEqual(['problem', 'constraints', 'decisions', 'outcomes', 'lessons']);
+    expect(fields(issues)).toEqual([
+      'problem',
+      'story.hook',
+      'story.shifts',
+      'constraints',
+      'decisions',
+      'outcomes',
+      'lessons',
+    ]);
   });
 
   it('validates the case-study architecture and prefixes its fields', () => {

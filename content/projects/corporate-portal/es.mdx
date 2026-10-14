@@ -36,6 +36,15 @@ confidentiality: public
 links:
   - label: Portal en línea
     url: https://www.gecelca.com.co/es/
+story:
+  hook: 'La empresa tenía cuatro sitios de WordPress separados, con contenido desactualizado, el inglés sin mantener y requisitos legales sin cumplir.'
+  shifts:
+    - before: 'Cuatro instalaciones separadas, una por idioma y dominio.'
+      after: 'Un solo portal con 134 páginas en español e inglés que salen de una misma fuente.'
+    - before: 'El contenido estaba desactualizado y el inglés no se mantenía.'
+      after: 'Comunicaciones publica y actualiza el contenido por su cuenta.'
+    - before: 'No cumplía las normas de transparencia ni de accesibilidad.'
+      after: 'Cada incumplimiento de accesibilidad quedó medido y corregido en un registro.'
 problem: El portal anterior eran cuatro instalaciones de WordPress independientes, una por idioma y dominio, alojadas en un tercero. El contenido estaba desactualizado, la versión en inglés no se mantenía y el sitio no cubría las obligaciones colombianas de transparencia (Ley 1712 de 2014) ni de accesibilidad (Resolución 1519 de 2020).
 responsibilities:
   - Extraje el diseño de Figma y el contenido del sitio anterior con herramientas propias, y lo repliqué página por página.
@@ -44,7 +53,7 @@ responsibilities:
   - Llevé una auditoría de seguridad interna con más de 100 hallazgos hasta su cierre y acompañé el ethical hacking externo.
   - Preparé el acta de paso a producción, con 9 casos de prueba y 35 evidencias, generada por código.
 constraints:
-  - El equipo de Comunicaciones edita el contenido sin un desarrollador y sin poder romper el diseño.
+  - El equipo de Comunicaciones edita el contenido por su cuenta, y desde el editor no se puede romper el diseño.
   - Cumplimiento obligatorio de transparencia y de accesibilidad WCAG 2.2 AA para un sitio público.
   - Infraestructura propia de la empresa, detrás de un firewall de aplicaciones corporativo.
   - Fuentes y recursos autoalojados, sin servicios de terceros que recojan datos de los visitantes.
@@ -55,7 +64,7 @@ decisions:
     alternatives:
       - Configurar el sitio desde el panel de administración
   - title: Motor propio para la versión en inglés
-    rationale: Las 67 páginas en inglés se generan desde las españolas con un catálogo de traducción por página, así la estructura es idéntica y una guarda impide publicar una traducción a medias.
+    rationale: Las 67 páginas en inglés se generan desde las españolas con un catálogo de traducción por página. Las dos versiones tienen la misma estructura, y una validación impide publicar una página con la traducción incompleta.
     alternatives:
       - Un plugin de multilenguaje con páginas duplicadas a mano
   - title: Despliegue reproducible con reversión automática
@@ -63,7 +72,7 @@ decisions:
     alternatives:
       - Subir archivos por FTP o editar en el servidor
   - title: Política de seguridad de contenido medida con navegador
-    rationale: La CSP se construyó recorriendo 137 rutas en dos anchos con un navegador real hasta llegar a cero violaciones, en lugar de adivinar qué recursos usa cada página.
+    rationale: La CSP se construyó recorriendo 137 rutas en dos anchos con un navegador real y corrigiendo hasta llegar a cero violaciones.
     alternatives:
       - Copiar una CSP genérica y relajarla cada vez que algo fallara
 architecture:
@@ -119,7 +128,7 @@ outcomes:
   - El sitio se verificó en 27 anchos de pantalla, de 360 a 1.920 px, y los incumplimientos de accesibilidad quedaron en un registro con mediciones y su corrección.
 lessons:
   - Montaría el arnés de seguridad y la medición de la CSP desde la primera semana; buena parte del trabajo de cierre salió de controles que se podían automatizar antes.
-  - Pediría desde el inicio un entorno de pruebas con la misma red y el mismo firewall que producción, para no descubrir esas diferencias en la recta final.
+  - Pediría desde el inicio un entorno de pruebas con la misma red y el mismo firewall que producción. Varias diferencias entre los dos entornos aparecieron al final del proyecto.
 ---
 
 {/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

@@ -1,0 +1,14 @@
+{
+  "cover": {
+    "es": "El flujo en Apache Airflow: las últimas 25 corridas, cada una con sus seis tareas. Las dos en rojo son fallas que ahora se detienen y avisan.",
+    "en": "The flow in Apache Airflow: the last 25 runs, each with its six tasks. The two in red are failures that now stop and send an alert."
+  },
+  "gallery-1": {
+    "es": "Historial por tarea: la descarga falló dos veces y la verificación final marcó esas dos corridas como fallidas.",
+    "en": "History per task: the download failed twice and the final check marked both runs as failed."
+  },
+  "gallery-2": {
+    "es": "Las seis tareas del flujo, de registrar la versión desplegada a verificar que la corrida cargó lo que descargó.",
+    "en": "The flow's six tasks, from recording the deployed version to checking that the run loaded what it downloaded."
+  }
+}

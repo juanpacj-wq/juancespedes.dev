@@ -1,0 +1,26 @@
+{
+  "cover": {
+    "es": "Portada de la plataforma del foro, con la fecha, la sede y la jornada.",
+    "en": "The forum platform's home page, with the date, venue and schedule."
+  },
+  "gallery-1": {
+    "es": "Escarapela digital armada con los datos de la cuenta corporativa (persona ficticia en esta captura).",
+    "en": "The digital badge, filled in from the corporate account (a fictitious person in this capture)."
+  },
+  "gallery-2": {
+    "es": "Reverso de la escarapela con el código QR personal que se escaneaba en el registro del evento.",
+    "en": "The back of the badge, with the personal QR code scanned at event check-in."
+  },
+  "gallery-3": {
+    "es": "La escarapela en un teléfono: cada asistente la mostraba desde su celular.",
+    "en": "The badge on a phone; each guest showed it from their own device."
+  },
+  "gallery-4": {
+    "es": "Encuestas del foro: la de satisfacción solo se habilita después de la hora de cierre.",
+    "en": "The forum surveys; the satisfaction survey only opens after the closing time."
+  },
+  "gallery-5": {
+    "es": "Portada en un teléfono de 390 px de ancho.",
+    "en": "The home page on a 390 px wide phone."
+  }
+}
