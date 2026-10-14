@@ -76,10 +76,12 @@ Take the interactions, not the libraries.
   the same name wins.
 - **Weight.** Nothing new competes with the first paint. The ticker's few rules are in the
   shared stylesheet (in the home page's own styles they pushed them past the 4 kB that Astro
-  inlines). The chat (9.3 kB) and card (5.7 kB) styles are separate files, fetched once the page
-  has loaded; the chat's code too, when the browser is idle, and the chat shows itself when both
-  are in (a header opener clicked earlier loads it at once). The cards sit below the first
-  screen. The drawn screen is a few short elements styled from the card sheet, not Tailwind
+  inlines). The chat (9.3 kB) and card (5.7 kB) styles are separate files. The chat's styles and
+  code are fetched 1.2 s after the load event (with a fast connection the load event comes
+  before the first paint, so "after load" alone still competed with it), and the chat shows
+  itself when both are in, close to the reference's two seconds; a header opener clicked earlier
+  loads it at once. The card styles are fetched when the cards come within a screen of the
+  viewport. The drawn screen is a few short elements styled from the card sheet, not Tailwind
   utilities, so the seven of them stay light in the HTML. The first version shipped all of it
   with the page: the shared stylesheet went from 48 kB to 68 kB and the home page HTML from 149
   kB to 167 kB, and the chat's script, Turnstile and both sheets were requested before the first

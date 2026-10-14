@@ -162,16 +162,31 @@ const sizes =
 <script>
   import cardStyles from '../styles/cards.css?url';
 
-  // The effects load once the page has loaded, so they never compete with the first paint; the
-  // cards sit below the first screen (CLAUDE.md, the performance budget).
+  /*
+   * The effects load when the cards come within a screen of the viewport. They sit below the
+   * first screen, so on arrival their styles never compete with the first paint (CLAUDE.md, the
+   * performance budget); a visit that lands on them loads the styles at once.
+   */
   const addStyles = () => {
     const sheet = document.createElement('link');
     sheet.rel = 'stylesheet';
     sheet.href = cardStyles;
     document.head.append(sheet);
   };
-  if (document.readyState === 'complete') addStyles();
-  else addEventListener('load', addStyles, { once: true });
+  const firstCard = document.querySelector('[data-tilt]');
+  if (firstCard && 'IntersectionObserver' in window) {
+    const watch = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        watch.disconnect();
+        addStyles();
+      },
+      { rootMargin: '100% 0px' },
+    );
+    watch.observe(firstCard);
+  } else {
+    addStyles();
+  }
 
   /*
    * Tilt and light follow a fine pointer (the reference's holographic card). One update per

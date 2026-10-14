@@ -169,9 +169,10 @@ const scriptText = {
 
   /*
    * Nothing of the chat competes with the first paint (CLAUDE.md, the performance budget): its
-   * code and styles are fetched once the page has loaded and the browser is idle, and the chat
-   * shows itself when both are in. A click on a header opener before then loads it at once and
-   * opens it.
+   * code and styles are fetched a moment after the page has loaded (on a fast connection the
+   * load event comes before the first paint), and the chat shows itself when both are in, as
+   * the reference's sphere does about two seconds in. A click on a header opener before then
+   * loads it at once and opens it.
    */
   const root = document.querySelector<HTMLElement>('[data-chat]');
   if (root) {
@@ -202,11 +203,13 @@ const scriptText = {
     };
     for (const opener of openers) opener.addEventListener('click', early, { once: true });
 
-    const whenIdle = () => {
-      if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 2000 });
-      else setTimeout(start, 200);
+    const later = () => {
+      setTimeout(() => {
+        if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1000 });
+        else start();
+      }, 1200);
     };
-    if (document.readyState === 'complete') whenIdle();
-    else addEventListener('load', whenIdle, { once: true });
+    if (document.readyState === 'complete') later();
+    else addEventListener('load', later, { once: true });
   }
 </script>
