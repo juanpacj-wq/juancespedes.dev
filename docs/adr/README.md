@@ -23,5 +23,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0016](0016-command-palette.md)                 | Command palette without a UI framework                                   | Accepted |
 | [0017](0017-ask-me-chat.md)                     | "Ask me": a chat about the published work, with bounded cost             | Accepted |
 | [0018](0018-chiaroscuro-redesign.md)            | Chiaroscuro: a visual identity with an ASCII painting and visible prices | Accepted |
+| [0020](0020-not-found-reflection.md)            | The 404 as a reflection: an ASCII "404" solid mirrored under a waterline | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.
