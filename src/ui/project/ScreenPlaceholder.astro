@@ -39,7 +39,7 @@ const rows = Array.from({ length: compact ? 2 : 4 }, () => Math.round(40 + next(
   <div class="flex min-h-0 flex-1">
     {!compact && (
       <div class="hidden w-28 shrink-0 flex-col gap-3 border-r border-line p-4 sm:flex">
-        <span class="h-2 w-14 rounded-chip bg-accent/70"></span>
+        <span class="h-2 w-14 rounded-chip sp-accent"></span>
         {[70, 55, 80, 50, 65].map((width) => (
           <span class="h-1.5 rounded-chip bg-line-strong" style={`width:${String(width)}%`}></span>
         ))}
@@ -48,14 +48,14 @@ const rows = Array.from({ length: compact ? 2 : 4 }, () => Math.round(40 + next(
     <div class="flex min-w-0 flex-1 flex-col gap-4 p-4 sm:p-5">
       <div class="flex items-center justify-between gap-4">
         <span class="h-2.5 w-32 rounded-chip bg-line-strong"></span>
-        <span class="h-5 w-16 rounded-chip bg-accent/25"></span>
+        <span class="h-5 w-16 rounded-chip sp-accent-soft"></span>
       </div>
       <div class:list={['grid gap-3', compact ? 'grid-cols-2' : 'grid-cols-3']}>
         {Array.from({ length: compact ? 2 : 3 }, (_, index) => (
           <div class="flex flex-col gap-2 rounded-control border border-line bg-surface-raised p-3">
             <span class="h-1.5 w-1/2 rounded-chip bg-line-strong"></span>
             <span
-              class:list={['h-3 w-3/4 rounded-chip', index === 0 ? 'bg-accent/80' : 'bg-ink/60']}
+              class:list={['h-3 w-3/4 rounded-chip', index === 0 ? 'sp-accent' : 'sp-ink']}
             ></span>
           </div>
         ))}
@@ -65,7 +65,7 @@ const rows = Array.from({ length: compact ? 2 : 4 }, () => Math.round(40 + next(
           <span
             class:list={[
               'flex-1 rounded-t-xs',
-              index === bars.length - 3 ? 'bg-accent' : 'bg-success/45',
+              index === bars.length - 3 ? 'bg-accent' : 'sp-success-soft',
             ]}
             style={`height:${String(height)}%`}
           ></span>
@@ -74,7 +74,7 @@ const rows = Array.from({ length: compact ? 2 : 4 }, () => Math.round(40 + next(
       <div class="flex flex-col gap-2">
         {rows.map((width) => (
           <div class="flex items-center gap-3">
-            <span class="size-2 shrink-0 rounded-full bg-success/70"></span>
+            <span class="size-2 shrink-0 rounded-full sp-success"></span>
             <span
               class="h-1.5 rounded-chip bg-line-strong"
               style={`width:${String(width)}%`}

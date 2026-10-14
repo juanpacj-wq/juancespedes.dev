@@ -1,6 +1,8 @@
 /*
- * Project cards (src/ui/project/ProjectCard.astro). Kept in the shared stylesheet, not in the
- * component: the home page's own styles must stay under the 4 kB that Astro inlines (CLAUDE.md).
+ * Project cards (src/ui/project/ProjectCard.astro). Not part of the stylesheet every page waits
+ * for: the card script loads this file after the page renders. The cards sit below the first
+ * screen, and until it arrives they show their content without the effects (CLAUDE.md, the
+ * home page's performance budget).
  *
  * Each effect owns one property, so they never fight: the scroll reveal moves the card with
  * `translate` (the .reveal utility), the pointer tilts the surface with `transform`, and the
@@ -182,16 +184,26 @@
     }
   }
 
-  /* Cross-document view transition: the card's screen becomes the project page's cover. */
-  @media (prefers-reduced-motion: no-preference) {
-    @view-transition {
-      navigation: auto;
-    }
+  /* Tints of the drawn screen (ScreenPlaceholder.astro). Plain classes instead of Tailwind's
+     opacity modifiers, which emit two rules each into the stylesheet every page waits for. */
+  .sp-accent {
+    background-color: color-mix(in srgb, var(--color-accent) 75%, transparent);
   }
 
-  ::view-transition-group(*) {
-    animation-duration: 450ms;
-    animation-timing-function: var(--ease-out);
+  .sp-accent-soft {
+    background-color: color-mix(in srgb, var(--color-accent) 25%, transparent);
+  }
+
+  .sp-ink {
+    background-color: color-mix(in srgb, var(--color-ink) 60%, transparent);
+  }
+
+  .sp-success {
+    background-color: color-mix(in srgb, var(--color-success) 70%, transparent);
+  }
+
+  .sp-success-soft {
+    background-color: color-mix(in srgb, var(--color-success) 45%, transparent);
   }
 }
 

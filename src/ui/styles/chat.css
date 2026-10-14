@@ -2,7 +2,9 @@
  * Floating "Ask me" chat (src/ui/chat/ChatDrawer.astro), modelled on the reference's assistant:
  * a glass sphere in the bottom-right corner opens a side panel that pushes the page on wide
  * screens and covers it on phones. The reference's teal and magenta glows become the palette's
- * candle ochre and verdigris. Kept in the shared stylesheet: it is on every page.
+ * candle ochre and verdigris. Not part of the stylesheet every page waits for: the chat script
+ * loads this file after the page renders and only then shows the sphere, which appears 1.8 s in
+ * anyway (CLAUDE.md, the home page's performance budget).
  */
 
 @layer components {

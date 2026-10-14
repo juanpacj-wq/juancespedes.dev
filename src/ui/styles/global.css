@@ -1,6 +1,4 @@
 @import 'tailwindcss';
-@import './cards.css';
-@import './chat.css';
 @import './hero.css';
 
 /*
@@ -195,6 +193,19 @@
       }
     }
   }
+}
+
+/* Cross-document view transition: a home page card's screen becomes its project page's cover
+   (ADR 0019). Both pages must opt in, so it lives here and not in the deferred card styles. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+::view-transition-group(*) {
+  animation-duration: 450ms;
+  animation-timing-function: var(--ease-out);
 }
 
 @keyframes reveal {

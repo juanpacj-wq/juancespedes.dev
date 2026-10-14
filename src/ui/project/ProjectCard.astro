@@ -160,6 +160,14 @@ const sizes =
 </article>
 
 <script>
+  import cardStyles from '../styles/cards.css?url';
+
+  // The effects load after the first paint; the cards sit below the first screen (CLAUDE.md).
+  const sheet = document.createElement('link');
+  sheet.rel = 'stylesheet';
+  sheet.href = cardStyles;
+  document.head.append(sheet);
+
   /*
    * Tilt and light follow a fine pointer (the reference's holographic card). One update per
    * frame, transforms and a gradient position only; touch screens and reduced motion skip it.
