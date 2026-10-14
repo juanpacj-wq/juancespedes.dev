@@ -13,9 +13,11 @@ interface Props {
   locale: Locale;
   email: string;
   privacyHref: string;
+  githubUrl: string;
+  linkedinUrl: string;
 }
 
-const { t, locale, email, privacyHref } = Astro.props;
+const { t, locale, email, privacyHref, githubUrl, linkedinUrl } = Astro.props;
 ---
 
 <Section id="contact" title={t.contact.title}>
@@ -38,6 +40,18 @@ const { t, locale, email, privacyHref } = Astro.props;
       <TextLink href={`mailto:${email}`} class="text-body break-words">
         {email}
       </TextLink>
+      <ul class="mt-4 flex flex-col gap-2" aria-label={t.contact.elsewhere}>
+        <li>
+          <TextLink href={linkedinUrl} external externalLabel={t.a11y.external}>
+            LinkedIn
+          </TextLink>
+        </li>
+        <li>
+          <TextLink href={githubUrl} external externalLabel={t.a11y.external}>
+            GitHub
+          </TextLink>
+        </li>
+      </ul>
     </aside>
   </div>
 </Section>

@@ -1,0 +1,557 @@
+/*
+ * Floating "Ask me" chat (src/ui/chat/ChatDrawer.astro), modelled on the reference's assistant:
+ * a glass sphere in the bottom-right corner opens a side panel that pushes the page on wide
+ * screens and covers it on phones. The reference's teal and magenta glows become the palette's
+ * candle ochre and verdigris. Not part of the stylesheet every page waits for: the chat script
+ * loads this file once the page has loaded and only then shows the sphere
+ * (CLAUDE.md, the home page's performance budget).
+ */
+
+@layer components {
+  /* ---------- Trigger: a glass sphere ---------- */
+
+  .chat-trigger {
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    z-index: 45;
+    display: grid;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 38% 32%,
+      color-mix(in srgb, var(--glint) 40%, transparent) 0%,
+      color-mix(in srgb, var(--glint) 8%, transparent) 38%,
+      color-mix(in srgb, var(--color-canvas) 30%, transparent) 62%,
+      color-mix(in srgb, var(--color-canvas) 70%, transparent) 100%
+    );
+    backdrop-filter: blur(6px) saturate(180%);
+    box-shadow:
+      -6px 10px 32px color-mix(in srgb, var(--color-success) 38%, transparent),
+      6px 10px 32px color-mix(in srgb, var(--color-accent) 38%, transparent),
+      inset 0 2px 2px color-mix(in srgb, var(--glint) 55%, transparent),
+      inset 2px 0 2px color-mix(in srgb, var(--glint) 25%, transparent),
+      inset 0 -3px 8px color-mix(in srgb, var(--color-canvas) 40%, transparent),
+      inset -3px 0 8px color-mix(in srgb, var(--color-canvas) 25%, transparent);
+    cursor: pointer;
+    transition:
+      translate 250ms ease,
+      scale 250ms ease,
+      box-shadow 250ms ease,
+      opacity 200ms ease;
+    animation: chat-trigger-in 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+  }
+
+  /* Primary specular highlight, top left. */
+  .chat-trigger::before {
+    content: '';
+    position: absolute;
+    top: 9%;
+    left: 15%;
+    z-index: 2;
+    width: 36%;
+    height: 28%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--glint) 90%, transparent) 0%,
+      color-mix(in srgb, var(--glint) 35%, transparent) 40%,
+      transparent 68%
+    );
+    pointer-events: none;
+  }
+
+  /* Rim light, bottom right. */
+  .chat-trigger::after {
+    content: '';
+    position: absolute;
+    right: 13%;
+    bottom: 11%;
+    z-index: 2;
+    width: 28%;
+    height: 20%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--glint) 45%, transparent) 0%,
+      transparent 65%
+    );
+    pointer-events: none;
+  }
+
+  /* The liquid inside the sphere (the reference's Lottie): two lights turning slowly. */
+  .chat-orb {
+    width: 62%;
+    height: 62%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 35%, var(--color-accent) 0%, transparent 55%),
+      radial-gradient(circle at 70% 65%, var(--color-success) 0%, transparent 55%);
+    filter: blur(5px);
+    opacity: 0.9;
+  }
+
+  .chat-trigger:hover {
+    translate: 0 -3px;
+    scale: 1.05;
+    box-shadow:
+      -8px 12px 40px color-mix(in srgb, var(--color-success) 50%, transparent),
+      8px 12px 40px color-mix(in srgb, var(--color-accent) 50%, transparent),
+      inset 0 2px 2px color-mix(in srgb, var(--glint) 65%, transparent),
+      inset 2px 0 2px color-mix(in srgb, var(--glint) 30%, transparent),
+      inset 0 -3px 8px color-mix(in srgb, var(--color-canvas) 45%, transparent),
+      inset -3px 0 8px color-mix(in srgb, var(--color-canvas) 30%, transparent);
+  }
+
+  .chat-trigger[aria-expanded='true'] {
+    opacity: 0;
+    pointer-events: none;
+    translate: 0 8px;
+  }
+
+  .chat-tooltip {
+    position: fixed;
+    right: calc(2rem + 4.5rem + 0.75rem);
+    bottom: 3.25rem;
+    z-index: 46;
+    border-radius: var(--radius-control);
+    background-color: var(--color-ink);
+    padding: 0.375rem 0.625rem;
+    color: var(--color-canvas);
+    font-size: var(--text-eyebrow);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    translate: 4px 0;
+    transition:
+      opacity 200ms ease,
+      translate 200ms ease;
+  }
+
+  .chat-trigger:hover + .chat-tooltip,
+  .chat-tooltip[data-shown] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .chat-tooltip[data-shown] {
+    transition:
+      opacity 600ms var(--ease-out),
+      translate 600ms var(--ease-out);
+  }
+
+  .chat-trigger[aria-expanded='true'] + .chat-tooltip {
+    opacity: 0;
+  }
+
+  /* ---------- Panel ---------- */
+
+  .chat-panel {
+    --panel-width: 380px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    display: flex;
+    width: var(--panel-width);
+    flex-direction: column;
+    overflow: hidden;
+    border-left: 1px solid var(--color-line);
+    background-color: var(--color-canvas);
+    translate: 100% 0;
+    visibility: hidden;
+    transition:
+      translate 350ms cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0s linear 350ms;
+  }
+
+  .chat-panel[data-open] {
+    translate: 0 0;
+    visibility: visible;
+    box-shadow: -4px 0 40px color-mix(in srgb, var(--shadow-tint) 25%, transparent);
+    transition: translate 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* On wide screens the page makes room for the panel instead of hiding under it. */
+  @media (min-width: 48rem) {
+    body {
+      transition: padding-right 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body:has(.chat-panel[data-open]) {
+      padding-right: 380px;
+    }
+  }
+
+  /* On phones the panel is a full-height sheet from below, and the page behind stays put. */
+  @media (max-width: 47.99rem) {
+    .chat-trigger {
+      right: 1rem;
+      bottom: 1rem;
+    }
+
+    .chat-tooltip {
+      right: 1rem;
+      bottom: calc(1rem + 4.5rem + 0.5rem);
+      translate: 0 4px;
+    }
+
+    .chat-panel {
+      width: 100%;
+      height: 100dvh;
+      bottom: auto;
+      border-left: 0;
+      translate: 0 100%;
+      transition:
+        translate 450ms cubic-bezier(0.16, 0.7, 0.3, 1),
+        visibility 0s linear 450ms;
+    }
+
+    .chat-panel[data-open] {
+      translate: 0 0;
+      transition: translate 450ms cubic-bezier(0.16, 0.7, 0.3, 1);
+    }
+
+    html:has(.chat-panel[data-open]) {
+      overflow: hidden;
+    }
+
+    .chat-footer {
+      padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  .chat-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.75rem 1.25rem;
+  }
+
+  .chat-avatar {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(
+        circle at 30% 30%,
+        color-mix(in srgb, var(--color-accent) 55%, transparent),
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 70% 75%,
+        color-mix(in srgb, var(--color-success) 45%, transparent),
+        transparent 60%
+      ),
+      var(--color-surface-raised);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+    font-weight: 600;
+  }
+
+  .chat-icon-button {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-control);
+    color: var(--color-muted);
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .chat-icon-button:hover,
+  .chat-icon-button[aria-expanded='true'] {
+    background-color: var(--color-surface-raised);
+    color: var(--color-ink);
+  }
+
+  .chat-info {
+    position: absolute;
+    top: 4.25rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    z-index: 20;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-card);
+    padding: 0.75rem 1rem;
+    color: var(--color-muted);
+    font-size: var(--text-small);
+  }
+
+  /* ---------- Messages ---------- */
+
+  .chat-messages {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1.25rem;
+    scrollbar-width: thin;
+  }
+
+  .chat-messages[data-active] {
+    justify-content: flex-start;
+  }
+
+  .chat-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .chat-chip {
+    display: flex;
+    width: 100%;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-card);
+    padding: 0.625rem 0.875rem;
+    color: var(--color-muted);
+    font-size: var(--text-small);
+    text-align: left;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .chat-chip:hover:not(:disabled) {
+    border-color: var(--color-muted);
+    background-color: var(--color-surface-raised);
+    color: var(--color-ink);
+  }
+
+  .chat-chip:disabled {
+    opacity: 0.6;
+  }
+
+  .chat-message {
+    display: flex;
+    max-width: 85%;
+    flex-direction: column;
+    gap: 0.5rem;
+    animation: chat-fade-up 200ms ease both;
+  }
+
+  .chat-message[data-role='assistant'] {
+    align-self: flex-start;
+  }
+
+  .chat-message[data-role='user'] {
+    align-self: flex-end;
+  }
+
+  .chat-bubble {
+    border-radius: var(--radius-card);
+    padding: 0.625rem 0.875rem;
+    font-size: var(--text-small);
+    line-height: 1.55;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  .chat-message[data-role='assistant'] .chat-bubble {
+    border-bottom-left-radius: 0.25rem;
+    background-color: var(--color-surface-raised);
+    color: var(--color-ink);
+  }
+
+  .chat-message[data-role='user'] .chat-bubble {
+    border-bottom-right-radius: 0.25rem;
+    background-color: var(--color-ink);
+    color: var(--color-canvas);
+  }
+
+  .chat-bubble a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent-ink);
+    text-underline-offset: 3px;
+  }
+
+  .chat-bubble a:hover {
+    color: var(--color-accent-ink);
+  }
+
+  .chat-note {
+    color: var(--color-subtle);
+    font-size: var(--text-eyebrow);
+  }
+
+  .chat-typing {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding-block: 0.875rem;
+  }
+
+  .chat-typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-muted);
+    animation: chat-typing 1.2s infinite;
+  }
+
+  .chat-typing span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .chat-typing span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  .chat-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: 1px;
+    background-color: var(--color-accent);
+    vertical-align: text-bottom;
+    animation: chat-blink 0.7s infinite;
+  }
+
+  /* Cards for the case studies an answer points to. */
+  .chat-link-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-control);
+    background-color: var(--color-surface);
+    padding: 0.625rem 0.75rem;
+    transition:
+      border-color 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .chat-link-card:hover {
+    border-color: var(--color-muted);
+    background-color: var(--color-surface-raised);
+  }
+
+  .chat-link-icon {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    border-radius: var(--radius-control);
+    background-color: color-mix(in srgb, var(--color-accent) 18%, transparent);
+    color: var(--color-accent-ink);
+  }
+
+  /* ---------- Footer ---------- */
+
+  .chat-footer {
+    flex-shrink: 0;
+    border-top: 1px solid var(--color-line);
+    padding: 0.75rem 1rem;
+  }
+
+  .chat-input {
+    width: 100%;
+    min-height: 2.75rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-chip);
+    background-color: var(--color-surface);
+    padding: 0.625rem 3.25rem 0.625rem 1rem;
+    color: var(--color-ink);
+    /* At least 16 px, or iOS zooms the page when the field takes focus. */
+    font-size: 1rem;
+    transition: border-color 150ms ease;
+  }
+
+  .chat-input::placeholder {
+    color: var(--color-subtle);
+  }
+
+  .chat-input:focus-visible {
+    border-color: var(--color-ink);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--color-ink);
+  }
+
+  .chat-send {
+    position: absolute;
+    top: 50%;
+    right: 0.25rem;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+    translate: 0 -50%;
+    transition:
+      filter 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .chat-send:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+
+  .chat-send:disabled {
+    background-color: var(--color-line-strong);
+    color: var(--color-subtle);
+    cursor: not-allowed;
+  }
+}
+
+@keyframes chat-trigger-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+    scale: 0.85;
+  }
+}
+
+@keyframes chat-fade-up {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@keyframes chat-typing {
+  0%,
+  60%,
+  100% {
+    translate: 0 0;
+    opacity: 0.4;
+  }
+
+  30% {
+    translate: 0 -4px;
+    opacity: 1;
+  }
+}
+
+@keyframes chat-blink {
+  50% {
+    opacity: 0;
+  }
+}

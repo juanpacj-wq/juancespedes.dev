@@ -16,9 +16,11 @@ interface Props {
   navItems?: readonly NavItem[] | undefined;
   /** The same page in the other language; absent on pages that exist in one language only. */
   switchTo?: { readonly href: string; readonly locale: Locale } | null;
+  /** Label of the button that opens the floating chat; null when the chat is off. */
+  chatLabel?: string | null;
 }
 
-const { t, homeHref, navItems = [], switchTo = null } = Astro.props;
+const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.props;
 ---
 
 <header class="site-header sticky top-0 z-40 border-b border-line/60 bg-canvas/80 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70">
@@ -40,6 +42,19 @@ const { t, homeHref, navItems = [], switchTo = null } = Astro.props;
                 </a>
               </li>
             ))}
+            {chatLabel && (
+              <li>
+                <button
+                  type="button"
+                  class="transition-colors hover:text-ink"
+                  aria-expanded="false"
+                  aria-controls="chat-panel"
+                  data-chat-open
+                >
+                  {chatLabel}
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
       )}

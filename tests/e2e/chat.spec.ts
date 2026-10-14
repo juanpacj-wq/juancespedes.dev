@@ -3,7 +3,8 @@ import { expect, test, type Page } from '@playwright/test';
 
 /*
  * "Ask me" against the production build on workerd with the free fake model (CHAT_MODEL=fake in
- * .dev.vars). The real model is covered by the evaluation set (pnpm eval:chat), not here.
+ * .dev.vars). The real model is covered by the evaluation set (pnpm eval:chat), not here. The
+ * chat is a floating panel on every page, opened from the sphere in the bottom-right corner.
  */
 
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
@@ -20,7 +21,7 @@ const asNewVisitor = async (page: Page) => {
   );
 };
 
-const openChat = async (page: Page, path = '/') => {
+const openChat = async (page: Page, path = '/', name = 'Pregúntame') => {
   await page.addInitScript(() => {
     const store: string[] = [];
     Object.defineProperty(window, '__cspViolations', { value: store });
@@ -28,15 +29,18 @@ const openChat = async (page: Page, path = '/') => {
       store.push(`${event.violatedDirective} ${event.blockedURI}`);
     });
   });
-  await page.goto(`${path}#ask`);
-  const section = page.locator('#ask');
-  await section.scrollIntoViewIfNeeded();
-  await expect(section.locator('astro-island')).not.toHaveAttribute('ssr', { timeout: 15_000 });
-  // Turnstile test keys solve on their own; the button enables once a token exists.
-  await expect(section.getByRole('button', { name: 'Preguntar' })).toBeEnabled({
-    timeout: 20_000,
-  });
-  return section;
+  await page.goto(path);
+  await page.locator('.chat-trigger').click();
+  const panel = page.getByRole('dialog', { name });
+  await expect(panel).toBeVisible();
+  // Turnstile test keys solve on their own; the suggestions enable once a token exists.
+  await expect(panel.locator('[data-chat-example]').first()).toBeEnabled({ timeout: 20_000 });
+  return panel;
+};
+
+/** Waits until a fresh Turnstile token is ready for the next question. */
+const readyToAsk = async (panel: ReturnType<Page['getByRole']>) => {
+  await expect(panel.locator('[data-chat-example]').first()).toBeEnabled({ timeout: 20_000 });
 };
 
 test.describe('ask me', () => {
@@ -47,46 +51,59 @@ test.describe('ask me', () => {
     );
   });
 
-  test('a suggested question streams an answer that links to a case study', async ({ page }) => {
+  test('a suggested question streams an answer with a card to the case study', async ({ page }) => {
     await asNewVisitor(page);
-    const section = await openChat(page);
-    await section.getByRole('button', { name: '¿Ha trabajado con Oracle?' }).click();
+    const panel = await openChat(page);
+    await panel.getByRole('button', { name: '¿Ha trabajado con Oracle?' }).click();
 
-    const log = section.getByRole('log');
+    const log = panel.getByRole('log');
     await expect(log).toContainText('¿Ha trabajado con Oracle?');
-    const link = log.getByRole('link').first();
-    await expect(link).toHaveAttribute('href', /^\/proyectos\/[a-z0-9-]+$/);
-    await expect(section.getByRole('button', { name: 'Preguntar' })).toBeEnabled({
-      timeout: 20_000,
-    });
+    const inline = log.locator('.chat-bubble a').first();
+    await expect(inline).toHaveAttribute('href', /^\/proyectos\/[a-z0-9-]+$/);
+    const card = log.locator('.chat-link-card').first();
+    await expect(card).toHaveAttribute('href', /^\/proyectos\/[a-z0-9-]+$/);
 
-    await link.click();
+    await card.click();
     await expect(page).toHaveURL(/\/proyectos\/[a-z0-9-]+$/);
   });
 
   test('keeps the conversation for follow-up questions and can start over', async ({ page }) => {
     await asNewVisitor(page);
-    const section = await openChat(page);
-    const input = section.getByLabel('Tu pregunta');
+    const panel = await openChat(page);
+    const input = panel.getByLabel('Tu pregunta');
     await input.fill('¿Qué hizo en telemetría?');
     await input.press('Enter');
-    await expect(section.getByRole('log')).toContainText('Respuesta de prueba');
-    await expect(section.getByRole('button', { name: 'Preguntar' })).toBeEnabled({
-      timeout: 20_000,
-    });
+    await expect(panel.getByRole('log')).toContainText('Respuesta de prueba');
+    await readyToAsk(panel);
 
     await input.fill('¿Y con qué tecnologías?');
     await input.press('Enter');
-    await expect(section.getByRole('log')).toContainText('¿Y con qué tecnologías?');
-    await expect(section.getByRole('log').getByText('Asistente')).toHaveCount(2);
+    await expect(panel.getByRole('log')).toContainText('¿Y con qué tecnologías?');
+    await expect(panel.locator('.chat-message[data-role="assistant"]')).toHaveCount(2);
 
-    await section.getByRole('button', { name: 'Nueva conversación' }).click();
-    await expect(section.getByRole('log')).toHaveCount(0);
+    await panel.getByRole('button', { name: 'Nueva conversación' }).click();
+    await expect(panel.locator('.chat-message')).toHaveCount(0);
+    await expect(panel.getByRole('button', { name: '¿Ha trabajado con Oracle?' })).toBeVisible();
     expect(
       await page.evaluate(
         () => (window as unknown as { __cspViolations: string[] }).__cspViolations,
       ),
     ).toEqual([]);
+  });
+
+  test('the conversation follows the visitor to another page', async ({ page }) => {
+    await asNewVisitor(page);
+    const panel = await openChat(page);
+    await panel.getByRole('button', { name: '¿Ha trabajado con Oracle?' }).click();
+    await expect(panel.locator('.chat-message[data-role="assistant"]')).toContainText(
+      'Respuesta de prueba',
+    );
+
+    await page.goto('/proyectos/plant-telemetry');
+    await page.locator('.chat-trigger').click();
+    await expect(page.getByRole('dialog', { name: 'Pregúntame' }).getByRole('log')).toContainText(
+      '¿Ha trabajado con Oracle?',
+    );
   });
 
   test('explains a question that is too short without sending it', async ({ page }) => {
@@ -95,10 +112,10 @@ test.describe('ask me', () => {
     page.on('request', (request) => {
       if (request.url().endsWith('/api/chat')) sent += 1;
     });
-    const section = await openChat(page);
-    await section.getByLabel('Tu pregunta').fill('ok');
-    await section.getByRole('button', { name: 'Preguntar' }).click();
-    await expect(section.getByRole('status')).toHaveText(
+    const panel = await openChat(page);
+    await panel.getByLabel('Tu pregunta').fill('ok');
+    await panel.getByRole('button', { name: 'Enviar' }).click();
+    await expect(panel.getByRole('status')).toHaveText(
       'Escribe una pregunta de entre 3 y 500 caracteres.',
     );
     expect(sent).toBe(0);
@@ -106,17 +123,17 @@ test.describe('ask me', () => {
 
   test('says when the visitor asks too fast', async ({ page }) => {
     await asNewVisitor(page);
-    const section = await openChat(page);
-    const input = section.getByLabel('Tu pregunta');
-    const ask = section.getByRole('button', { name: 'Preguntar' });
+    const panel = await openChat(page);
+    const input = panel.getByLabel('Tu pregunta');
+    const send = panel.getByRole('button', { name: 'Enviar' });
     // Three questions per minute are allowed; the fourth is refused by the server.
     for (let index = 1; index <= 4; index += 1) {
-      await expect(ask).toBeEnabled({ timeout: 20_000 });
+      await readyToAsk(panel);
       await input.fill(`Pregunta número ${String(index)}`);
-      await ask.click();
-      await expect(ask).toBeDisabled();
+      await send.click();
+      await expect(send).toBeDisabled();
     }
-    await expect(section.getByRole('status')).toHaveText(
+    await expect(panel.getByRole('status')).toHaveText(
       'Hiciste varias preguntas seguidas. Espera un minuto e inténtalo de nuevo.',
       { timeout: 20_000 },
     );
@@ -124,27 +141,51 @@ test.describe('ask me', () => {
 
   test('is accessible with a conversation on screen', async ({ page }) => {
     await asNewVisitor(page);
-    const section = await openChat(page);
-    await section.getByRole('button', { name: '¿Ha trabajado con Oracle?' }).click();
-    await expect(section.getByRole('log').getByRole('link').first()).toBeVisible();
-    const results = await new AxeBuilder({ page }).include('#ask').withTags(WCAG).analyze();
+    const panel = await openChat(page);
+    await panel.getByRole('button', { name: '¿Ha trabajado con Oracle?' }).click();
+    await expect(panel.locator('.chat-link-card').first()).toBeVisible();
+    const results = await new AxeBuilder({ page })
+      .include('#chat-panel')
+      .include('.chat-trigger')
+      .withTags(WCAG)
+      .analyze();
     expect(results.violations).toEqual([]);
   });
 
-  test('speaks English on the English home page', async ({ page }) => {
+  test('speaks English on the English pages', async ({ page }) => {
     await asNewVisitor(page);
-    await page.goto('/en#ask');
-    const section = page.locator('#ask');
-    await section.scrollIntoViewIfNeeded();
-    await expect(section.getByRole('heading', { level: 2 })).toHaveText('Ask my portfolio');
-    await expect(section.getByRole('button', { name: 'Ask', exact: true })).toBeEnabled({
-      timeout: 20_000,
-    });
-    await section.getByRole('button', { name: 'Has he worked with Oracle?' }).click();
-    await expect(section.getByRole('log').getByRole('link').first()).toHaveAttribute(
+    const panel = await openChat(page, '/en', 'Ask me');
+    await panel.getByRole('button', { name: 'Has he worked with Oracle?' }).click();
+    await expect(panel.locator('.chat-link-card').first()).toHaveAttribute(
       'href',
       /^\/en\/projects\/[a-z0-9-]+$/,
     );
+  });
+});
+
+test.describe('chat panel', () => {
+  test('Escape closes it and gives focus back to the sphere', async ({ page }) => {
+    await page.goto('/');
+    const trigger = page.locator('.chat-trigger');
+    await trigger.click();
+    const panel = page.getByRole('dialog', { name: 'Pregúntame' });
+    await expect(panel).toBeVisible();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    await page.keyboard.press('Escape');
+    await expect(panel).toBeHidden();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(trigger).toBeFocused();
+  });
+
+  test('the header link opens it on wide screens', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'The section links live in the desktop header');
+    await page.goto('/proyectos/plant-telemetry');
+    await page
+      .getByRole('navigation', { name: 'Navegación principal' })
+      .getByRole('button', { name: 'Pregúntame' })
+      .click();
+    await expect(page.getByRole('dialog', { name: 'Pregúntame' })).toBeVisible();
   });
 });
 

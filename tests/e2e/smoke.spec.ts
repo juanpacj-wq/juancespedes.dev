@@ -5,7 +5,7 @@ test.describe('smoke', () => {
     await page.goto('/');
 
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Juan Céspedes');
+    await expect(page.getByRole('heading', { level: 1, name: /^Hola, soy Juan/ })).toBeVisible();
   });
 
   test('health endpoint reports ok and is not cached', async ({ request }) => {

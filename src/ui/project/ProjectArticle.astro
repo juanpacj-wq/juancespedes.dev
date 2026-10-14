@@ -3,6 +3,7 @@ import type { Project } from '../../domain/project/project';
 import type { Dictionary } from '../i18n/dictionary';
 import { formatPeriod } from '../i18n/format';
 import { projectPath, projectsListPath } from '../i18n/routes';
+import { Picture } from 'astro:assets';
 import Icon from '../icons/Icon.astro';
 import Badge from '../primitives/Badge.astro';
 import Card from '../primitives/Card.astro';
@@ -12,6 +13,7 @@ import Tag from '../primitives/Tag.astro';
 import TextLink from '../primitives/TextLink.astro';
 import ArchitectureDiagram from './ArchitectureDiagram.astro';
 import DetailSection from './DetailSection.astro';
+import { mediaFor } from './media';
 
 /**
  * A project page. Case studies follow the fixed template (problem, role, constraints, decisions,
@@ -29,6 +31,7 @@ interface Props {
 const { t, project, previous, next } = Astro.props;
 const { locale } = project;
 const two = (n: number) => String(n + 1).padStart(2, '0');
+const media = mediaFor(project.slug);
 ---
 
 <article>
@@ -49,6 +52,30 @@ const two = (n: number) => String(n + 1).padStart(2, '0');
       <h1 class="text-heading font-semibold text-balance sm:text-display">{project.title}</h1>
       <p class="max-w-3xl text-lead text-muted">{project.summary}</p>
     </div>
+
+    {media.cover && (
+      <figure class="flex flex-col gap-3">
+        {/* The home page card's screen turns into this cover (cross-document view transition). */}
+        <div
+          class="overflow-hidden rounded-panel bg-surface-raised shadow-bevel"
+          style={`view-transition-name: project-screen-${project.slug}`}
+        >
+          <Picture
+            src={media.cover.src}
+            alt=""
+            formats={['avif', 'webp']}
+            widths={[640, 960, 1280, 1600]}
+            sizes="(min-width: 1280px) 1216px, calc(100vw - 2rem)"
+            loading="eager"
+            fetchpriority="high"
+            class="aspect-[16/7] w-full object-cover"
+          />
+        </div>
+        {media.cover.stock && (
+          <figcaption class="text-small text-subtle">{t.project.stockNote}</figcaption>
+        )}
+      </figure>
+    )}
 
     <section aria-labelledby="facts-title" class="flex flex-col gap-4">
       <h2 id="facts-title" class="sr-only">
@@ -278,6 +305,33 @@ const two = (n: number) => String(n + 1).padStart(2, '0');
           {t.project.platform}: {project.platform}
         </p>
       </DetailSection>
+    )}
+
+    {media.gallery.length > 0 && (
+      <figure class="flex flex-col gap-3">
+        <ul class="grid gap-4 sm:grid-cols-2" aria-label={t.project.gallery}>
+          {media.gallery.map((image, index) => (
+            <li
+              class:list={[
+                'reveal overflow-hidden rounded-panel bg-surface-raised shadow-bevel',
+                media.gallery.length % 2 === 1 && index === 0 && 'sm:col-span-2',
+              ]}
+            >
+              <Picture
+                src={image.src}
+                alt=""
+                formats={['avif', 'webp']}
+                widths={[480, 800, 1200]}
+                sizes="(min-width: 640px) 50vw, 100vw"
+                class="aspect-[4/3] size-full object-cover transition-transform duration-700 ease-out hover:scale-103"
+              />
+            </li>
+          ))}
+        </ul>
+        {media.gallery.some((image) => image.stock) && (
+          <figcaption class="text-small text-subtle">{t.project.stockNote}</figcaption>
+        )}
+      </figure>
     )}
 
     <DetailSection id="stack" title={t.project.stack}>

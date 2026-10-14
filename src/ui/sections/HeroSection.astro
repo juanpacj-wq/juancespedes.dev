@@ -4,7 +4,6 @@ import monoFont from '@fontsource-variable/geist-mono/files/geist-mono-latin-wgh
 import type { Locale } from '../../domain/shared/locale';
 import AsciiArt from '../art/AsciiArt.astro';
 import type { Dictionary } from '../i18n/dictionary';
-import Icon from '../icons/Icon.astro';
 import Badge from '../primitives/Badge.astro';
 import Button from '../primitives/Button.astro';
 import Container from '../primitives/Container.astro';
@@ -12,17 +11,16 @@ import Container from '../primitives/Container.astro';
 interface Props {
   t: Dictionary;
   locale: Locale;
-  email: string;
-  githubUrl: string;
-  linkedinUrl: string;
 }
 
-const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
+const { t, locale } = Astro.props;
+const { roles } = t.hero;
 ---
 
 <!--
   Two layers: the painting fills the hero as a backdrop, the content stands centred in front of
-  it. The lamp follows the pointer anywhere on the stage (data-ascii-stage).
+  it, below Narcissus's face. The lamp follows the pointer anywhere on the stage
+  (data-ascii-stage).
 -->
 <!--
   The backdrop text is the largest paint of the page and is drawn in Geist Mono, which the
@@ -43,71 +41,112 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
   </div>
   <!-- A pool of shadow behind the text, so it reads over the brightest paint. -->
   <div class="hero-veil pointer-events-none absolute inset-0" aria-hidden="true"></div>
-  <Container class="hero-front relative flex min-h-svh flex-col items-center justify-center gap-7 pt-32 pb-28 text-center">
+  <Container class="hero-front relative flex min-h-svh flex-col items-center justify-center gap-6 pt-28 pb-24 text-center">
     <Badge tone="success" status>
       {t.availability.available}
     </Badge>
-    <div class="flex flex-col items-center gap-x-2 gap-y-1 text-lead sm:flex-row sm:flex-wrap sm:justify-center">
-      <h1 class="font-medium text-ink">{t.profile.name}</h1>
-      <span class="hidden text-muted sm:inline" aria-hidden="true">
-        ·
+    <!--
+      The headline is read once, whole, from the hidden copy. The visible one rotates the role
+      (the reference's title ticker): a column of roles, each moved up by the same step, plus a
+      copy of the first one at the end so the last step lands where it started.
+    -->
+    <h1 class="hero-title max-w-5xl font-display text-display font-light" data-role-heading>
+      <span class="sr-only">{t.hero.headlineText}</span>
+      <span aria-hidden="true" class="block">
+        <span class="block">{t.hero.greeting}</span>
+        <span class="role-line">
+          {t.hero.rolePrefix && (
+            <span class="role-prefix" data-role-prefix>
+              {t.hero.rolePrefix}
+            </span>
+          )}
+          <span class="role-ticker text-accent-ink" data-role-ticker>
+            {[...roles, roles[0]].map((role) => (
+              <span class="role-ticker-item">{role}</span>
+            ))}
+          </span>
+        </span>
       </span>
-      <p class="text-muted">{t.hero.intro}</p>
-    </div>
-    <p class="max-w-4xl font-display text-display font-light text-balance">{t.hero.headline}</p>
+    </h1>
     <p class="max-w-2xl text-lead text-pretty text-muted">{t.hero.pitch}</p>
-    <div class="hero-actions flex flex-wrap justify-center gap-3">
-      <Button href="#projects" icon="arrow-right" size="lg">
+    <div class="hero-actions flex flex-wrap justify-center gap-3 pt-2">
+      <Button href="#projects" icon="arrow-down" size="lg">
         {t.hero.primaryCta}
       </Button>
-      <Button href="#contact" variant="secondary" size="lg">
+      <Button href="#contact" variant="secondary" icon="arrow-right" size="lg">
         {t.hero.secondaryCta}
       </Button>
     </div>
-    <ul
-      class="flex flex-wrap items-center justify-center gap-1 text-small"
-      aria-label={t.hero.elsewhere}
-    >
-      <li>
-        <Button
-          href={githubUrl}
-          variant="ghost"
-          icon="github"
-          external
-          externalLabel={t.a11y.external}
-        >
-          GitHub
-        </Button>
-      </li>
-      <li>
-        <Button
-          href={linkedinUrl}
-          variant="ghost"
-          icon="linkedin"
-          external
-          externalLabel={t.a11y.external}
-        >
-          LinkedIn
-        </Button>
-      </li>
-      <li>
-        <Button href={`mailto:${email}`} variant="ghost" icon="mail">
-          {email}
-        </Button>
-      </li>
-    </ul>
-    <a
-      href="#projects"
-      class="mt-4 hidden min-h-11 items-center gap-4 text-small text-muted transition-colors duration-150 hover:text-ink lg:flex"
-    >
-      <span>{t.hero.scrollLead}</span>
-      <span class="h-px w-28 bg-line-strong" aria-hidden="true"></span>
-      <Icon name="mouse" size={22} />
-      <span class="h-px w-28 bg-line-strong" aria-hidden="true"></span>
-      <span>{t.hero.scrollTail}</span>
-    </a>
   </Container>
 </section>
+
+<script>
+  /*
+   * Rotates the role every few seconds, one full turn, then rests on the first role: moving text
+   * that never stops would need a pause control (WCAG 2.2.2). Only a transform changes, so no
+   * frame repaints the glyphs or moves anything around them. Without motion it never starts.
+   */
+  const HOLD_MS = 2600;
+  const ticker = document.querySelector<HTMLElement>('[data-role-ticker]');
+  const prefix = document.querySelector<HTMLElement>('[data-role-prefix]');
+  const first = ticker?.firstElementChild;
+
+  /*
+   * The ticker is as wide as the longest role and each role is centred in it, so a short role
+   * leaves a gap between it and the prefix ("ingeniero"). The prefix closes the gap with a
+   * transform, never with layout, so nothing shifts. When the prefix wraps onto its own line
+   * (narrow screens) there is no gap to close.
+   */
+  const closeGap = (index: number) => {
+    if (!ticker || !prefix) return;
+    const role = ticker.children[index] as HTMLElement | undefined;
+    const sameLine = Math.abs(prefix.offsetTop - ticker.offsetTop) < 4;
+    const gap = role && sameLine ? (ticker.offsetWidth - role.offsetWidth) / 2 : 0;
+    prefix.style.setProperty('--gap', `${gap.toFixed(1)}px`);
+  };
+  if (ticker && prefix) {
+    void document.fonts.ready.then(() => {
+      closeGap(0);
+      // Slide only from now on: the first placement must not animate.
+      requestAnimationFrame(() => {
+        prefix.dataset['measured'] = '';
+      });
+    });
+    new ResizeObserver(() => {
+      closeGap(Number(ticker.style.getPropertyValue('--role') || '0'));
+    }).observe(ticker.parentElement ?? ticker);
+  }
+
+  if (ticker && first && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    const last = ticker.childElementCount - 1;
+    let index = 0;
+    let hovered = false;
+    const heading = ticker.closest('h1');
+    heading?.addEventListener('pointerenter', () => (hovered = true));
+    heading?.addEventListener('pointerleave', () => (hovered = false));
+
+    const tick = () => {
+      // Wait while the reader looks at it, or while nobody can see it.
+      if (hovered || document.hidden) {
+        setTimeout(tick, 600);
+        return;
+      }
+      index += 1;
+      ticker.style.setProperty('--role', String(index));
+      closeGap(index);
+    };
+    first.addEventListener('transitionend', () => {
+      if (index < last) {
+        setTimeout(tick, HOLD_MS);
+        return;
+      }
+      // The copy of the first role is showing: jump back to the real one without a transition.
+      ticker.dataset['settled'] = '';
+      ticker.style.setProperty('--role', '0');
+    });
+    setTimeout(tick, HOLD_MS);
+  }
+</script>
 
 <style>
   /* The painting as a backdrop covering the whole screen, bar included. It is drawn 10 % wider
@@ -128,8 +167,6 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
   }
 
   .hero-art :global(.ascii-art) {
-    /* --ratio is set on the figure itself, so the size is worked out here. Percentages are of
-       the hero's width, in the width and in both margins alike. */
     --width: max(var(--stage) * var(--ratio), 110%);
     flex: none;
     width: var(--width);
@@ -143,15 +180,11 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
     }
   }
 
-  /* Behind the text the figure is a presence, not a picture: dimmer, fading into the ground at
-     its edges. The lamp and the switch let its colours through. */
   .hero-art :global(.ascii-canvas) {
-    opacity: 0.55;
-    /* Fades into the page below, where the water (the reflection) would be. */
+    opacity: 0.5;
     mask-image: linear-gradient(to bottom, black 62%, transparent 100%);
   }
 
-  /* The caption and the switch sit on the bottom edge of the hero, aligned with the content. */
   .hero-art :global(figcaption) {
     position: absolute;
     inset-inline: max(1rem, (100% - 80rem) / 2 + 2rem);
@@ -164,22 +197,19 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
     background:
       linear-gradient(color-mix(in srgb, var(--color-canvas) 75%, transparent), transparent 7rem),
       radial-gradient(
-        ellipse 40% 46% at 50% 48%,
-        color-mix(in srgb, var(--color-canvas) 70%, transparent),
+        ellipse 42% 46% at 50% 52%,
+        color-mix(in srgb, var(--color-canvas) 72%, transparent),
         transparent 100%
       ),
       radial-gradient(
-        50% 60% at 50% 42%,
+        50% 60% at 50% 45%,
         color-mix(in srgb, var(--color-accent) 8%, transparent),
         transparent 70%
       );
   }
 
-  /* The front layer lets clicks through to the painting between its blocks. Container renders
-     it, so the rule reaches it from the section. */
   .hero :global(.hero-front) {
     pointer-events: none;
-    /* A halo of the ground colour lifts the text off the glyphs behind it, in both themes. */
     text-shadow:
       0 0 0.35rem var(--color-canvas),
       0 0 1.25rem var(--color-canvas);
@@ -189,7 +219,6 @@ const { t, locale, email, githubUrl, linkedinUrl } = Astro.props;
     pointer-events: auto;
   }
 
-  /* The filled buttons carry their own ground; a dark halo on them would only lower contrast. */
   .hero-actions {
     text-shadow: none;
   }

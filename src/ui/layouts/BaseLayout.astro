@@ -5,7 +5,11 @@ import '@fontsource-variable/geist-mono';
 import displayFont from '../../assets/fonts/literata-display.woff2?url';
 import '../styles/global.css';
 
-import { PUBLIC_WEB_ANALYTICS_TOKEN } from 'astro:env/client';
+import {
+  PUBLIC_CHAT_ENABLED,
+  PUBLIC_TURNSTILE_SITE_KEY,
+  PUBLIC_WEB_ANALYTICS_TOKEN,
+} from 'astro:env/client';
 import { APP_VERSION } from 'astro:env/server';
 
 import { SUPPORTED_LOCALES, type Locale } from '../../domain/shared/locale';
@@ -20,6 +24,7 @@ import {
 } from '../i18n/routes';
 import { toJsonLd, type JsonLd } from '../seo/structured-data';
 import { absoluteUrl, SITE } from '../site';
+import ChatDrawer from '../chat/ChatDrawer.astro';
 import ErrorReporter from '../chrome/ErrorReporter.astro';
 import SiteFooter from '../chrome/SiteFooter.astro';
 import SiteHeader, { type NavItem } from '../chrome/SiteHeader.astro';
@@ -128,6 +133,7 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
       homeHref={alternates ? alternates[locale] : '/'}
       navItems={navItems}
       switchTo={switchTo}
+      chatLabel={PUBLIC_CHAT_ENABLED ? t.chat.open : null}
     />
     <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
       <slot />
@@ -139,6 +145,9 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
       notesHref={notesPath(locale)}
       nowHref={nowPath(locale)}
     />
+    {PUBLIC_CHAT_ENABLED && (
+      <ChatDrawer t={t} locale={locale} email={SITE.email} siteKey={PUBLIC_TURNSTILE_SITE_KEY} />
+    )}
     <ErrorReporter />
   </body>
 </html>

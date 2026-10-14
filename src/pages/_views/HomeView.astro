@@ -1,13 +1,10 @@
 ---
-import { PUBLIC_CHAT_ENABLED } from 'astro:env/client';
-
 import { container } from '../../composition/container';
 import type { Locale } from '../../domain/shared/locale';
 import { dictionaryFor } from '../../ui/i18n/dictionary';
 import { homePath, privacyPath } from '../../ui/i18n/routes';
 import BaseLayout from '../../ui/layouts/BaseLayout.astro';
 import AboutSection from '../../ui/sections/AboutSection.astro';
-import AskSection from '../../ui/sections/AskSection.astro';
 import CapabilitiesSection from '../../ui/sections/CapabilitiesSection.astro';
 import ContactSection from '../../ui/sections/ContactSection.astro';
 import CredentialsSection from '../../ui/sections/CredentialsSection.astro';
@@ -60,13 +57,7 @@ const jsonLd = homeGraph({
   navItems={navItems}
   jsonLd={jsonLd}
 >
-  <HeroSection
-    t={t}
-    locale={locale}
-    email={SITE.email}
-    githubUrl={SITE.githubUrl}
-    linkedinUrl={SITE.linkedinUrl}
-  />
+  <HeroSection t={t} locale={locale} />
   <MetricsSection t={t} metrics={metrics} />
   <ProjectsSection t={t} projects={projects} />
   <AboutSection t={t} />
@@ -86,6 +77,12 @@ const jsonLd = homeGraph({
     pricing={profile.pricing}
   />
   <CredentialsSection t={t} locale={locale} credentials={profile.credentials} />
-  {PUBLIC_CHAT_ENABLED && <AskSection t={t} locale={locale} email={SITE.email} />}
-  <ContactSection t={t} locale={locale} email={SITE.email} privacyHref={privacyPath(locale)} />
+  <ContactSection
+    t={t}
+    locale={locale}
+    email={SITE.email}
+    privacyHref={privacyPath(locale)}
+    githubUrl={SITE.githubUrl}
+    linkedinUrl={SITE.linkedinUrl}
+  />
 </BaseLayout>

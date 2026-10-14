@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './hero.css';
 
 /*
  * Design tokens: the only place where raw color, type, radius, shadow and motion values live.
@@ -33,6 +34,8 @@
   --ascii: light-dark(#a8540f, #e8a33a);
   --bevel: light-dark(#000000, #ffffff);
   --shadow-tint: light-dark(#6b6259, #000000);
+  /* Specular light on glass (the chat button): white in both themes, never text. */
+  --glint: light-dark(#ffffff, #ffffff);
 }
 
 :root[data-theme='light'] {
@@ -190,6 +193,19 @@
       }
     }
   }
+}
+
+/* Cross-document view transition: a home page card's screen becomes its project page's cover
+   (ADR 0019). Both pages must opt in, so it lives here and not in the deferred card styles. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+::view-transition-group(*) {
+  animation-duration: 450ms;
+  animation-timing-function: var(--ease-out);
 }
 
 @keyframes reveal {

@@ -69,25 +69,27 @@ Imports may only point inward. Two independent tools check it on every pull requ
 
 ## Decisions
 
-| ADR                                                      | Decision                                                                  |
-| -------------------------------------------------------- | ------------------------------------------------------------------------- |
-| [0001](docs/adr/0001-layered-architecture.md)            | Layered architecture in a mostly static site, and where it stops          |
-| [0002](docs/adr/0002-astro-with-react-islands.md)        | Astro with React islands                                                  |
-| [0003](docs/adr/0003-cloudflare-workers-hosting.md)      | Cloudflare Workers with static assets                                     |
-| [0004](docs/adr/0004-projects-as-typed-content.md)       | Projects as typed content, extensible by kind                             |
-| [0005](docs/adr/0005-i18n-by-route.md)                   | Spanish and English by route                                              |
-| [0006](docs/adr/0006-tailwind-on-design-tokens.md)       | Tailwind CSS v4 on design tokens                                          |
-| [0007](docs/adr/0007-testing-strategy.md)                | Testing strategy and quality gates                                        |
-| [0008](docs/adr/0008-content-validation-layers.md)       | Content validated in three layers: schema, domain rules, cross-file tests |
-| [0009](docs/adr/0009-theming-and-design-tokens.md)       | Theming with light-dark() tokens; raw colors rejected in CI               |
-| [0010](docs/adr/0010-contact-form-delivery.md)           | Contact form on Email Routing and Turnstile; fails closed; stores nothing |
-| [0011](docs/adr/0011-case-study-pages.md)                | Case study pages: fixed template, diagrams as data, private denylist      |
-| [0012](docs/adr/0012-bilingual-routes-and-seo.md)        | Spanish at the root, English under /en; hreflang, sitemap, JSON-LD, OG    |
-| [0013](docs/adr/0013-launch-hardening-and-operations.md) | Security headers, monitoring without third parties, gated releases        |
-| [0014](docs/adr/0014-mutation-testing.md)                | Mutation testing of the domain with Stryker, weekly                       |
-| [0015](docs/adr/0015-notes-and-now-page.md)              | Technical notes and a "now" page as validated, bilingual content          |
-| [0016](docs/adr/0016-command-palette.md)                 | Ctrl+K command palette with a native dialog, no UI framework              |
-| [0017](docs/adr/0017-ask-me-chat.md)                     | "Ask me" chat with a cached corpus, quotas and an evaluation set          |
+| ADR                                                         | Decision                                                                  |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [0001](docs/adr/0001-layered-architecture.md)               | Layered architecture in a mostly static site, and where it stops          |
+| [0002](docs/adr/0002-astro-with-react-islands.md)           | Astro with React islands                                                  |
+| [0003](docs/adr/0003-cloudflare-workers-hosting.md)         | Cloudflare Workers with static assets                                     |
+| [0004](docs/adr/0004-projects-as-typed-content.md)          | Projects as typed content, extensible by kind                             |
+| [0005](docs/adr/0005-i18n-by-route.md)                      | Spanish and English by route                                              |
+| [0006](docs/adr/0006-tailwind-on-design-tokens.md)          | Tailwind CSS v4 on design tokens                                          |
+| [0007](docs/adr/0007-testing-strategy.md)                   | Testing strategy and quality gates                                        |
+| [0008](docs/adr/0008-content-validation-layers.md)          | Content validated in three layers: schema, domain rules, cross-file tests |
+| [0009](docs/adr/0009-theming-and-design-tokens.md)          | Theming with light-dark() tokens; raw colors rejected in CI               |
+| [0010](docs/adr/0010-contact-form-delivery.md)              | Contact form on Email Routing and Turnstile; fails closed; stores nothing |
+| [0011](docs/adr/0011-case-study-pages.md)                   | Case study pages: fixed template, diagrams as data, private denylist      |
+| [0012](docs/adr/0012-bilingual-routes-and-seo.md)           | Spanish at the root, English under /en; hreflang, sitemap, JSON-LD, OG    |
+| [0013](docs/adr/0013-launch-hardening-and-operations.md)    | Security headers, monitoring without third parties, gated releases        |
+| [0014](docs/adr/0014-mutation-testing.md)                   | Mutation testing of the domain with Stryker, weekly                       |
+| [0015](docs/adr/0015-notes-and-now-page.md)                 | Technical notes and a "now" page as validated, bilingual content          |
+| [0016](docs/adr/0016-command-palette.md)                    | Ctrl+K command palette with a native dialog, no UI framework              |
+| [0017](docs/adr/0017-ask-me-chat.md)                        | "Ask me" chat with a cached corpus, quotas and an evaluation set          |
+| [0018](docs/adr/0018-chiaroscuro-redesign.md)               | Chiaroscuro identity: ASCII painting hero, visible prices                 |
+| [0019](docs/adr/0019-reference-hero-chat-and-case-cards.md) | Rotating role in the hero, floating chat, case-study cards                |
 
 ## Quality gates
 

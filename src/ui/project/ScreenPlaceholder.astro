@@ -1,0 +1,81 @@
+---
+/**
+ * A drawn app window that stands in for a project screenshot until the real one is dropped in
+ * src/assets/projects/<slug>/card.* (see media.ts). It costs no request and looks the same in
+ * both themes. The bar heights come from the slug, so each project gets its own chart.
+ * Decorative: the card around it carries the meaning.
+ *
+ * Short classes styled in cards.css (the deferred card sheet), not Tailwind utilities: seven of
+ * these sit in the home page's HTML, and every byte of it is on the way to the first paint.
+ */
+interface Props {
+  slug: string;
+  compact?: boolean;
+}
+
+const { slug, compact = false } = Astro.props;
+
+// A small deterministic sequence from the slug (FNV-1a, then a linear congruential step).
+let seed = [...slug].reduce(
+  (hash, char) => Math.imul(hash ^ char.charCodeAt(0), 16777619),
+  2166136261,
+);
+const next = () => {
+  seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+  return seed / 2 ** 32;
+};
+const bars = Array.from({ length: compact ? 9 : 14 }, () => Math.round(28 + next() * 68));
+const rows = Array.from({ length: compact ? 2 : 4 }, () => Math.round(40 + next() * 45));
+const tiles = compact ? 2 : 3;
+---
+
+<div class:list={['sp', compact && 'sp-compact']}>
+  <div class="sp-top">
+    <i></i>
+    <i></i>
+    <i></i>
+    <span>/{slug}</span>
+  </div>
+  <div class="sp-body">
+    {!compact && (
+      <div class="sp-side">
+        <b />
+        <i style="width:70%" />
+        <i style="width:55%" />
+        <i style="width:80%" />
+        <i style="width:50%" />
+        <i style="width:65%" />
+      </div>
+    )}
+    <div class="sp-main">
+      <div class="sp-head">
+        <i></i>
+        <b></b>
+      </div>
+      <div class="sp-tiles">
+        {Array.from({ length: tiles }, (_, index) => (
+          <div>
+            <i />
+            <b class:list={[index === 0 && 'sp-hot']} />
+          </div>
+        ))}
+      </div>
+      <div class="sp-chart">
+        {bars.map((height, index) => (
+          <i
+            class:list={[index === bars.length - 3 && 'sp-hot']}
+            style={`height:${String(height)}%`}
+          />
+        ))}
+      </div>
+      <div class="sp-rows">
+        {rows.map((width) => (
+          <div>
+            <b />
+            <i style={`width:${String(width)}%`} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>

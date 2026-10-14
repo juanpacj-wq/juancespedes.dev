@@ -89,19 +89,18 @@ test.describe('bilingual site and SEO', () => {
     await page.goto('/en');
     await expect(page.locator('main h2')).toHaveText([
       'Results you can verify',
-      'Systems in production and open source',
+      'Featured case studies',
       "Who's behind the work",
       'Every skill, with the project that proves it',
       'Experience and education',
       'Services and prices',
       'Education and certifications',
-      'Ask my portfolio',
       'Tell me what you need',
     ]);
-    const esRows = await page.request
+    const esCards = await page.request
       .get('/')
-      .then(async (r) => (await r.text()).match(/data-capabilities=/g)?.length);
-    await expect(page.locator('#projects li[data-capabilities]')).toHaveCount(esRows ?? 0);
+      .then(async (r) => (await r.text()).match(/<article[^>]*data-tilt/g)?.length);
+    await expect(page.locator('#projects article[data-tilt]')).toHaveCount(esCards ?? 0);
 
     await page.locator('#project-plant-telemetry').getByRole('link').click();
     await expect(page).toHaveURL(/\/en\/projects\/plant-telemetry$/);
