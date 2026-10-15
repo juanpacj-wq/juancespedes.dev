@@ -1,0 +1,107 @@
+---
+kind: case-study
+title: A bridge that lets an AI agent read and edit Figma desktop
+summary: A Figma development plugin and a local Python server that let an AI agent read, export, create, modify and delete nodes and frames in Figma desktop, without going through the REST API or its quota.
+role: Sole author, from diagnosing the quota to the plugin, the server and their docs
+period: { start: '2026-07', end: null }
+capabilities: [automation-ai, frontend]
+stack:
+  - Python
+  - JavaScript
+  - Figma
+  - REST APIs
+  - WordPress
+metrics:
+  - value: '0'
+    label: Figma REST API calls per extraction, against a cap of 6 a month on the available plan
+    source: Bridge tests against real Figma and Figma's rate limit docs, July 2026
+  - value: '7'
+    label: job types, from reading the file tree to creating, modifying and deleting nodes
+    source: Bridge README, October 2026
+  - value: '1 to 1'
+    label: outputs identical byte for byte to those of the previous REST API flow
+    source: Extractions of the same frame through both paths compared, July 2026
+featured: false
+order: 7
+status: published
+confidentiality: anonymized
+story:
+  hook: 'Building a site from the design meant reading Figma, and the available plan allowed six requests a month.'
+  shifts:
+    - before: 'Six requests a month to Figma, and every page of the site spent several.'
+      after: 'The agent reads the design as often as it needs, with no quota.'
+    - before: 'The agent could only look at the design.'
+      after: 'The agent creates and adjusts frames, text and images right on the canvas.'
+    - before: 'A wrong change in Figma had to be undone by hand.'
+      after: 'Every job is a single undo step, and only what the bridge created can be deleted.'
+problem: The team was building a corporate WordPress site from a Figma design, with an AI agent extracting each frame. The available account had a view-only seat, and with that seat Figma allows six calls a month to both the REST API and its official MCP server. A single page spent several. On top of that, the agent had no way to write to the design to propose variants.
+responsibilities:
+  - Diagnosed the real quota limit and checked which calls spent it.
+  - Designed the job protocol between the command line, the local server and the plugin.
+  - Wrote the Figma plugin, the Python server and the usage and troubleshooting docs.
+  - Validated the outputs byte for byte against the previous flow, so the existing tools kept working unchanged.
+constraints:
+  - View-only access to the original file, where plugins do not run.
+  - The plugin can only reach the local machine and has to stay open while it works.
+  - Figma reloads or closes the plugin now and then, so no job may be left half done without notice.
+  - Writing to the design must never delete or damage the design team's work.
+decisions:
+  - title: Read and write from inside the editor
+    rationale: A development plugin runs with the user's session and uses the official plugin API, so reading the document and exporting images goes through no meter and returns the same pixels as the Export button.
+    alternatives:
+      - Paying for a developer seat just to get quota
+      - Reading the web app with an automated browser
+      - Waiting for the quota to reset every month
+  - title: A job queue that only the command line can fill
+    rationale: The server listens only on the local machine and rejects any request that carries an origin header, so a page open in the browser cannot queue changes to the design.
+    alternatives:
+      - An HTTP server open to any local client
+  - title: All or nothing, and a single undo step
+    rationale: If one node fails, the plugin removes what it had already created and the error gives the node's exact path. Every job lands in Figma as a single undo step.
+    alternatives:
+      - Creating whatever works and reporting the failures at the end
+  - title: Delete only what the bridge created
+    rationale: Every node it creates carries a mark in the plugin data, and deleting refuses to touch any node without it. The original design cannot be deleted through the bridge.
+    alternatives:
+      - Allowing any node to be deleted by its id
+  - title: Every job is addressed to a file by name
+    rationale: With two copies of the design open, a job once extracted from the wrong file without any warning. Since then the server only hands a job to the plugin that has the requested file open.
+    alternatives:
+      - Handing each job to the first plugin that asks
+architecture:
+  summary: The agent queues jobs from the command line. A local Python server stores them, and the plugin, open in Figma desktop, picks them up every two seconds, runs them with the plugin API and returns JSON files, images or the nodes it created.
+  layers:
+    - name: Agent
+      nodes:
+        - { id: agent, label: 'AI agent', detail: 'Decides what to read or change in the design' }
+        - { id: cli, label: 'Command line', detail: 'Queues, waits for and retries jobs' }
+    - name: Local bridge
+      nodes:
+        - { id: bridge, label: 'Python server', detail: 'Job queue, local machine only' }
+    - name: Figma desktop
+      nodes:
+        - {
+            id: plugin,
+            label: 'Development plugin',
+            detail: 'Reads, exports, creates, modifies and deletes',
+          }
+        - { id: canvas, label: 'Copy of the design', detail: 'Frames, nodes, text and images' }
+    - name: Outputs
+      nodes:
+        - { id: outputs, label: 'Project files', detail: 'Node JSON, WebP images and renders' }
+  flows:
+    - { from: agent, to: cli, label: 'Requested job' }
+    - { from: cli, to: bridge, label: 'Queue' }
+    - { from: plugin, to: bridge, label: 'Polls every 2 s' }
+    - { from: plugin, to: canvas, label: 'Figma plugin API' }
+    - { from: bridge, to: outputs, label: 'Result of each job' }
+outcomes:
+  - The site's extractions no longer depend on a quota of six calls a month.
+  - The agent can propose new sections as real frames in Figma, which the team reviews and adjusts on the same canvas.
+  - The extraction and fidelity check tools kept working unchanged, because the outputs are identical.
+lessons:
+  - I would address every job to a file by name from day one, instead of finding out through a wrong extraction.
+  - I would also expose the bridge as an MCP server, so any assistant can use it without knowing the command line.
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

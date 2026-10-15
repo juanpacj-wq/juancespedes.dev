@@ -121,7 +121,7 @@ test.describe('hero headline', () => {
 test.describe('project cards', () => {
   test('featured cases get the wide card and the rest share a grid', async ({ page }) => {
     await page.goto('/#projects');
-    await expect(page.locator('#projects .project-card--feature')).toHaveCount(4);
+    await expect(page.locator('#projects .project-card--feature')).toHaveCount(5);
     await expect(page.locator('#projects .project-card--compact')).toHaveCount(3);
     // One link per card, named by the project's title.
     const card = page.locator('#project-operations-logbook');

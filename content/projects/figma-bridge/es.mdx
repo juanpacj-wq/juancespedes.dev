@@ -1,0 +1,115 @@
+---
+kind: case-study
+title: Un puente para que un agente de IA lea y edite Figma de escritorio
+summary: Un plugin de desarrollo de Figma y un servidor local en Python que le permiten a un agente de IA leer, exportar, crear, modificar y borrar nodos y frames en Figma de escritorio, sin pasar por la API REST ni por su cuota.
+role: Autor único, del diagnóstico de la cuota al plugin, el servidor y su documentación
+period: { start: '2026-07', end: null }
+capabilities: [automation-ai, frontend]
+stack:
+  - Python
+  - JavaScript
+  - Figma
+  - REST APIs
+  - WordPress
+metrics:
+  - value: '0'
+    label: llamadas a la API REST de Figma por extracción, frente a un tope de 6 al mes con el plan disponible
+    source: Pruebas del puente contra Figma real y documentación de límites de Figma, julio de 2026
+  - value: '7'
+    label: tipos de trabajo, de leer el árbol del archivo a crear, modificar y borrar nodos
+    source: README del puente, octubre de 2026
+  - value: '1 a 1'
+    label: salidas idénticas byte a byte a las del flujo anterior por la API REST
+    source: Comparación de extracciones del mismo frame por las dos vías, julio de 2026
+featured: false
+order: 7
+status: published
+confidentiality: anonymized
+story:
+  hook: 'Para construir un sitio desde el diseño había que leer Figma, y el plan disponible solo permitía seis consultas al mes.'
+  shifts:
+    - before: 'Seis consultas al mes a Figma, y cada página del sitio gastaba varias.'
+      after: 'El agente lee el diseño las veces que haga falta, sin cuota.'
+    - before: 'El agente solo podía mirar el diseño.'
+      after: 'El agente crea y ajusta frames, textos e imágenes directamente en el lienzo.'
+    - before: 'Un cambio equivocado en Figma había que deshacerlo a mano.'
+      after: 'Cada trabajo es un solo paso de deshacer, y solo se borra lo que el puente creó.'
+problem: El equipo construía un sitio corporativo en WordPress a partir de un diseño en Figma, con un agente de IA extrayendo cada frame. La cuenta disponible tenía un asiento de solo lectura, y con ese asiento Figma permite seis llamadas al mes tanto a la API REST como a su servidor MCP oficial. Una sola página gastaba varias. Además, el agente no tenía forma de escribir en el diseño para proponer variantes.
+responsibilities:
+  - Diagnostiqué el límite real de la cuota y verifiqué qué llamadas lo consumían.
+  - Diseñé el protocolo de trabajos entre la línea de comandos, el servidor local y el plugin.
+  - Escribí el plugin de Figma, el servidor en Python y la documentación de uso y de solución de problemas.
+  - Validé las salidas byte a byte contra el flujo anterior para que las herramientas existentes siguieran funcionando sin cambios.
+constraints:
+  - Acceso de solo lectura al archivo original, donde los plugins no corren.
+  - El plugin solo puede conectarse a la máquina local y debe quedar abierto durante el trabajo.
+  - Figma recarga o cierra el plugin a ratos, así que ningún trabajo puede quedar a medias sin aviso.
+  - Escribir en el diseño no puede borrar ni dañar el trabajo del equipo de diseño.
+decisions:
+  - title: Leer y escribir desde dentro del editor
+    rationale: Un plugin de desarrollo corre con la sesión del usuario y usa la API oficial de plugins, así que leer el documento y exportar imágenes no pasa por ningún medidor y entrega los mismos píxeles que el botón Exportar.
+    alternatives:
+      - Pagar un asiento de desarrollo solo para tener cuota
+      - Leer la aplicación web con un navegador automatizado
+      - Esperar cada mes a que la cuota se renueve
+  - title: Una cola de trabajos que solo llena la línea de comandos
+    rationale: El servidor escucha solo en la máquina local y rechaza cualquier petición que traiga cabecera de origen, así que una página abierta en el navegador no puede encolar cambios en el diseño.
+    alternatives:
+      - Un servidor HTTP abierto a cualquier cliente local
+  - title: Todo o nada, y un solo paso de deshacer
+    rationale: Si un nodo falla, el plugin retira lo que alcanzó a crear y el error dice la ruta exacta del nodo. Cada trabajo queda como un único paso de deshacer en Figma.
+    alternatives:
+      - Crear lo que se pueda y reportar los fallos al final
+  - title: Borrar solo lo que el puente creó
+    rationale: Cada nodo creado lleva una marca en los datos del plugin, y el borrado se niega a tocar cualquier nodo sin ella. El diseño original no se puede borrar desde el puente.
+    alternatives:
+      - Permitir borrar cualquier nodo por su identificador
+  - title: Cada trabajo va dirigido a un archivo por su nombre
+    rationale: Con dos copias del diseño abiertas, un trabajo llegó a extraer del archivo equivocado sin avisar. Desde entonces el servidor solo entrega un trabajo al plugin que tiene abierto el archivo pedido.
+    alternatives:
+      - Entregar cada trabajo al primer plugin que pregunte
+architecture:
+  summary: El agente encola trabajos con la línea de comandos. Un servidor local en Python los guarda y el plugin, abierto en Figma de escritorio, los toma cada dos segundos, los ejecuta con la API de plugins y devuelve archivos JSON, imágenes o los nodos creados.
+  layers:
+    - name: Agente
+      nodes:
+        - { id: agent, label: 'Agente de IA', detail: 'Decide qué leer o cambiar en el diseño' }
+        - { id: cli, label: 'Línea de comandos', detail: 'Encola, espera y reintenta trabajos' }
+    - name: Puente local
+      nodes:
+        - {
+            id: bridge,
+            label: 'Servidor en Python',
+            detail: 'Cola de trabajos, solo en la máquina local',
+          }
+    - name: Figma de escritorio
+      nodes:
+        - {
+            id: plugin,
+            label: 'Plugin de desarrollo',
+            detail: 'Lee, exporta, crea, modifica y borra',
+          }
+        - { id: canvas, label: 'Copia del diseño', detail: 'Frames, nodos, textos e imágenes' }
+    - name: Salidas
+      nodes:
+        - {
+            id: outputs,
+            label: 'Archivos del proyecto',
+            detail: 'JSON de nodos, imágenes WebP y renders',
+          }
+  flows:
+    - { from: agent, to: cli, label: 'Trabajo pedido' }
+    - { from: cli, to: bridge, label: 'Encolar' }
+    - { from: plugin, to: bridge, label: 'Consulta cada 2 s' }
+    - { from: plugin, to: canvas, label: 'API de plugins de Figma' }
+    - { from: bridge, to: outputs, label: 'Resultado de cada trabajo' }
+outcomes:
+  - Las extracciones del sitio dejaron de depender de una cuota de seis llamadas al mes.
+  - El agente puede proponer secciones nuevas como frames reales en Figma, que el equipo revisa y ajusta en el mismo lienzo.
+  - Las herramientas de extracción y de verificación de fidelidad siguieron funcionando sin cambios, porque las salidas son idénticas.
+lessons:
+  - Dirigiría cada trabajo a un archivo por su nombre desde el primer día, en lugar de descubrirlo con una extracción equivocada.
+  - Expondría el puente también como servidor MCP, para que cualquier asistente lo use sin conocer la línea de comandos.
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

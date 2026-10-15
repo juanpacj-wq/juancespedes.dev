@@ -1,0 +1,24 @@
+{
+  "cover": {
+    "es": "La portada en el tema oscuro, con el fondo en arte ASCII que se dibuja con la fuente monoespaciada precargada.",
+    "en": "The home page in the dark theme, with the ASCII art backdrop drawn in the preloaded monospaced font."
+  },
+  "gallery-1": {
+    "es": "El diagrama de arquitectura de un caso de estudio, dibujado desde los datos del archivo de contenido y legible sin imágenes.",
+    "en": "The architecture diagram of a case study, drawn from the data in the content file and readable without images."
+  },
+  "gallery-2": {
+    "es": "La página pública del sistema de diseño: los tokens de color que el lint exige y cuyo contraste verifican las pruebas.",
+    "en": "The public design system page: the color tokens that lint enforces and whose contrast the tests verify."
+  },
+  "gallery-3": {
+    "es": "La portada en un teléfono de 390 px de ancho.",
+    "en": "The home page on a 390 px wide phone.",
+    "frame": "phone"
+  },
+  "gallery-4": {
+    "es": "El diagrama de arquitectura en el teléfono, en una sola columna.",
+    "en": "The architecture diagram on the phone, in a single column.",
+    "frame": "phone"
+  }
+}
