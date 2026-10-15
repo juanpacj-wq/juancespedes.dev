@@ -642,7 +642,18 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
       start();
     });
   };
-  const href = document.querySelector<HTMLElement>('[data-chapter-styles]')?.dataset.chapterStyles;
+  const article = document.querySelector<HTMLElement>('[data-chapter-styles]');
+  const href = article?.dataset.chapterStyles;
+  // Transitions come back once a frame has been drawn with the sheet (case-study-hero.css): the
+  // first callback runs before that frame's styles, the second after them.
+  const ready = () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (article) article.dataset.chaptersReady = '';
+        startCaseStudy();
+      });
+    });
+  };
   const triggers = ['scroll', 'pointerdown', 'keydown'] as const;
   let started = false;
   const addChapterStyles = () => {
@@ -651,14 +662,19 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
     removeEventListener('load', addChapterStyles);
     for (const type of triggers) removeEventListener(type, addChapterStyles);
     if (!href) {
-      startCaseStudy();
+      ready();
       return;
+    }
+    // The logo band is driven by the motion code (live), never a bare scrollable row: mark it
+    // before its styles apply, or it would be a scroll region without focus for a few frames.
+    for (const band of document.querySelectorAll('[data-band]')) {
+      band.toggleAttribute('data-live', true);
     }
     const sheet = document.createElement('link');
     sheet.rel = 'stylesheet';
     sheet.href = href;
-    sheet.addEventListener('load', startCaseStudy, { once: true });
-    sheet.addEventListener('error', startCaseStudy, { once: true });
+    sheet.addEventListener('load', ready, { once: true });
+    sheet.addEventListener('error', ready, { once: true });
     document.head.append(sheet);
   };
   if (document.readyState === 'complete') {

@@ -11,6 +11,14 @@
     overflow-x: clip;
   }
 
+  /* Until the chapters' sheet applies (ProjectArticle.astro), nothing transitions: its arrival
+     must not fade text in or out, which also leaves it half drawn for the contrast checks. */
+  .cs-article:not([data-chapters-ready]) *,
+  .cs-article:not([data-chapters-ready]) *::before,
+  .cs-article:not([data-chapters-ready]) *::after {
+    transition: none !important;
+  }
+
   /* ---------- Reading progress ---------- */
 
   .cs-progress {

@@ -17,6 +17,8 @@ Status of each fix: **open** until it is implemented.
 | Fixes, local checks and `git commit` (hook: 301 s)    | about 50 min       |
 | CI round 2 (home 0.95 passed, case study 0.94)        | 6 min              |
 | Second set of fixes, local checks                     | about 30 min       |
+| CI round 3 (Lighthouse passed, axe failed)            | 7 min              |
+| Accessibility fixes, local checks, commit             | about 25 min       |
 
 ## 1. Lighthouse is the gate that fails, and CI is the only meter
 
@@ -113,6 +115,22 @@ First CI round: FCP 1.8 s on main became 2.5 s, CLS 0.046 became 0.08.
 than the shared one, a raw HTML size above a threshold (home 150 kB, case study 100 kB), or an
 `<img>` with `src` below the first screen. That turns the most common Lighthouse failures into a
 2 s local check.
+
+- Round 3: Lighthouse passed, but axe failed on every case study page. Loading the chapters'
+  sheet late changed what the page looks like between the load event and the sheet: the logo
+  names (`opacity: 0` with a 300 ms transition) faded out when the sheet arrived and axe measured
+  them half drawn (contrast 1.06), and for a few frames the logo band was a scroll region that
+  could not be focused. **Fixed:** nothing in the article transitions until a frame has been
+  drawn with the sheet (`data-chapters-ready`), and the band is marked live before its styles
+  apply. **Lesson:** deferring a stylesheet changes the page's states; run the axe suite for the
+  affected pages locally before pushing (`--grep` on the path, about 5 min).
+- **Open, found on the way:** without JavaScript the logo band is a scrollable row that the
+  keyboard cannot focus (axe `scrollable-region-focusable`). The lint preset forbids `tabindex`
+  on a non-interactive element, so the fix needs a decision (a lint exception for scroll regions,
+  or a different markup).
+- **Also measured:** the CI meter is noisy by itself. The same build scored 0.93, 0.94 and 0.96 on
+  the case study in round 3 (FCP 2.13 to 2.35 s); lhci asserts on the representative run, so a
+  page at 0.95 passes or fails by luck. Headroom (section 2) is the only real fix.
 
 ## 5. Local end-to-end runs fail by overload, not by bugs
 
