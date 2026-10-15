@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = '4330';
+// E2E_PORT lets two checkouts (git worktrees) run their suites at once: an existing server on the
+// port is reused locally, so a shared port would test the other checkout's build.
+const PORT = process.env.E2E_PORT ?? '4330';
 const CI = Boolean(process.env.CI);
 
 export default defineConfig({

@@ -341,6 +341,45 @@
     border-radius: 1.75rem;
   }
 
+  .cs-frame--tablet {
+    border: 0.625rem solid var(--color-frame);
+    border-radius: 1.75rem;
+  }
+
+  .cs-frame--tablet img {
+    border-radius: 1.125rem;
+  }
+
+  /* The same site on phones and a tablet (ProjectScreens.astro). The devices wrap instead of
+     scrolling and stand on one baseline, so their different heights read as different screens. */
+  .cs-screens {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 3.5rem;
+  }
+
+  .cs-screens-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2rem 1.25rem;
+  }
+
+  .cs-screen {
+    flex: 0 1 min(13rem, calc(50% - 0.625rem));
+  }
+
+  .cs-screen--tablet {
+    flex-basis: min(22rem, 100%);
+  }
+
+  /* Captions of up to three lines keep every device on the same baseline. */
+  .cs-screen-caption {
+    min-height: 4.5em;
+  }
+
   .cs-frame-bar {
     display: flex;
     height: 2.25rem;
@@ -394,7 +433,7 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .cs-frame:hover {
+    a.cs-frame:hover {
       translate: 0 -4px;
     }
   }
