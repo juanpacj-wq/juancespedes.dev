@@ -8,6 +8,7 @@ import { SUPPORTED_LOCALES } from '../../src/domain/shared/locale';
 import { normalizeTechnologyName } from '../../src/domain/project/technology';
 import { toProfile } from '../../src/infrastructure/content/profile-mapper';
 import {
+  achievementSchema,
   headlineMetricSchema,
   noteFrontmatterSchema,
   nowSchema,
@@ -182,6 +183,26 @@ describe('headline metrics', () => {
     expect(new Set(metrics.map((m) => m.id)).size).toBe(metrics.length);
     expect(new Set(metrics.map((m) => m.order)).size).toBe(metrics.length);
   });
+});
+
+describe('achievements', () => {
+  const achievements = achievementSchema
+    .array()
+    .parse(readYaml(join(CONTENT, 'achievements.yaml')));
+  const projectSlugs = readdirSync(PROJECTS);
+
+  it('has unique ids and orders, and at most one featured achievement', () => {
+    expect(new Set(achievements.map((a) => a.id)).size).toBe(achievements.length);
+    expect(new Set(achievements.map((a) => a.order)).size).toBe(achievements.length);
+    expect(achievements.filter((a) => a.featured).length).toBeLessThanOrEqual(1);
+  });
+
+  it.each(achievements.flatMap((a) => (a.project === null ? [] : [[a.id, a.project]])))(
+    '%s links to a case study that exists (%s)',
+    (_, slug) => {
+      expect(projectSlugs).toContain(slug);
+    },
+  );
 });
 
 describe('anonymization and style policy', () => {

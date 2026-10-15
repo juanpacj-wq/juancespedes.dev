@@ -1,0 +1,24 @@
+/*
+ * Achievement charts (src/ui/impact). Deferred with the card styles (imported by cards.css): the
+ * section sits far below the first screen, and its bars already have their final length without
+ * this file. The bars only grow from their start as the card scrolls in, with `scale` alone, so
+ * the effect is composited and never repaints the text around it.
+ */
+@layer utilities {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .impact-bar {
+        transform-origin: left center;
+        animation: impact-bar-grow linear both;
+        animation-timeline: view();
+        animation-range: entry 40% cover 50%;
+      }
+    }
+  }
+}
+
+@keyframes impact-bar-grow {
+  from {
+    scale: 0 1;
+  }
+}

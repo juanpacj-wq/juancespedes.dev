@@ -6,11 +6,13 @@ import { makeGetNowPage } from '../application/use-cases/get-now-page';
 import { makeGetProfile } from '../application/use-cases/get-profile';
 import { makeGetProject } from '../application/use-cases/get-project';
 import { makeGetProjectPage } from '../application/use-cases/get-project-page';
+import { makeListAchievements } from '../application/use-cases/list-achievements';
 import { makeListFeaturedProjects } from '../application/use-cases/list-featured-projects';
 import { makeListHeadlineMetrics } from '../application/use-cases/list-headline-metrics';
 import { makeListProjects } from '../application/use-cases/list-projects';
 import { makeGetNote, makeListNotes } from '../application/use-cases/notes';
 import {
+  astroAchievementRepository,
   astroHeadlineMetricRepository,
   astroNoteRepository,
   astroNowRepository,
@@ -44,6 +46,10 @@ export const container = {
     catalog: astroTechnologyCatalog,
   }),
   listHeadlineMetrics: makeListHeadlineMetrics(astroHeadlineMetricRepository),
+  listAchievements: makeListAchievements({
+    achievements: astroAchievementRepository,
+    listProjects: (locale) => listProjects(locale),
+  }),
   getProfile: makeGetProfile(astroProfileRepository),
   listNotes,
   getNote: makeGetNote(listNotes),
