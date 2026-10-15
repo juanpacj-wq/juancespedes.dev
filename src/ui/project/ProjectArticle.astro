@@ -1,5 +1,5 @@
 ---
-import { getImage, Picture } from 'astro:assets';
+import { getImage } from 'astro:assets';
 
 import type { Project } from '../../domain/project/project';
 import type { Dictionary } from '../i18n/dictionary';
@@ -15,6 +15,7 @@ import { captionFor, mediaFor } from './media';
 import ProjectGallery from './ProjectGallery.astro';
 import ProjectScreens from './ProjectScreens.astro';
 import ScreenPlaceholder from './ScreenPlaceholder.astro';
+import { SCREENSHOT_QUALITY, SCREENSHOT_WIDTHS } from './screenshots';
 import TechBand from './TechBand.astro';
 import chapterStyles from '../styles/case-study.css?url';
 import placeholderStyles from '../styles/screen-placeholder.css?url';
@@ -44,6 +45,22 @@ const two = (n: number) => String(n + 1).padStart(2, '0');
 const media = mediaFor(project.slug);
 // A stock photo says nothing about the product; the drawn screen at least matches the home card.
 const cover = media.cover && !media.cover.stock ? media.cover : null;
+// The cover is the first screen's largest paint and holds small type: it gets the gallery's
+// widths and quality (screenshots.ts), not the encoders' defaults, which smear text.
+const coverSizes = '(min-width: 1280px) 1100px, 90vw';
+const [coverAvif, coverWebp] = cover
+  ? await Promise.all(
+      (['avif', 'webp'] as const).map((format) =>
+        getImage({
+          src: cover.src,
+          widths: [...SCREENSHOT_WIDTHS.wide],
+          sizes: coverSizes,
+          format,
+          quality: SCREENSHOT_QUALITY[format],
+        }),
+      ),
+    )
+  : [null, null];
 const nextMedia = next ? mediaFor(next.slug) : null;
 // The next case's screen sits at the end of the page: decoration that waits for the chapters to
 // start (case-study-motion.ts); without JavaScript the card keeps its stage, without the picture.
@@ -52,7 +69,13 @@ const nextCard = nextMedia?.card ?? null;
 const nextShot = nextCard
   ? await Promise.all(
       (['avif', 'webp'] as const).map((format) =>
-        getImage({ src: nextCard.src, widths: [480, 800], sizes: nextSizes, format }),
+        getImage({
+          src: nextCard.src,
+          widths: [480, 800, 1200],
+          sizes: nextSizes,
+          format,
+          quality: SCREENSHOT_QUALITY[format],
+        }),
       ),
     )
   : null;
@@ -150,16 +173,25 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
               style={`view-transition-name: project-screen-${project.slug}`}
             >
               {cover ? (
-                <Picture
-                  src={cover.src}
-                  alt={captionFor(project.slug, 'cover', locale) ?? ''}
-                  formats={['avif', 'webp']}
-                  widths={[640, 960, 1280, 1600, 2200]}
-                  sizes="(min-width: 1280px) 1100px, 90vw"
-                  loading="eager"
-                  fetchpriority="high"
-                  class="size-full rounded-card object-cover object-top-left"
-                />
+                <picture>
+                  <source
+                    type="image/avif"
+                    srcset={coverAvif?.srcSet.attribute}
+                    sizes={coverSizes}
+                  />
+                  <img
+                    src={coverWebp?.src}
+                    srcset={coverWebp?.srcSet.attribute}
+                    sizes={coverSizes}
+                    width={cover.src.width}
+                    height={cover.src.height}
+                    alt={captionFor(project.slug, 'cover', locale) ?? ''}
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                    class="size-full rounded-card object-cover object-top-left"
+                  />
+                </picture>
               ) : (
                 <>
                   {/* The drawn screen is on the first screen: its styles come with it. */}
