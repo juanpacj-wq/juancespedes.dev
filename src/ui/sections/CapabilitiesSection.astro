@@ -1,64 +1,117 @@
 ---
 import type { Capability } from '../../domain/project/capability';
-import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
-import { projectPath } from '../i18n/routes';
-import Card from '../primitives/Card.astro';
+import { logoFor, monogramFor, techId } from '../icons/tech-logos';
 import Section from '../primitives/Section.astro';
 
-/** View model: what the section renders, shaped by the page from the skill-evidence use case. */
-export interface CapabilityEvidenceView {
+/**
+ * The stack, one row per area: the area's name on the left, its technologies as logos on the
+ * right. Which project used each one is told by the case studies, so the section only says what
+ * the owner works with; the page shape (the skill-evidence use case) still keeps out any
+ * technology no visible project uses.
+ *
+ * The logos come from one sprite (src/pages/tech-logos.svg.ts) whose address waits in
+ * `data-href` until the section comes within a screen: the section sits below the first screen,
+ * so the logos never compete with the first paint and add nothing to the HTML (CLAUDE.md, the
+ * performance budget). Each logo wears its brand colour where it keeps 3:1 against the canvas
+ * (global.css, `.stack-*`). A technology without a free logo shows a monogram.
+ */
+export interface CapabilityStackView {
   readonly capability: Capability;
-  readonly technologies: readonly {
-    readonly name: string;
-    readonly projects: readonly { readonly slug: string; readonly title: string }[];
-  }[];
+  readonly technologies: readonly { readonly name: string }[];
 }
 
 interface Props {
   t: Dictionary;
-  locale: Locale;
-  matrix: readonly CapabilityEvidenceView[];
+  matrix: readonly CapabilityStackView[];
 }
 
-const { t, locale, matrix } = Astro.props;
-const rows = matrix.filter((row) => row.technologies.length > 0);
+const { t, matrix } = Astro.props;
+const sprite = '/tech-logos.svg';
+const rows = matrix
+  .filter((row) => row.technologies.length > 0)
+  .map((row, index) => ({
+    capability: row.capability,
+    number: String(index + 1).padStart(2, '0'),
+    technologies: row.technologies.map(({ name }) => ({
+      name,
+      id: techId(name),
+      logo: logoFor(name),
+      monogram: monogramFor(name),
+    })),
+  }));
 ---
 
 {rows.length > 0 && (
   <Section id="capabilities" title={t.capabilities.title}>
     <p slot="description">{t.capabilities.description}</p>
-    <ul class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div class="border-t border-line" data-stack>
       {rows.map((row) => (
-        <li>
-          <Card class="h-full">
-            <h3 class="mb-4 font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
+        <div class="stack-row reveal grid gap-6 border-b border-line py-8 sm:py-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,9fr)] lg:gap-12">
+          <div class="flex items-baseline gap-4 lg:flex-col lg:gap-3">
+            <span class="stack-number font-mono text-eyebrow tracking-widest text-subtle tabular-nums">
+              {row.number}
+            </span>
+            <h3 class="font-display text-quote font-light text-balance text-ink">
               {t.capabilityLabels[row.capability]}
             </h3>
-            <ul class="flex flex-col divide-y divide-line">
-              {row.technologies.map((technology) => (
-                <li class="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
-                  <span class="font-medium text-ink">{technology.name}</span>
-                  <span class="text-small text-muted">
-                    {t.capabilities.provenBy}{' '}
-                    {technology.projects.map((project, index) => (
-                      <>
-                        {index > 0 && ', '}
-                        <a
-                          href={projectPath(locale, project.slug)}
-                          class="underline decoration-line-strong underline-offset-4 hover:text-accent-ink hover:decoration-accent-ink"
-                        >
-                          {project.title}
-                        </a>
-                      </>
-                    ))}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        </li>
+          </div>
+          <ul class="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3 xl:grid-cols-4">
+            {row.technologies.map((technology) => (
+              <li
+                class="stack-item flex min-w-0 items-center gap-3"
+                style={technology.logo ? `--brand:#${technology.logo.hex}` : undefined}
+                data-on-dark={technology.logo?.onDark ? '' : undefined}
+                data-on-light={technology.logo?.onLight ? '' : undefined}
+              >
+                <span
+                  class="stack-tile grid size-12 shrink-0 place-items-center rounded-control bg-surface shadow-bevel"
+                  aria-hidden="true"
+                >
+                  {technology.logo ? (
+                    <svg viewBox="0 0 24 24" class="stack-logo size-6">
+                      <use data-href={`${sprite}#${technology.id}`} />
+                    </svg>
+                  ) : (
+                    <span class="stack-monogram font-mono text-eyebrow font-medium text-muted">
+                      {technology.monogram}
+                    </span>
+                  )}
+                </span>
+                <span class="stack-name font-mono text-eyebrow leading-snug tracking-wider text-pretty text-muted uppercase">
+                  {technology.name}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
-    </ul>
+    </div>
   </Section>
 )}
+
+<script>
+  /*
+   * The logos load when the section comes within a screen of the viewport, the way the project
+   * cards load their screenshots: a visit that lands on the section loads them at once.
+   */
+  const load = () => {
+    for (const use of document.querySelectorAll<SVGUseElement>('use[data-href]')) {
+      use.setAttribute('href', use.dataset.href ?? '');
+    }
+  };
+  const stack = document.querySelector('[data-stack]');
+  if (stack && 'IntersectionObserver' in window) {
+    const watch = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        watch.disconnect();
+        load();
+      },
+      { rootMargin: '100% 0px' },
+    );
+    watch.observe(stack);
+  } else {
+    load();
+  }
+</script>

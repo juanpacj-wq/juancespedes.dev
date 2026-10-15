@@ -106,9 +106,9 @@ const es = {
   },
   capabilities: {
     eyebrow: 'Capacidades',
-    title: 'Cada habilidad, con el proyecto que la demuestra',
-    description: 'Sin porcentajes ni barras: cada tecnología enlaza al trabajo donde la usé.',
-    provenBy: 'Demostrado en',
+    title: 'Las herramientas con las que construyo',
+    description:
+      'Organizadas por área. Cada caso de estudio cuenta dónde y cómo usé cada una, con el resultado.',
   },
   experience: {
     eyebrow: 'Trayectoria',
@@ -441,9 +441,9 @@ const en: Dictionary = {
   },
   capabilities: {
     eyebrow: 'Capabilities',
-    title: 'Every skill, with the project that proves it',
-    description: 'No percentages or bars: each technology links to the work where I used it.',
-    provenBy: 'Proven in',
+    title: 'The tools I build with',
+    description:
+      'Grouped by area. Each case study tells where and how I used each one, and what came of it.',
   },
   experience: {
     eyebrow: 'Background',

@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { formatFigure, parseFigure } from '../../../src/ui/project/figure';
-import { logoFor, luminance } from '../../../src/ui/project/tech-logos';
+import {
+  logoFor,
+  luminance,
+  monogramFor,
+  techId,
+  techLogoSprite,
+} from '../../../src/ui/icons/tech-logos';
 import { portOffset, wireEnds, wirePath, type Box } from '../../../src/ui/project/wires';
 
 describe('parseFigure', () => {
@@ -98,5 +104,19 @@ describe('tech logos', () => {
   it('has no logo for technologies without a free, faithful mark', () => {
     expect(logoFor('SQL Server')).toBeNull();
     expect(logoFor('Legacy code rescue')).toBeNull();
+  });
+
+  it('names each technology the same way in the sprite and the page', () => {
+    expect(techId('Node.js')).toBe('node-js');
+    expect(techId('WCAG 2.2')).toBe('wcag-2-2');
+    expect(techId('pdfminer.six')).toBe('pdfminer-six');
+    const sprite = techLogoSprite();
+    expect(sprite).toContain('<symbol id="node-js" viewBox="0 0 24 24">');
+    expect(sprite).not.toContain('id="sql-server"');
+  });
+
+  it('gives a technology without a logo a short monogram', () => {
+    expect(monogramFor('SQL Server')).toBe('SQL');
+    expect(monogramFor('Some Tool')).toBe('SO');
   });
 });

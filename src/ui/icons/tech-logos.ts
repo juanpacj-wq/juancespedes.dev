@@ -1,5 +1,7 @@
 import {
   siApacheairflow,
+  siAstro,
+  siCloudflareworkers,
   siDirectus,
   siDocker,
   siExpress,
@@ -9,6 +11,7 @@ import {
   siMariadb,
   siModelcontextprotocol,
   siMongodb,
+  siNextdotjs,
   siNginx,
   siNodedotjs,
   siPandas,
@@ -19,6 +22,7 @@ import {
   siReact,
   siSelenium,
   siSqlite,
+  siTailwindcss,
   siTypescript,
   siVite,
   siWordpress,
@@ -26,15 +30,19 @@ import {
 } from 'simple-icons';
 
 /*
- * Logos for the technologies band of a case study (ADR 0023). Paths come from Simple Icons
- * (CC0), inlined at build time: no request and no client code. A technology without a free,
- * faithful logo (Microsoft products, systemd, Oracle, protocols, practices) is shown as a
- * wordmark instead, so the band never shows a wrong or invented mark.
+ * Technology logos, for the band of a case study (ADR 0023) and the stack on the home page.
+ * Paths come from Simple Icons (CC0). The band inlines them at build time; the home page reads
+ * them from one sprite (src/pages/tech-logos.svg.ts) once the section comes near, so the logos
+ * do not weigh on its HTML. A technology without a free, faithful logo (Microsoft products,
+ * systemd, Oracle, protocols, practices) is shown by its name or a monogram instead, so no
+ * page shows a wrong or invented mark.
  */
 
 const LOGOS: Readonly<Record<string, SimpleIcon>> = {
   'Apache Airflow': siApacheairflow,
+  Astro: siAstro,
   Bash: siGnubash,
+  'Cloudflare Workers': siCloudflareworkers,
   Directus: siDirectus,
   Docker: siDocker,
   Express: siExpress,
@@ -43,6 +51,7 @@ const LOGOS: Readonly<Record<string, SimpleIcon>> = {
   MariaDB: siMariadb,
   'Model Context Protocol': siModelcontextprotocol,
   MongoDB: siMongodb,
+  'Next.js': siNextdotjs,
   nginx: siNginx,
   'Node.js': siNodedotjs,
   pandas: siPandas,
@@ -53,6 +62,7 @@ const LOGOS: Readonly<Record<string, SimpleIcon>> = {
   React: siReact,
   Selenium: siSelenium,
   SQLite: siSqlite,
+  'Tailwind CSS': siTailwindcss,
   TypeScript: siTypescript,
   Vite: siVite,
   WordPress: siWordpress,
@@ -90,3 +100,53 @@ export const logoFor = (name: string): TechLogo | null => {
   const value = luminance(icon.hex);
   return { path: icon.path, hex: icon.hex, onDark: value >= DARK_MIN, onLight: value <= LIGHT_MAX };
 };
+
+/** A technology's id in a sprite or a page: "Node.js" is "node-js", "WCAG 2.2" is "wcag-2-2". */
+export const techId = (name: string): string =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+/*
+ * What stands in the logo's place when a technology has none: a short mark of the name, set in
+ * the mono face like an element in a table. Decorative; the full name always sits next to it.
+ */
+const MONOGRAMS: Readonly<Record<string, string>> = {
+  Azure: 'AZ',
+  CustomTkinter: 'TK',
+  Excel: 'XLS',
+  'Incident forensics': 'RCA',
+  'Legacy code rescue': '</>',
+  'LLM integration': 'LLM',
+  'Microsoft Entra ID': 'ID',
+  'Microsoft Fabric': 'FAB',
+  'Microsoft Graph': 'GR',
+  'Modbus TCP': 'MB',
+  Oracle: 'ORA',
+  'pdfminer.six': 'PDF',
+  Playwright: 'PW',
+  'Power BI': 'BI',
+  PyInstaller: 'EXE',
+  'REST APIs': '{ }',
+  'SQL Server': 'SQL',
+  systemd: 'SD',
+  'WCAG 2.2': 'A11Y',
+  WebSockets: 'WS',
+};
+
+export const monogramFor = (name: string): string =>
+  MONOGRAMS[name] ??
+  name
+    .replace(/[^A-Za-z0-9]/g, '')
+    .slice(0, 2)
+    .toUpperCase();
+
+/** Every logo as one SVG sprite of symbols, addressed as `tech-logos.svg#<techId>`. */
+export const techLogoSprite = (): string =>
+  `<svg xmlns="http://www.w3.org/2000/svg">${Object.entries(LOGOS)
+    .map(
+      ([name, icon]) =>
+        `<symbol id="${techId(name)}" viewBox="0 0 24 24"><path fill="currentColor" d="${icon.path}"/></symbol>`,
+    )
+    .join('')}</svg>`;

@@ -61,7 +61,7 @@ test.describe('home sections', () => {
       'Resultados que se pueden verificar',
       'Casos de estudio destacados',
       'Quién está detrás',
-      'Cada habilidad, con el proyecto que la demuestra',
+      'Las herramientas con las que construyo',
       'Experiencia y formación',
       'Servicios y precios',
       'Formación y certificaciones',
@@ -81,17 +81,23 @@ test.describe('home sections', () => {
     await expect(page.getByRole('heading', { name: 'Servicios y precios' })).toBeInViewport();
   });
 
-  test('skill evidence links open the project that proves them', async ({ page }) => {
+  test('the stack lists each area with its technologies and loads its logos on approach', async ({
+    page,
+  }) => {
     await page.goto('/');
-    const evidence = page
-      .locator('#capabilities')
-      .getByRole('link', { name: /Telemetría/ })
-      .first();
-    await expect(evidence).toHaveAttribute('href', '/proyectos/plant-telemetry');
-    await evidence.click();
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      'Telemetría de generación eléctrica en tiempo real',
-    );
+    const stack = page.locator('#capabilities');
+    await expect(stack.getByRole('heading', { level: 3 })).toContainText([
+      'Frontend',
+      'Backend',
+      'Datos y BI',
+    ]);
+    await expect(stack.getByRole('listitem').filter({ hasText: 'PostgreSQL' })).toBeVisible();
+    await expect(stack.getByRole('link')).toHaveCount(0);
+    // The sprite waits until the section comes near, so it is not part of the first load.
+    const logo = stack.locator('use').first();
+    await expect(logo).not.toHaveAttribute('href', /./);
+    await stack.scrollIntoViewIfNeeded();
+    await expect(logo).toHaveAttribute('href', /^\/tech-logos\.svg#[a-z0-9-]+$/);
   });
 });
 
