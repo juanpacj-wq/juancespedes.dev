@@ -120,8 +120,9 @@ const es = {
     eyebrow: 'Servicios',
     title: 'Servicios y precios',
     description:
-      'Cuatro formas de trabajar conmigo, cada una con un precio de partida claro. Los detalles los ajustamos a tu proyecto en la primera conversación.',
+      'Tres formas de trabajar conmigo. Datos y automatización tienen un precio de partida claro; las aplicaciones a la medida se cotizan según tu requerimiento. Los detalles los ajustamos en la primera conversación.',
     from: 'desde',
+    quoted: 'Por cotización',
     scope: 'Alcance',
     featured: 'Lo que más hago',
     currencyNote: 'Valores en pesos colombianos (COP).',
@@ -455,8 +456,9 @@ const en: Dictionary = {
     eyebrow: 'Services',
     title: 'Services and prices',
     description:
-      'Four ways to work with me, each with a clear starting price. We adjust the details to your project in the first conversation.',
+      'Three ways to work with me. Data and automation have a clear starting price; custom applications are quoted from your requirement. We adjust the details in the first conversation.',
     from: 'from',
+    quoted: 'Custom quote',
     scope: 'Scope',
     featured: 'My core work',
     currencyNote: 'Prices in US dollars (USD).',
