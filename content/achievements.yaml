@@ -1,0 +1,186 @@
+# Achievements for the home page "impact" section: results told for a manager, not a CV.
+# Every figure comes from a case study in content/projects and keeps that case study's source.
+# `chart` amounts drive the bars and are the same in both languages; `display` is what is printed.
+
+- id: portal-external-audit
+  order: 1
+  kind: security
+  featured: true
+  project: corporate-portal
+  value: { es: '0', en: '0' }
+  title:
+    es: Cero vulnerabilidades graves en una auditoría externa
+    en: Zero serious vulnerabilities in an external audit
+  summary:
+    es: El portal corporativo que reconstruí pasó el ethical hacking de una firma externa sin hallazgos críticos, altos ni medios. Solo quedaron 3 de severidad baja.
+    en: The corporate website I rebuilt went through an outside firm's ethical hacking with no critical, high or medium findings. Only 3 low-severity ones remained.
+  context: { es: Portal corporativo, en: Corporate website }
+  source:
+    es: Informe de la firma auditora externa, septiembre de 2026
+    en: External auditing firm's report, September 2026
+  chart:
+    kind: breakdown
+    items:
+      - { amount: 0, display: { es: '0', en: '0' }, label: { es: Críticos, en: Critical } }
+      - { amount: 0, display: { es: '0', en: '0' }, label: { es: Altos, en: High } }
+      - { amount: 0, display: { es: '0', en: '0' }, label: { es: Medios, en: Medium } }
+      - { amount: 3, display: { es: '3', en: '3' }, label: { es: Bajos, en: Low } }
+
+- id: telemetry-latency
+  order: 2
+  kind: performance
+  project: plant-telemetry
+  value: { es: '44×', en: '44×' }
+  title:
+    es: Lecturas de generación 44 veces más rápidas
+    en: Generation readings 44 times faster
+  summary:
+    es: Conecté la telemetría directo a los medidores de las plantas. Cada lectura tarda 25 ms en vez de cerca de 1,1 s, y ya no depende de un sistema central que era un punto único de falla.
+    en: I connected the telemetry straight to the plants' meters. Each reading takes 25 ms instead of about 1.1 s, and no longer depends on a central system that was a single point of failure.
+  context: { es: Telemetría de generación, en: Generation telemetry }
+  source:
+    es: Mediciones de latencia del servicio de telemetría (p50 de 15 a 25 ms), 2026
+    en: Telemetry service latency measurements (p50 15 to 25 ms), 2026
+  chart:
+    kind: compare
+    before:
+      {
+        amount: 1100,
+        display: { es: '1,1 s', en: '1.1 s' },
+        label: { es: Sistema central, en: Central system },
+      }
+    after:
+      {
+        amount: 25,
+        display: { es: '25 ms', en: '25 ms' },
+        label: { es: Lectura directa, en: Direct reading },
+      }
+
+- id: forum-nine-days
+  order: 3
+  kind: delivery
+  project: event-platform
+  value: { es: '9 días', en: '9 days' }
+  title:
+    es: Del primer commit al evento en vivo
+    en: From first commit to a live event
+  summary:
+    es: Construí y operé solo la plataforma de un foro del sector energético. 163 invitados recibieron su QR personal y salieron 156 certificados revisados por dos auditores automáticos.
+    en: I built and ran, on my own, the platform of an energy-sector forum. 163 guests received their personal QR code and 156 certificates went out, checked by two automated auditors.
+  context: { es: Foro corporativo, en: Corporate forum }
+  source:
+    es: Historial de git y registro del envío masivo, julio y agosto de 2026
+    en: Git history and bulk send log, July and August 2026
+
+- id: telemetry-footprint
+  order: 4
+  kind: efficiency
+  project: plant-telemetry
+  value: { es: '98 %', en: '98%' }
+  title:
+    es: Un despliegue 98 % más liviano
+    en: A 98% lighter deployment
+  summary:
+    es: Al retirar el navegador automatizado que extraía los datos, el paquete del servicio pasó de 300 MB a 5 MB, con una pieza menos que mantener y actualizar.
+    en: Removing the automated browser that scraped the data took the service package from 300 MB to 5 MB, with one less component to maintain and patch.
+  context: { es: Telemetría de generación, en: Generation telemetry }
+  source:
+    es: Registro de decisiones de arquitectura del proyecto, 2026
+    en: Project architecture decision record, 2026
+  chart:
+    kind: compare
+    before:
+      {
+        amount: 300,
+        display: { es: '300 MB', en: '300 MB' },
+        label: { es: Con navegador, en: With a browser },
+      }
+    after:
+      {
+        amount: 5,
+        display: { es: '5 MB', en: '5 MB' },
+        label: { es: Lectura directa, en: Direct reading },
+      }
+
+- id: portal-rollbacks
+  order: 5
+  kind: reliability
+  project: corporate-portal
+  value: { es: '0 caídas', en: '0 outages' }
+  title:
+    es: Despliegues que se corrigen solos
+    en: Deployments that fix themselves
+  summary:
+    es: Cada versión del portal se verifica al publicarse y, si algo falla, vuelve sola a la anterior. Pasó 4 veces en producción y el sitio nunca dejó de responder.
+    en: Every release of the website is verified as it goes live and, if anything fails, rolls itself back. It happened 4 times in production and the site never stopped responding.
+  context: { es: Portal corporativo, en: Corporate website }
+  source:
+    es: Decisiones de despliegue del caso de estudio del portal, 2026
+    en: Deployment decisions in the website case study, 2026
+
+- id: invoice-etl-tests
+  order: 6
+  kind: quality
+  project: invoice-etl-rescue
+  value: { es: '0 a 151', en: '0 to 151' }
+  title:
+    es: Una facturación que ya no falla en silencio
+    en: Invoicing that no longer fails silently
+  summary:
+    es: Recibí un ETL de facturación electrónica que perdía facturas y reportaba éxito. Lo audité contra producción con 74 hallazgos, lo cubrí con pruebas y hoy, si una corrida falla, avisa por correo.
+    en: I took over an e-invoicing ETL that lost invoices and reported success. I audited it against production with 74 findings, covered it with tests and today, if a run fails, it sends an email.
+  context: { es: ETL de facturación, en: Invoicing ETL }
+  source:
+    es: Auditoría técnica y suite de pytest del repositorio, agosto y septiembre de 2026
+    en: Technical audit and the repository's pytest suite, August and September 2026
+  chart:
+    kind: compare
+    before:
+      {
+        amount: 0,
+        display: { es: '0', en: '0' },
+        label: { es: Pruebas al recibirlo, en: Tests on handover },
+      }
+    after:
+      {
+        amount: 151,
+        display: { es: '151', en: '151' },
+        label: { es: Pruebas hoy, en: Tests today },
+      }
+
+- id: logbook-security-audit
+  order: 7
+  kind: security
+  project: operations-logbook
+  value: { es: '97 %', en: '97%' }
+  title:
+    es: Hallazgos de seguridad cerrados en la bitácora de dos plantas
+    en: Security findings closed in a two-plant logbook
+  summary:
+    es: La bitácora digital que reemplazó los libros de Excel de dos plantas térmicas pasó por una auditoría de seguridad, y cerré 38 de sus 39 hallazgos.
+    en: The digital logbook that replaced the Excel books of two thermal plants went through a security audit, and I closed 38 of its 39 findings.
+  context: { es: Bitácora de operación, en: Operations logbook }
+  source:
+    es: Informe interno de auditoría de seguridad, 2026
+    en: Internal security audit report, 2026
+  chart:
+    kind: progress
+    done: 38
+    total: 39
+    label: { es: hallazgos cerrados, en: findings closed }
+
+- id: invoice-parser-consolidation
+  order: 8
+  kind: efficiency
+  project: invoice-parser
+  value: { es: '4 en 1', en: '4 in 1' }
+  title:
+    es: Cuatro herramientas convertidas en una
+    en: Four tools turned into one
+  summary:
+    es: Unifiqué cuatro extractores de facturas de energía, uno por empresa, en una sola aplicación protegida por 73 facturas reales con 26 campos verificados en cada una.
+    en: I merged four energy-invoice extractors, one per company, into a single application guarded by 73 real invoices with 26 fields checked in each.
+  context: { es: Extractor de facturas, en: Invoice extractor }
+  source:
+    es: Historial de git y suite de regresión del repositorio, junio de 2026
+    en: Git history and the repository's regression suite, June 2026

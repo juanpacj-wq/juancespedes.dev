@@ -94,7 +94,7 @@ test.describe('bilingual site and SEO', () => {
       'Featured case studies',
       "Who's behind the work",
       'Every skill, with the project that proves it',
-      'Experience and education',
+      'Business impact',
       'Services and prices',
       'Education and certifications',
       'Tell me what you need',

@@ -1,0 +1,134 @@
+---
+import type { Achievement, AchievementKind } from '../../domain/project/achievement';
+import type { Locale } from '../../domain/shared/locale';
+import type { Dictionary } from '../i18n/dictionary';
+import { projectPath } from '../i18n/routes';
+import Icon from '../icons/Icon.astro';
+import type { IconName } from '../icons/icons';
+import Card from '../primitives/Card.astro';
+import AchievementChart from './AchievementChart.astro';
+
+/**
+ * One achievement as a card: what kind of win and where (the rule between them is the
+ * reference's), the figure, the sentence a manager would repeat, a chart when the figure has a
+ * shape, and the source. When the case study is published, the title is the card's one link and
+ * stretches over the whole card. The featured card is wide, with its chart beside the text.
+ */
+interface Props {
+  t: Dictionary;
+  locale: Locale;
+  achievement: Achievement;
+}
+
+const { t, locale, achievement } = Astro.props;
+const { kind, featured, chart, project } = achievement;
+
+const ICON: Record<AchievementKind, IconName> = {
+  security: 'shield',
+  performance: 'zap',
+  efficiency: 'minimize',
+  delivery: 'clock',
+  reliability: 'rotate-ccw',
+  quality: 'badge-check',
+};
+
+/** Wins about safety and steadiness glow verdigris; wins about speed and savings glow ochre. */
+const tone: 'accent' | 'success' =
+  kind === 'security' || kind === 'reliability' || kind === 'quality' ? 'success' : 'accent';
+const href = project === null ? null : projectPath(locale, project);
+---
+
+<Card
+  as="li"
+  interactive={href !== null}
+  padding={featured ? 'lg' : 'md'}
+  class:list={[
+    'reveal group flex flex-col overflow-hidden',
+    // The stretched title link carries the focus; the ring goes around the whole card.
+    'has-[.impact-link:focus-visible]:outline-2 has-[.impact-link:focus-visible]:outline-offset-4 has-[.impact-link:focus-visible]:outline-accent-ink',
+    featured && 'md:col-span-2',
+    featured &&
+      tone === 'success' &&
+      'bg-radial-[at_90%_10%] from-success/12 to-transparent to-60%',
+    featured && tone === 'accent' && 'bg-radial-[at_90%_10%] from-accent/12 to-transparent to-60%',
+  ]}
+>
+  <p class="flex items-center gap-3 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+    <span>{t.impact.kinds[kind]}</span>
+    <span aria-hidden="true" class="h-px flex-1 bg-line"></span>
+    <span class="text-right">{achievement.context}</span>
+  </p>
+
+  <div
+    class:list={[
+      'mt-6 flex flex-1 flex-col gap-6',
+      featured && chart && 'sm:grid sm:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] sm:gap-10',
+    ]}
+  >
+    <div class="flex flex-col">
+      <span
+        aria-hidden="true"
+        class:list={[
+          'mb-5 grid size-11 place-items-center rounded-control bg-surface-raised shadow-bevel',
+          tone === 'success' ? 'text-success' : 'text-accent-ink',
+        ]}
+      >
+        <Icon name={ICON[kind]} size={20} />
+      </span>
+      <p
+        class:list={[
+          'font-display leading-none font-light tabular-nums',
+          featured ? 'text-display' : 'text-heading',
+          tone === 'success' ? 'text-success' : 'text-accent-ink',
+        ]}
+      >
+        {achievement.value}
+      </p>
+      <h3
+        class:list={[
+          'mt-4 font-medium text-balance text-ink',
+          featured ? 'text-title' : 'text-lead',
+        ]}
+      >
+        {href === null ? (
+          achievement.title
+        ) : (
+          <a
+            href={href}
+            class="impact-link after:absolute after:inset-0 after:z-10 focus-visible:outline-none"
+          >
+            {achievement.title}
+          </a>
+        )}
+      </h3>
+      <p class:list={['mt-3 text-pretty text-muted', featured ? 'text-body' : 'text-small']}>
+        {achievement.summary}
+      </p>
+    </div>
+
+    {chart && (
+      <div class:list={['flex flex-col', featured ? 'justify-end sm:pb-1' : 'mt-auto']}>
+        <AchievementChart t={t} chart={chart} tone={tone} />
+      </div>
+    )}
+  </div>
+
+  <div class="mt-6 flex items-end justify-between gap-4 border-t border-line pt-4">
+    <p class="font-mono text-eyebrow text-subtle">
+      {t.metric.source}: {achievement.source}
+    </p>
+    {href !== null && (
+      <span
+        aria-hidden="true"
+        class="inline-flex shrink-0 items-center gap-1.5 text-small font-medium whitespace-nowrap text-ink transition-colors group-hover:text-accent-ink"
+      >
+        {t.impact.caseLink}
+        <Icon
+          name="arrow-up-right"
+          size={16}
+          class="transition-transform duration-300 ease-out motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5"
+        />
+      </span>
+    )}
+  </div>
+</Card>

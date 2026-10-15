@@ -1,7 +1,14 @@
 import { z } from 'astro/zod';
 
+import {
+  ACHIEVEMENT_KINDS,
+  validateAchievementChart,
+  type AchievementChart,
+  type Amount,
+} from '../../domain/project/achievement';
 import { CAPABILITIES } from '../../domain/project/capability';
 import { validateProjectContent, type ProjectContent } from '../../domain/project/project';
+import type { Locale } from '../../domain/shared/locale';
 import { validateNoteContent, type NoteContent } from '../../domain/writing/note';
 
 /*
@@ -113,6 +120,72 @@ export const headlineMetricSchema = z.strictObject({
 });
 
 export type HeadlineMetricEntry = z.output<typeof headlineMetricSchema>;
+
+const amount = z.strictObject({ amount: z.number().min(0), display: localized, label: localized });
+
+const achievementChart = z.discriminatedUnion('kind', [
+  z.strictObject({ kind: z.literal('compare'), before: amount, after: amount }),
+  z.strictObject({ kind: z.literal('breakdown'), items: z.array(amount).min(2) }),
+  z.strictObject({
+    kind: z.literal('progress'),
+    done: z.number().int().min(0),
+    total: z.number().int().min(1),
+    label: localized,
+  }),
+]);
+
+/** An achievement for the home page (content/achievements.yaml), in both languages. */
+export const achievementSchema = z
+  .strictObject({
+    id: z.string().regex(/^[a-z0-9-]+$/),
+    order: z.number().int().min(0),
+    kind: z.enum(ACHIEVEMENT_KINDS),
+    featured: z.boolean().default(false),
+    value: localized,
+    title: localized,
+    summary: localized,
+    context: localized,
+    source: localized,
+    project: z
+      .string()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .nullable()
+      .default(null),
+    chart: achievementChart.nullable().default(null),
+  })
+  .superRefine((entry, ctx) => {
+    // The amounts drive the drawing and are the same in both languages.
+    const chart = entry.chart && toChartIn('en', entry.chart);
+    for (const issue of validateAchievementChart(chart)) {
+      ctx.addIssue({ code: 'custom', path: [issue.field], message: issue.message });
+    }
+  });
+
+export type AchievementEntry = z.output<typeof achievementSchema>;
+type ChartEntry = NonNullable<AchievementEntry['chart']>;
+type AmountEntry = z.output<typeof amount>;
+
+const toAmountIn = (locale: Locale, entry: AmountEntry): Amount => ({
+  amount: entry.amount,
+  display: entry.display[locale],
+  label: entry.label[locale],
+});
+
+/** A chart entry in one language, as the domain describes it. */
+export const toChartIn = (locale: Locale, chart: ChartEntry): AchievementChart => {
+  switch (chart.kind) {
+    case 'compare':
+      return {
+        kind: chart.kind,
+        before: toAmountIn(locale, chart.before),
+        after: toAmountIn(locale, chart.after),
+      };
+    case 'breakdown':
+      return { kind: chart.kind, items: chart.items.map((item) => toAmountIn(locale, item)) };
+    case 'progress':
+      return { kind: chart.kind, done: chart.done, total: chart.total, label: chart.label[locale] };
+  }
+};
 
 export const technologySchema = z.strictObject({
   id: z.string().regex(/^[a-z0-9-]+$/),

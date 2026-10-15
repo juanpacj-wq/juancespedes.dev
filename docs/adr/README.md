@@ -29,5 +29,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0022](0022-real-screenshots-and-gallery.md)       | Real screenshots in case studies, shown in a framed gallery              | Accepted |
 | [0023](0023-technology-logo-band.md)               | Technologies as one draggable band of logos                              | Accepted |
 | [0024](0024-faster-deploys.md)                     | Faster deploys: compressed Lighthouse, local budgets, parallel CI        | Accepted |
+| [0025](0025-business-impact-section.md)            | Business impact instead of a CV-style history                            | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.

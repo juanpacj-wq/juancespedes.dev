@@ -69,12 +69,28 @@ test.describe('home sections', () => {
       'Casos de estudio destacados',
       'Quién está detrás',
       'Cada habilidad, con el proyecto que la demuestra',
-      'Experiencia y formación',
+      'Impacto en el negocio',
       'Servicios y precios',
       'Formación y certificaciones',
       'Cuéntame qué necesitas',
     ]);
     await expect(page.getByText('Fuente:').first()).toBeVisible();
+  });
+
+  test('impact cards tell a figure with its source and open the case behind it', async ({
+    page,
+  }) => {
+    await page.goto('/#impact');
+    const cards = page.locator('#impact li:has(h3)');
+    await expect(cards).toHaveCount(8);
+    const featured = cards.first();
+    await expect(featured.getByRole('heading', { level: 3 })).toHaveText(
+      'Cero vulnerabilidades graves en una auditoría externa',
+    );
+    await expect(featured.getByText(/^Fuente: /)).toBeVisible();
+    await expect(page.locator('#impact')).toContainText('Universidad del Norte');
+    await featured.getByRole('link').click();
+    await expect(page).toHaveURL(/\/proyectos\/corporate-portal$/);
   });
 
   test('header links jump to their sections', async ({ page, isMobile }) => {

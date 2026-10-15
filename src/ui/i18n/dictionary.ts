@@ -110,11 +110,21 @@ const es = {
     description: 'Sin porcentajes ni barras: cada tecnología enlaza al trabajo donde la usé.',
     provenBy: 'Demostrado en',
   },
-  experience: {
-    eyebrow: 'Trayectoria',
-    title: 'Experiencia y formación',
-    work: 'Experiencia',
-    education: 'Formación',
+  impact: {
+    title: 'Impacto en el negocio',
+    description:
+      'Lo que cambió para la operación con cada entrega: cuánto, dónde y con qué evidencia. Cada cifra lleva su fuente y su caso de estudio.',
+    kinds: {
+      security: 'Seguridad',
+      performance: 'Rendimiento',
+      efficiency: 'Eficiencia',
+      delivery: 'Entrega',
+      reliability: 'Confiabilidad',
+      quality: 'Calidad',
+    },
+    caseLink: 'Ver el caso',
+    of: 'de',
+    where: 'Dónde lo logré',
   },
   services: {
     eyebrow: 'Servicios',
@@ -446,11 +456,21 @@ const en: Dictionary = {
     description: 'No percentages or bars: each technology links to the work where I used it.',
     provenBy: 'Proven in',
   },
-  experience: {
-    eyebrow: 'Background',
-    title: 'Experience and education',
-    work: 'Experience',
-    education: 'Education',
+  impact: {
+    title: 'Business impact',
+    description:
+      'What changed for the operation with each delivery: how much, where and with what evidence. Every figure carries its source and its case study.',
+    kinds: {
+      security: 'Security',
+      performance: 'Performance',
+      efficiency: 'Efficiency',
+      delivery: 'Delivery',
+      reliability: 'Reliability',
+      quality: 'Quality',
+    },
+    caseLink: 'Read the case',
+    of: 'of',
+    where: 'Where I did it',
   },
   services: {
     eyebrow: 'Services',
