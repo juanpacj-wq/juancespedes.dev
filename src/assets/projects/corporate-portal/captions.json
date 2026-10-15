@@ -4,19 +4,36 @@
     "en": "The Generation page of the live portal, with the header and main navigation."
   },
   "gallery-1": {
-    "es": "Diseño en Figma (izquierda) frente a la página construida (derecha): cada página se comparó así antes de publicarse.",
-    "en": "The Figma design (left) next to the built page (right); every page was compared this way before going live."
+    "es": "Página de Transparencia y acceso a la información pública, exigida por la Ley 1712 de 2014.",
+    "en": "The Transparency and access to public information page, required by Law 1712 of 2014."
   },
   "gallery-2": {
+    "es": "Información regulatoria de Comercialización, con los documentos que se descargan desde la misma página.",
+    "en": "The Trading unit's regulatory information, with documents downloaded from the same page."
+  },
+  "gallery-3": {
     "es": "Editor de WordPress de una página: Comunicaciones cambia textos y documentos, pero la estructura de los bloques está bloqueada.",
     "en": "The WordPress editor for one page: Communications changes text and documents, while the block structure is locked."
   },
-  "gallery-3": {
-    "es": "Menú en un teléfono de 390 px de ancho, con las secciones desplegadas.",
-    "en": "The menu on a 390 px wide phone, with its sections expanded."
+  "responsive": {
+    "es": "El portal es responsive: el mismo contenido se ajusta a teléfonos, tabletas y pantallas de escritorio, con un menú propio para pantallas pequeñas y textos que se reacomodan sin desplazamiento horizontal. Las páginas se revisaron también en el ancho de un teléfono antes de publicarse.",
+    "en": "The portal is responsive: the same content adapts to phones, tablets and desktop screens, with its own menu for small screens and text that reflows without horizontal scrolling. Pages were also checked at phone width before going live."
   },
-  "gallery-4": {
-    "es": "Página de Transparencia y acceso a la información pública, exigida por la Ley 1712 de 2014.",
-    "en": "The Transparency and access to public information page, required by Law 1712 of 2014."
+  "mobile-1": {
+    "es": "Generación en un teléfono de 390 px de ancho.",
+    "en": "The Generation page on a 390 px wide phone."
+  },
+  "mobile-2": {
+    "es": "El menú en el teléfono, con las secciones desplegadas.",
+    "en": "The menu on the phone, with its sections expanded."
+  },
+  "mobile-3": {
+    "es": "Transparencia en el teléfono: el texto legal se lee sin hacer zoom.",
+    "en": "Transparency on the phone; the legal text reads without zooming."
+  },
+  "mobile-4": {
+    "es": "Generación en una tableta de 820 px de ancho.",
+    "en": "The Generation page on an 820 px wide tablet.",
+    "frame": "tablet"
   }
 }

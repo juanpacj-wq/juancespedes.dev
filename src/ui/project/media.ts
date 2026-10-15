@@ -9,13 +9,15 @@ import type { Locale } from '../../domain/shared/locale';
  * - card.*      the screenshot on the home page card; without it the card draws a placeholder.
  * - cover.*     the wide image under the title of the project page.
  * - gallery-N.* more images on the project page, in N order.
+ * - mobile-N.*  the same product on phones and tablets, shown together to prove it is responsive.
  *
  * A `.stock` before the extension (cover.stock.webp) marks a stand-in photo. Project pages skip
  * stand-ins and draw the app window instead (ADR 0021); a real file with the same name wins.
  *
  * - captions.json says what each image shows, in both languages: { "gallery-1": { "es", "en" } },
- *   plus an optional "frame" (browser, phone or none). The caption is also the image's text
- *   alternative, so a real screenshot needs one.
+ *   plus an optional "frame" (browser, phone, tablet or none). The caption is also the image's
+ *   text alternative, so a real screenshot needs one. Its "responsive" entry introduces the
+ *   mobile-N captures.
  *
  * Images are presentation, so they stay out of the domain and the content schema.
  */
@@ -23,12 +25,13 @@ import type { Locale } from '../../domain/shared/locale';
 export interface ProjectImage {
   readonly src: ImageMetadata;
   readonly stock: boolean;
-  /** The file name without extension: card, cover, gallery-1... */
+  /** The file name without extension: card, cover, gallery-1, mobile-1... */
   readonly slot: string;
 }
 
-/** Where a screenshot is shown: a browser window, a phone, or as is (it brings its own window). */
-export type Frame = 'browser' | 'phone' | 'none';
+/** Where a screenshot is shown: a browser window, a phone, a tablet, or as is (it brings its own
+ * window). */
+export type Frame = 'browser' | 'phone' | 'tablet' | 'none';
 
 export interface Caption {
   readonly es: string;
@@ -39,16 +42,25 @@ export interface Caption {
 
 export type Captions = Readonly<Record<string, Caption>>;
 
-const FRAMES: readonly Frame[] = ['browser', 'phone', 'none'];
+const FRAMES: readonly Frame[] = ['browser', 'phone', 'tablet', 'none'];
 
 export interface ProjectMedia {
   readonly card: ProjectImage | null;
   readonly cover: ProjectImage | null;
   readonly gallery: readonly ProjectImage[];
+  /** Captures on phones and tablets, in N order. */
+  readonly mobile: readonly ProjectImage[];
 }
 
 const NAME =
-  /\/projects\/([a-z0-9-]+)\/(card|cover|gallery-\d+)(\.stock)?\.(?:avif|webp|png|jpe?g)$/;
+  /\/projects\/([a-z0-9-]+)\/(card|cover|gallery-\d+|mobile-\d+)(\.stock)?\.(?:avif|webp|png|jpe?g)$/;
+
+/** The images whose slot is `<prefix>N`, in N order. */
+const numbered = (project: ReadonlyMap<string, ProjectImage>, prefix: string): ProjectImage[] =>
+  [...project]
+    .filter(([slot]) => slot.startsWith(prefix))
+    .sort(([a], [b]) => Number(a.slice(prefix.length)) - Number(b.slice(prefix.length)))
+    .map(([, image]) => image);
 
 /** Groups glob entries (path to image) by project slug. Exported for tests. */
 export const groupMedia = (
@@ -71,10 +83,8 @@ export const groupMedia = (
       {
         card: project.get('card') ?? null,
         cover: project.get('cover') ?? null,
-        gallery: [...project]
-          .filter(([slot]) => slot.startsWith('gallery-'))
-          .sort(([a], [b]) => Number(a.slice(8)) - Number(b.slice(8)))
-          .map(([, image]) => image),
+        gallery: numbered(project, 'gallery-'),
+        mobile: numbered(project, 'mobile-'),
       },
     ]),
   );
@@ -87,7 +97,7 @@ const ALL = groupMedia(
   }),
 );
 
-const NONE: ProjectMedia = { card: null, cover: null, gallery: [] };
+const NONE: ProjectMedia = { card: null, cover: null, gallery: [], mobile: [] };
 
 export const mediaFor = (slug: string): ProjectMedia => ALL.get(slug) ?? NONE;
 

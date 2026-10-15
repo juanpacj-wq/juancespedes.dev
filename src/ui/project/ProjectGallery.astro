@@ -5,6 +5,7 @@ import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
 import Icon from '../icons/Icon.astro';
 import { captionFor, frameFor, type ProjectImage } from './media';
+import { SCREENSHOT_QUALITY, SCREENSHOT_WIDTHS } from './screenshots';
 
 /**
  * The product in screenshots (ADR 0022). Each image sits in the frame of where it runs: a browser
@@ -32,13 +33,19 @@ const two = (n: number) => String(n + 1).padStart(2, '0');
 const slides = await Promise.all(
   images.map(async (image) => {
     const tall = image.src.height > image.src.width;
-    const widths = tall ? [360, 540, 720] : [640, 960, 1280, 1600];
-    const sizes = tall ? '(min-width: 640px) 22rem, 70vw' : '(min-width: 1280px) 1000px, 85vw';
+    const widths = [...(tall ? SCREENSHOT_WIDTHS.tall : SCREENSHOT_WIDTHS.wide)];
+    // A wide slide is at most 64rem (1024 px), so a 2x screen needs a 2048 px file.
+    const sizes = tall ? '(min-width: 640px) 22rem, 70vw' : '(min-width: 1088px) 1024px, 94vw';
     const [avif, webp, large] = await Promise.all([
-      getImage({ src: image.src, widths, sizes, format: 'avif' }),
-      getImage({ src: image.src, widths, sizes, format: 'webp' }),
-      // The enlarged view loads one large WebP only when it is opened.
-      getImage({ src: image.src, width: 2000, format: 'webp' }),
+      getImage({ src: image.src, widths, sizes, format: 'avif', quality: SCREENSHOT_QUALITY.avif }),
+      getImage({ src: image.src, widths, sizes, format: 'webp', quality: SCREENSHOT_QUALITY.webp }),
+      // The enlarged view loads one large WebP only when it is opened, at the capture's own size.
+      getImage({
+        src: image.src,
+        width: Math.min(image.src.width, 2880),
+        format: 'webp',
+        quality: SCREENSHOT_QUALITY.webp,
+      }),
     ]);
     return {
       frame: frameFor(slug, image),

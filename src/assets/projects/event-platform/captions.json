@@ -12,15 +12,28 @@
     "en": "The back of the badge, with the personal QR code scanned at event check-in."
   },
   "gallery-3": {
-    "es": "La escarapela en un teléfono: cada asistente la mostraba desde su celular.",
-    "en": "The badge on a phone; each guest showed it from their own device."
-  },
-  "gallery-4": {
     "es": "Encuestas del foro: la de satisfacción solo se habilita después de la hora de cierre.",
     "en": "The forum surveys; the satisfaction survey only opens after the closing time."
   },
-  "gallery-5": {
+  "responsive": {
+    "es": "La plataforma es responsive: se ajusta a teléfonos, tabletas y computadores sin perder ninguna función. Cada asistente mostraba la escarapela desde su celular en el registro, así que el teléfono era la pantalla principal.",
+    "en": "The platform is responsive: it adapts to phones, tablets and computers without losing any feature. Each guest showed the badge from their own phone at check-in, so the phone was the main screen."
+  },
+  "mobile-1": {
     "es": "Portada en un teléfono de 390 px de ancho.",
     "en": "The home page on a 390 px wide phone."
+  },
+  "mobile-2": {
+    "es": "La escarapela en el teléfono, lista para mostrar en el registro (persona ficticia).",
+    "en": "The badge on the phone, ready to show at check-in (a fictitious person)."
+  },
+  "mobile-3": {
+    "es": "Encuestas en el teléfono.",
+    "en": "The surveys on the phone."
+  },
+  "mobile-4": {
+    "es": "Portada en una tableta de 820 px de ancho.",
+    "en": "The home page on an 820 px wide tablet.",
+    "frame": "tablet"
   }
 }

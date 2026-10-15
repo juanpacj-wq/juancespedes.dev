@@ -13,6 +13,7 @@ import ArchitectureDiagram from './ArchitectureDiagram.astro';
 import DetailSection from './DetailSection.astro';
 import { captionFor, mediaFor } from './media';
 import ProjectGallery from './ProjectGallery.astro';
+import ProjectScreens from './ProjectScreens.astro';
 import ScreenPlaceholder from './ScreenPlaceholder.astro';
 import TechBand from './TechBand.astro';
 import chapterStyles from '../styles/case-study.css?url';
@@ -57,13 +58,15 @@ const nextShot = nextCard
   : null;
 // Same rule for the gallery: only real images; stock stand-ins wait in the folder for their swap.
 const gallery = media.gallery.filter((image) => !image.stock);
+const mobile = media.mobile.filter((image) => !image.stock);
+const solution = gallery.length > 0 || mobile.length > 0;
 const words = (text: string) => text.split(/\s+/).filter(Boolean);
 
 const kindChapters: Record<Project['kind'], [string, string][]> = {
   'case-study': [
     ['overview', t.project.overview],
     ['problem', t.project.problem],
-    ...(gallery.length > 0 ? ([['solution', t.project.solution]] as [string, string][]) : []),
+    ...(solution ? ([['solution', t.project.solution]] as [string, string][]) : []),
     ['role', t.project.responsibilities],
     ['constraints', t.project.constraints],
     ['decisions', t.project.decisions],
@@ -76,7 +79,7 @@ const kindChapters: Record<Project['kind'], [string, string][]> = {
   tool: [['tool', t.project.automates]],
 };
 const galleryChapter: [string, string][] =
-  project.kind !== 'case-study' && gallery.length > 0 ? [['solution', t.project.solution]] : [];
+  project.kind !== 'case-study' && solution ? [['solution', t.project.solution]] : [];
 const chapters = [
   ...kindChapters[project.kind],
   ...galleryChapter,
@@ -151,7 +154,7 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
                   src={cover.src}
                   alt={captionFor(project.slug, 'cover', locale) ?? ''}
                   formats={['avif', 'webp']}
-                  widths={[640, 960, 1280, 1600]}
+                  widths={[640, 960, 1280, 1600, 2200]}
                   sizes="(min-width: 1280px) 1100px, 90vw"
                   loading="eager"
                   fetchpriority="high"
@@ -323,20 +326,25 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
           </ol>
         </DetailSection>
 
-        {gallery.length > 0 && (
+        {solution && (
           <DetailSection
             id="solution"
             title={titleOf('solution')}
             number={numberOf('solution')}
             wide
           >
-            <ProjectGallery
-              t={t}
-              slug={project.slug}
-              locale={locale}
-              images={gallery}
-              address={address}
-            />
+            {gallery.length > 0 && (
+              <ProjectGallery
+                t={t}
+                slug={project.slug}
+                locale={locale}
+                images={gallery}
+                address={address}
+              />
+            )}
+            {mobile.length > 0 && (
+              <ProjectScreens t={t} slug={project.slug} locale={locale} images={mobile} />
+            )}
           </DetailSection>
         )}
 
@@ -528,15 +536,20 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
       </DetailSection>
     )}
 
-    {project.kind !== 'case-study' && gallery.length > 0 && (
+    {project.kind !== 'case-study' && solution && (
       <DetailSection id="solution" title={titleOf('solution')} number={numberOf('solution')} wide>
-        <ProjectGallery
-          t={t}
-          slug={project.slug}
-          locale={locale}
-          images={gallery}
-          address={address}
-        />
+        {gallery.length > 0 && (
+          <ProjectGallery
+            t={t}
+            slug={project.slug}
+            locale={locale}
+            images={gallery}
+            address={address}
+          />
+        )}
+        {mobile.length > 0 && (
+          <ProjectScreens t={t} slug={project.slug} locale={locale} images={mobile} />
+        )}
       </DetailSection>
     )}
 
