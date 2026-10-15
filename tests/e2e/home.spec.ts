@@ -17,6 +17,9 @@ const useClientIp = async (page: Page) => {
 
 /** The form is a hydrated island: interact only once React owns it. */
 const openContactForm = async (page: Page) => {
+  // Smooth scrolling and the button's hover scale keep targets moving; on a slow WebKit the submit
+  // button was not stable in time. Reduced motion keeps every behavior the tests check.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/#contact');
   // The form hydrates when it becomes visible (client:visible). Under load WebKit sometimes skips
   // the jump to #contact while the page is still loading, so scroll to it like a reader would.
@@ -127,6 +130,10 @@ test.describe('project cards', () => {
   });
 
   test('a click anywhere on a card opens its case study', async ({ page }) => {
+    // The click goes to coordinates: with smooth scrolling and the cards' reveal the box is read
+    // while the card still moves, and on WebKit the click landed beside it. Reduced motion keeps
+    // the link that covers the card.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/#projects');
     // On the screen drawing, away from the title: the link covers the whole card.
     const stage = page.locator('#project-plant-telemetry .project-card-stage');

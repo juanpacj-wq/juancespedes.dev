@@ -1,8 +1,8 @@
 {
   "ci": {
     "collect": {
-      "startServerCommand": "pnpm preview --port 4331",
-      "startServerReadyPattern": "ready",
+      "startServerCommand": "node scripts/preview-compressed.mjs --port 4331",
+      "startServerReadyPattern": "compressed preview on",
       "url": [
         "http://localhost:4331/",
         "http://localhost:4331/design-system",

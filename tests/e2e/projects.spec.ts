@@ -130,6 +130,10 @@ test.describe('project pages', () => {
   test('the solution shows real screenshots with captions, tabs and an enlarged view', async ({
     page,
   }) => {
+    // The page scrolls smoothly (scroll-behavior), so every scroll Playwright makes before a click
+    // is animated and, on a slow WebKit, the target is still moving ("not stable"); the gallery's
+    // auto-advance moves the row as well. Reduced motion keeps the tabs and the enlarged view.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/proyectos/corporate-portal');
     const solution = page.locator('#solution');
     await solution.scrollIntoViewIfNeeded();
@@ -154,13 +158,40 @@ test.describe('project pages', () => {
     await expect(dialog).toBeHidden();
   });
 
+  test.describe('without JavaScript', () => {
+    test.use({ javaScriptEnabled: false });
+
+    // Without the script the band is not a scroll region the keyboard cannot reach (WCAG 2.1.1):
+    // every logo shows within the screen and the copy that closes the loop is hidden. Axe cannot
+    // run here (it needs page scripts), so the layout is checked directly.
+    test('the technologies band wraps instead of scrolling', async ({ page }) => {
+      await page.goto('/proyectos/invoice-etl-rescue');
+      const list = page.getByRole('list', { name: 'Tecnologías' });
+      await expect(list.getByRole('img', { name: 'Python' })).toBeVisible();
+      await expect(page.locator('.cs-band-row[aria-hidden]')).toBeHidden();
+
+      const width = page.viewportSize()?.width ?? 0;
+      for (const item of await list.getByRole('listitem').all()) {
+        const box = await item.boundingBox();
+        expect(box, 'every logo is laid out').not.toBeNull();
+        expect((box?.x ?? -1) >= 0 && (box?.x ?? 0) + (box?.width ?? 0) <= width).toBe(true);
+      }
+    });
+  });
+
   test('the technologies band shows logos and can be dragged', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'mobile', 'mouse drag; touch scrolls the row natively');
+    // The drag goes to coordinates read after a scroll: with smooth scrolling they can be stale.
+    // Reduced motion also stops the drift, so only the drag moves the band.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/proyectos/invoice-etl-rescue');
     const band = page.locator('[data-band]');
     await band.scrollIntoViewIfNeeded();
     const list = page.getByRole('list', { name: 'Tecnologías' });
     await expect(list.getByRole('img', { name: 'Python' })).toBeVisible();
+    // The motion layer starts after the load event (ProjectArticle.astro); it reveals the chapter
+    // nav in the same task that wires the band, so a drag before that would move nothing.
+    await expect(page.locator('[data-chapters]')).not.toHaveAttribute('hidden');
 
     const offset = () =>
       page
@@ -172,7 +203,8 @@ test.describe('project pages', () => {
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
     await page.mouse.move(box.x + box.width / 2 - 300, box.y + box.height / 2, { steps: 6 });
-    expect(await offset()).toBeLessThan(before - 200);
+    // WebKit applies pointer moves a frame later: poll instead of reading once.
+    await expect.poll(offset).toBeLessThan(before - 200);
     await page.mouse.up();
   });
 

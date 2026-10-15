@@ -14,6 +14,8 @@ test.describe('bilingual site and SEO', () => {
     page,
     request,
   }) => {
+    // One test visits every page of the site (about 30): it needs more than the default 30 s.
+    test.slow();
     const sitemap = await request.get('/sitemap.xml');
     expect(sitemap.status()).toBe(200);
     expect(sitemap.headers()['content-type']).toContain('xml');

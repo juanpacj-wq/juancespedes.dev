@@ -1,7 +1,5 @@
 #!/bin/sh
-# Fast checks on every commit. The full suite runs in CI and in `pnpm verify`.
+# Fast checks on the staged files only (lint-staged.config.mjs). The full suite runs in
+# `pnpm verify` and in CI.
 set -e
-pnpm format:check
-pnpm lint
-pnpm arch:check
-pnpm test
+pnpm exec lint-staged

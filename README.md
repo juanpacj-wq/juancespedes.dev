@@ -120,9 +120,10 @@ Requirements: Node 24+ and pnpm 10.
 ```bash
 pnpm install          # also activates the git hooks in .githooks/
 pnpm dev              # http://localhost:4321
-pnpm verify           # format, lint, types, architecture, unit coverage, build
+pnpm verify           # format, lint, types, architecture, unit coverage, build, JS and page budgets
 pnpm exec playwright install chromium webkit
 pnpm test:e2e         # end-to-end and accessibility on the production build
+pnpm lighthouse:local # Lighthouse as CI runs it, in Docker, after pnpm build
 pnpm test:mutation    # mutation testing of the domain (about ten minutes)
 pnpm eval:chat        # chat evaluation set against the real model (needs ANTHROPIC_API_KEY, costs money)
 ```

@@ -1,8 +1,10 @@
 name: CI
 
+# Pull requests only. `main` accepts squash merges of branches that are up to date with it and
+# passed these checks (ruleset "Protect main", strict status checks), so the tree that lands on
+# main is the tree tested here; running the suite again after the merge took 7 minutes and
+# checked nothing new (ADR 0024).
 on:
-  push:
-    branches: [main]
   pull_request:
   # The release workflow dispatches CI on the release-please branch: pull requests opened with
   # GITHUB_TOKEN do not trigger workflows, and workflow_dispatch is the exception (ADR 0013).
@@ -53,9 +55,20 @@ jobs:
           echo '### Coverage (domain + application)' >> "$GITHUB_STEP_SUMMARY"
           node -e "const s=require('./coverage/coverage-summary.json').total;for(const k of ['lines','branches','functions','statements'])console.log('- '+k+': '+s[k].pct+' %')" >> "$GITHUB_STEP_SUMMARY"
 
-  e2e:
-    name: End-to-end and accessibility
+  # One job per browser: the suite took 4 minutes in a single job, about a third in each.
+  e2e-browser:
+    name: End-to-end (${{ matrix.project }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: chromium
+            browser: chromium
+          - project: webkit
+            browser: webkit
+          - project: mobile
+            browser: chromium
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -69,19 +82,48 @@ jobs:
       - run: pnpm build
         env:
           APP_VERSION: ${{ github.sha }}
-      - run: pnpm bundle:check
-      - run: pnpm exec playwright install --with-deps chromium webkit
-      - run: pnpm test:e2e
+      - name: JavaScript and page budgets
+        if: matrix.project == 'chromium'
+        run: pnpm bundle:check && pnpm pages:check
+      # Browsers are cached per Playwright version (from the lockfile); the system libraries they
+      # need are not cacheable and are installed on every run.
+      - id: browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ matrix.browser }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - if: steps.browsers.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+      - if: steps.browsers.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps ${{ matrix.browser }}
+      - run: pnpm test:e2e --project=${{ matrix.project }}
+      - name: Flaky tests
+        if: always()
+        run: node scripts/flaky-summary.mjs
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: playwright-report/
           retention-days: 7
 
-  lighthouse:
-    name: Lighthouse budgets
+  # The required check keeps its name: it passes when every browser passed.
+  e2e:
+    name: End-to-end and accessibility
+    if: always()
+    needs: e2e-browser
     runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.e2e-browser.result }}" = success
+
+  # Two jobs, three pages each (lighthouserc.json): 18 runs took 4 minutes in a single job.
+  lighthouse-group:
+    name: Lighthouse (pages ${{ matrix.group }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [0, 1]
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -92,13 +134,30 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: cp .env.example .dev.vars
       - run: pnpm build
-      - run: pnpm lighthouse
+      - name: Pages of this group
+        run: |
+          node -e "
+            const fs = require('fs');
+            const config = JSON.parse(fs.readFileSync('lighthouserc.json', 'utf8'));
+            config.ci.collect.url = config.ci.collect.url.filter((_, i) => i % 2 === ${{ matrix.group }});
+            console.log(config.ci.collect.url.join('\n'));
+            fs.writeFileSync('lighthouserc.group.json', JSON.stringify(config));
+          "
+      - run: pnpm exec lhci autorun --config=lighthouserc.group.json
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: lighthouse-reports
+          name: lighthouse-reports-${{ matrix.group }}
           path: .lighthouseci/reports/
           retention-days: 14
+
+  lighthouse:
+    name: Lighthouse budgets
+    if: always()
+    needs: lighthouse-group
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.lighthouse-group.result }}" = success
 
   security:
     name: Dependencies and secrets

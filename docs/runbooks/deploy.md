@@ -23,8 +23,29 @@
 
 ## Normal deploys
 
-- Pull request: the workflow uploads a preview version and comments its URL on the PR.
-- Merge to `main`: production deploy. `/api/health` shows the new SHA within a minute.
+The goal is one CI round per change (ADR 0024). Before pushing:
+
+1. `pnpm verify`: everything CI's quality and unit jobs check, plus the build and the JavaScript
+   and page budgets (`pnpm pages:check`).
+2. If the change touches a page in `lighthouserc.json`: `pnpm lighthouse:local` (Docker running;
+   about 3 minutes for all pages, `RUNS=1 pnpm lighthouse:local en` for a quick look at one). It
+   serves the build compressed, as CI and Cloudflare do, and reports the score estimated with
+   TBT 0 from the best of three runs, because a busy workstation only makes runs worse.
+3. `pnpm test:e2e --project=chromium` (add `--grep <path>` to narrow it); the full suite runs in CI,
+   one job per browser.
+
+Stop any `pnpm preview` before `pnpm build` (on Windows the running preview locks `dist/`), and
+run builds, end-to-end tests and Lighthouse one at a time.
+
+Then:
+
+- Pull request: CI (about 4 minutes) and the workflow that uploads a preview version and comments
+  its URL on the PR. CI lists any test that passed only on a retry in the job summary.
+- Merge to `main` (squash, branch up to date: the ruleset enforces both, so the merged tree is the
+  tested tree): production deploy, without a second CI run. `/api/health` shows the new SHA within
+  about two minutes.
+- If Lighthouse fails in CI: `gh run download <run> -p 'lighthouse-reports-*'`, read every failing
+  metric and audit, reproduce with `pnpm lighthouse:local`, fix everything in one push.
 
 ## Rollback
 
