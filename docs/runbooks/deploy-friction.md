@@ -110,6 +110,12 @@ with Geist's metrics, transitions held until the sheet applies).
   click is animated and the target is "not stable"; the gallery's auto-advance moves the row too.
   The test now runs with reduced motion, which keeps the tabs and the enlarged view. The sitemap
   test visits about 30 pages and is marked slow.
+- **Caught by the flaky summary on its first CI run:** the home card click (WebKit) had the same
+  cause: coordinates read while smooth scrolling and the reveal still moved the card. Every test
+  that scrolls and then clicks or drags by position now runs with reduced motion (card click,
+  contact form, logo band drag); the drag also waits for the motion layer to start and polls the
+  offset, because WebKit applies pointer moves a frame later. All of them passed four repeats on
+  three browsers without retries.
 
 ## 6. The pre-commit hook repeated the whole suite
 

@@ -181,11 +181,17 @@ test.describe('project pages', () => {
 
   test('the technologies band shows logos and can be dragged', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === 'mobile', 'mouse drag; touch scrolls the row natively');
+    // The drag goes to coordinates read after a scroll: with smooth scrolling they can be stale.
+    // Reduced motion also stops the drift, so only the drag moves the band.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/proyectos/invoice-etl-rescue');
     const band = page.locator('[data-band]');
     await band.scrollIntoViewIfNeeded();
     const list = page.getByRole('list', { name: 'Tecnologías' });
     await expect(list.getByRole('img', { name: 'Python' })).toBeVisible();
+    // The motion layer starts after the load event (ProjectArticle.astro); it reveals the chapter
+    // nav in the same task that wires the band, so a drag before that would move nothing.
+    await expect(page.locator('[data-chapters]')).not.toHaveAttribute('hidden');
 
     const offset = () =>
       page
@@ -197,7 +203,8 @@ test.describe('project pages', () => {
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
     await page.mouse.move(box.x + box.width / 2 - 300, box.y + box.height / 2, { steps: 6 });
-    expect(await offset()).toBeLessThan(before - 200);
+    // WebKit applies pointer moves a frame later: poll instead of reading once.
+    await expect.poll(offset).toBeLessThan(before - 200);
     await page.mouse.up();
   });
 
