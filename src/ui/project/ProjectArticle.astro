@@ -15,7 +15,9 @@ import { captionFor, mediaFor } from './media';
 import ProjectGallery from './ProjectGallery.astro';
 import ScreenPlaceholder from './ScreenPlaceholder.astro';
 import TechBand from './TechBand.astro';
-import '../styles/case-study.css';
+import chapterStyles from '../styles/case-study.css?url';
+import placeholderStyles from '../styles/screen-placeholder.css?url';
+import '../styles/case-study-hero.css';
 
 /**
  * A project page, told as a case study (ADR 0011, redesigned in ADR 0021): a hero with the
@@ -78,7 +80,7 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
 
 <div class="cs-progress" aria-hidden="true"></div>
 
-<article class="cs-article">
+<article class="cs-article" data-chapter-styles={chapterStyles}>
   <header data-cs-hero class="relative flex flex-col gap-12 pb-16 sm:gap-16 sm:pb-24">
     <Container class="flex flex-col gap-8 pt-10 sm:pt-16">
       <a
@@ -145,7 +147,11 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
                   class="size-full rounded-card object-cover object-top-left"
                 />
               ) : (
-                <ScreenPlaceholder slug={project.slug} />
+                <>
+                  {/* The drawn screen is on the first screen: its styles come with it. */}
+                  <link rel="stylesheet" href={placeholderStyles} />
+                  <ScreenPlaceholder slug={project.slug} />
+                </>
               )}
             </div>
           </div>
@@ -617,10 +623,29 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
       ))}
     </ul>
   </nav>
+  <noscript>
+    <link rel="stylesheet" href={chapterStyles} />
+  </noscript>
 </article>
 
 <script>
   import { startCaseStudy } from './case-study-motion';
 
-  startCaseStudy();
+  /*
+   * Only the first screen's styles come with the HTML (case-study-hero.css, inlined). The
+   * chapters below it get theirs here, without blocking the first paint (CLAUDE.md, the
+   * performance budget); the motion starts once they apply, so nothing it shows appears unstyled.
+   * The URL comes from the page, so it is the same sheet the noscript fallback links.
+   */
+  const href = document.querySelector<HTMLElement>('[data-chapter-styles]')?.dataset.chapterStyles;
+  if (href) {
+    const sheet = document.createElement('link');
+    sheet.rel = 'stylesheet';
+    sheet.href = href;
+    sheet.addEventListener('load', startCaseStudy, { once: true });
+    sheet.addEventListener('error', startCaseStudy, { once: true });
+    document.head.append(sheet);
+  } else {
+    startCaseStudy();
+  }
 </script>

@@ -7,7 +7,8 @@ import { logoFor } from './tech-logos';
  * once until the loop comes back. It moves on its own and the
  * reader can grab it and drag it either way (case-study-motion.ts); it is also a scrollable row,
  * so it works by keyboard and without JavaScript. The first list is the readable one; the copy
- * that closes the loop is hidden from assistive technology.
+ * that closes the loop is hidden from assistive technology. Each logo is drawn once, as a symbol
+ * both rounds reuse, so the second round adds no paths to the HTML.
  */
 interface Props {
   label: string;
@@ -15,9 +16,19 @@ interface Props {
 }
 
 const { label, stack } = Astro.props;
-const items = stack.map((name) => ({ name, logo: logoFor(name) }));
+const id = (name: string) => `tech-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+const items = stack.map((name) => ({ name, id: id(name), logo: logoFor(name) }));
 ---
 
+<svg class="hidden" aria-hidden="true">
+  {items.map(({ id, logo }) =>
+    logo ? (
+      <symbol id={id} viewBox="0 0 24 24">
+        <path d={logo.path} fill="currentColor" />
+      </symbol>
+    ) : null,
+  )}
+</svg>
 <div class="cs-band" data-band>
   <div class="cs-band-track" data-band-track>
     {[0, 1].map((round) => (
@@ -26,7 +37,7 @@ const items = stack.map((name) => ({ name, logo: logoFor(name) }));
         aria-label={round === 0 ? label : undefined}
         aria-hidden={round === 0 ? undefined : 'true'}
       >
-        {items.map(({ name, logo }) => (
+        {items.map(({ name, id, logo }) => (
           <li class="cs-band-item">
             {logo ? (
               <svg
@@ -39,7 +50,7 @@ const items = stack.map((name) => ({ name, logo: logoFor(name) }));
                 data-on-light={logo.onLight ? '' : undefined}
               >
                 <title>{name}</title>
-                <path d={logo.path} fill="currentColor" />
+                <use href={`#${id}`} />
               </svg>
             ) : (
               <span class="cs-band-word">{name}</span>
