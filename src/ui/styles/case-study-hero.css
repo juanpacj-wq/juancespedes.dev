@@ -6,6 +6,11 @@
  */
 
 @layer components {
+  /* The stage and the bleeding bands overflow sideways; the page never scrolls sideways. */
+  .cs-article {
+    overflow-x: clip;
+  }
+
   /* ---------- Reading progress ---------- */
 
   .cs-progress {

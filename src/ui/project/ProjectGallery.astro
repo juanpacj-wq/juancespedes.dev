@@ -1,5 +1,5 @@
 ---
-import { getImage, Picture } from 'astro:assets';
+import { getImage } from 'astro:assets';
 
 import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
@@ -12,6 +12,11 @@ import { captionFor, frameFor, type ProjectImage } from './media';
  * (a terminal). The slides form a row that snaps into place,
  * so it scrolls by swipe or keyboard without JavaScript; the case study script adds the tabs with
  * an auto-advancing progress bar and the enlarged view. The caption is the text alternative.
+ *
+ * The screenshots sit below the first screen, and a lazy image within the browser's look-ahead
+ * distance still downloads with the page (CLAUDE.md, the performance budget): their addresses
+ * wait in data attributes until the case study script starts the gallery. Without JavaScript the
+ * noscript copy shows instead.
  */
 interface Props {
   t: Dictionary;
@@ -25,20 +30,37 @@ interface Props {
 const { t, slug, locale, images, address } = Astro.props;
 const two = (n: number) => String(n + 1).padStart(2, '0');
 const slides = await Promise.all(
-  images.map(async (image) => ({
-    image,
-    frame: frameFor(slug, image),
-    tall: image.src.height > image.src.width,
-    caption: captionFor(slug, image.slot, locale) ?? '',
-    // The enlarged view loads one large WebP only when it is opened.
-    large: (await getImage({ src: image.src, width: 2000, format: 'webp' })).src,
-  })),
+  images.map(async (image) => {
+    const tall = image.src.height > image.src.width;
+    const widths = tall ? [360, 540, 720] : [640, 960, 1280, 1600];
+    const sizes = tall ? '(min-width: 640px) 22rem, 70vw' : '(min-width: 1280px) 1000px, 85vw';
+    const [avif, webp, large] = await Promise.all([
+      getImage({ src: image.src, widths, sizes, format: 'avif' }),
+      getImage({ src: image.src, widths, sizes, format: 'webp' }),
+      // The enlarged view loads one large WebP only when it is opened.
+      getImage({ src: image.src, width: 2000, format: 'webp' }),
+    ]);
+    return {
+      frame: frameFor(slug, image),
+      tall,
+      sizes,
+      avif: avif.srcSet.attribute,
+      webp: {
+        src: webp.src,
+        srcset: webp.srcSet.attribute,
+        width: image.src.width,
+        height: image.src.height,
+      },
+      caption: captionFor(slug, image.slot, locale) ?? '',
+      large: large.src,
+    };
+  }),
 );
 ---
 
 <div class="cs-gallery" data-gallery>
   <ol class="cs-gallery-track" aria-label={t.project.gallery} data-gallery-track>
-    {slides.map(({ image, frame, tall, caption, large }, index) => (
+    {slides.map(({ frame, tall, sizes, avif, webp, caption, large }, index) => (
       <li class:list={['cs-slide', tall && 'cs-slide--tall']} data-slide={index}>
         <figure class="flex flex-col gap-4">
           <a
@@ -55,14 +77,32 @@ const slides = await Promise.all(
                 <span>{address}</span>
               </span>
             )}
-            <Picture
-              src={image.src}
-              alt={caption}
-              formats={['avif', 'webp']}
-              widths={tall ? [360, 540, 720] : [640, 960, 1280, 1600]}
-              sizes={tall ? '(min-width: 640px) 22rem, 70vw' : '(min-width: 1280px) 1000px, 85vw'}
-              class="block h-auto w-full"
-            />
+            <picture>
+              <source type="image/avif" data-srcset={avif} sizes={sizes} />
+              <source type="image/webp" data-srcset={webp.srcset} sizes={sizes} />
+              <img
+                data-deferred
+                data-src={webp.src}
+                alt={caption}
+                width={webp.width}
+                height={webp.height}
+                decoding="async"
+                class="block h-auto w-full"
+              />
+            </picture>
+            <noscript>
+              <img
+                src={webp.src}
+                srcset={webp.srcset}
+                sizes={sizes}
+                alt={caption}
+                width={webp.width}
+                height={webp.height}
+                loading="lazy"
+                decoding="async"
+                class="block h-auto w-full"
+              />
+            </noscript>
             <span class="cs-frame-zoom" aria-hidden="true">
               <Icon name="search" size={16} />
             </span>

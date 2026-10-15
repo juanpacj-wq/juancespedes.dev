@@ -332,6 +332,14 @@ const gallery = (root: HTMLElement) => {
   const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-go]')];
   if (!track || slides.length === 0) return;
 
+  // The screenshots wait for the gallery to start (ProjectGallery.astro): give them their address.
+  for (const source of root.querySelectorAll<HTMLSourceElement>('source[data-srcset]')) {
+    source.srcset = source.dataset.srcset ?? '';
+  }
+  for (const image of root.querySelectorAll<HTMLImageElement>('img[data-deferred]')) {
+    image.src = image.dataset.src ?? '';
+  }
+
   const DWELL = 6000;
   let current = 0;
   let timer = 0;

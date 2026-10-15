@@ -13,8 +13,10 @@ Status of each fix: **open** until it is implemented.
 | Rerun of the failed e2e tests with `--workers=2`      | 1.6 min            |
 | `git commit` (pre-commit hook repeats verify's steps) | 2.5 min            |
 | CI round 1 (Lighthouse failed, everything else green) | 8 min              |
-| Diagnosis from the downloaded reports                 | (see 6, 7)         |
 | Local Lighthouse in Docker: setup and calibration     | about 20 min, once |
+| Fixes, local checks and `git commit` (hook: 301 s)    | about 50 min       |
+| CI round 2 (home 0.95 passed, case study 0.94)        | 6 min              |
+| Second set of fixes, local checks                     | about 30 min       |
 
 ## 1. Lighthouse is the gate that fails, and CI is the only meter
 
@@ -98,8 +100,13 @@ First CI round: FCP 1.8 s on main became 2.5 s, CLS 0.046 became 0.08.
 - `?url` imports of the same CSS from the frontmatter and from a client script produce two
   different files (different hashes, and the client copy lacks `-webkit-backdrop-filter`). **Fixed:**
   the script reads the URL the server rendered (`data-chapter-styles`).
-- **Still open:** the first two gallery images (18 kB) download with the page for the same
-  look-ahead reason as the home card.
+- Round 2 (home 0.95, case study 0.94, FCP 2.15 to 2.3 s): the chapters' sheet (20 kB, requested
+  at 174 ms), the first two gallery images (18 kB, the same look-ahead as the home card) and the
+  motion script (13 kB) still downloaded before the first paint. **Fixed:** the chapters' sheet
+  loads on the `load` event or the first scroll, tap or key, whichever comes first; the motion code
+  is imported once it applies; the gallery's screenshots get their address when the gallery
+  starts (noscript copies for readers without JavaScript). `.cs-article { overflow-x: clip }` moved
+  to the inlined sheet so the page never scrolls sideways while the other one loads.
 
 **Permanent fix (open):** extend `scripts/check-bundle.mjs` into a page budget that fails
 `pnpm verify` locally when a page in `lighthouserc.json` has a render-blocking stylesheet other
@@ -123,8 +130,9 @@ than the shared one, a raw HTML size above a threshold (home 150 kB, case study 
 
 ## 6. The pre-commit hook repeats what `pnpm verify` just did
 
-- **Cost:** 149 s per commit (format, lint, architecture and unit tests), right after `pnpm
-verify` passed on the same tree. Every fix commit in a failing PR pays it again.
+- **Cost:** 149 s and 301 s for the two commits of PR #39 (format, lint, architecture and unit
+  tests), right after the same checks passed on the same tree. Every fix commit in a failing PR
+  pays it again.
 - **Permanent fix (open):** keep the hook fast: `lint-staged` with Prettier and ESLint on the
   staged files only, and leave the full suite to `pnpm verify` and CI.
 

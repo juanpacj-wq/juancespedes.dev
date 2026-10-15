@@ -331,6 +331,12 @@
     border-radius: 2.25rem;
   }
 
+  /* A screenshot waiting for its address (ProjectGallery.astro): nothing to show yet, and without
+     JavaScript the noscript copy next to it shows instead. */
+  .cs-frame img[data-deferred]:not([src]) {
+    display: none;
+  }
+
   .cs-frame--phone img {
     border-radius: 1.75rem;
   }
@@ -654,10 +660,6 @@
 
   /* The stack as one band of logos that moves and can be dragged (TechBand.astro, ADR 0023).
      It spans the whole window; the article clips the overflow. */
-  .cs-article {
-    overflow-x: clip;
-  }
-
   .cs-bleed {
     margin-inline: calc(50% - 50vw);
   }

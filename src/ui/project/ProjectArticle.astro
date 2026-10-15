@@ -629,23 +629,42 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
 </article>
 
 <script>
-  import { startCaseStudy } from './case-study-motion';
-
   /*
    * Only the first screen's styles come with the HTML (case-study-hero.css, inlined). The
-   * chapters below it get theirs here, without blocking the first paint (CLAUDE.md, the
-   * performance budget); the motion starts once they apply, so nothing it shows appears unstyled.
+   * chapters below it get theirs once the page has loaded, or as soon as the reader scrolls,
+   * taps or types, whichever comes first: nothing below the first screen competes with the first
+   * paint (CLAUDE.md, the performance budget). The motion (its code too), and with it the
+   * gallery's screenshots, starts once the sheet applies, so nothing it shows appears unstyled.
    * The URL comes from the page, so it is the same sheet the noscript fallback links.
    */
+  const startCaseStudy = () => {
+    void import('./case-study-motion').then(({ startCaseStudy: start }) => {
+      start();
+    });
+  };
   const href = document.querySelector<HTMLElement>('[data-chapter-styles]')?.dataset.chapterStyles;
-  if (href) {
+  const triggers = ['scroll', 'pointerdown', 'keydown'] as const;
+  let started = false;
+  const addChapterStyles = () => {
+    if (started) return;
+    started = true;
+    removeEventListener('load', addChapterStyles);
+    for (const type of triggers) removeEventListener(type, addChapterStyles);
+    if (!href) {
+      startCaseStudy();
+      return;
+    }
     const sheet = document.createElement('link');
     sheet.rel = 'stylesheet';
     sheet.href = href;
     sheet.addEventListener('load', startCaseStudy, { once: true });
     sheet.addEventListener('error', startCaseStudy, { once: true });
     document.head.append(sheet);
+  };
+  if (document.readyState === 'complete') {
+    addChapterStyles();
   } else {
-    startCaseStudy();
+    addEventListener('load', addChapterStyles, { once: true });
+    for (const type of triggers) addEventListener(type, addChapterStyles, { passive: true });
   }
 </script>
