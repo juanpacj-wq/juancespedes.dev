@@ -1,0 +1,124 @@
+---
+kind: case-study
+title: Este portafolio, construido en público como muestra de frontend
+summary: El sitio que estás leyendo, bilingüe, estático en Astro con islas de React y hecho como un producto, con capas verificadas, presupuestos de rendimiento que bloquean el merge y accesibilidad probada en cada página.
+role: Autor único, del diseño y el sistema de diseño a la infraestructura y la operación
+period: { start: '2026-10', end: null }
+capabilities: [frontend, infrastructure]
+stack:
+  - Astro
+  - React
+  - TypeScript
+  - Tailwind CSS
+  - WCAG 2.2
+  - Cloudflare Workers
+  - GitHub Actions
+  - Playwright
+  - Docker
+  - LLM integration
+metrics:
+  - value: '0.95'
+    label: puntaje mínimo de rendimiento en Lighthouse por página, medido en CI y obligatorio para hacer merge
+    source: lighthouserc.json y flujo de CI del repositorio, octubre de 2026
+  - value: '24'
+    label: decisiones de arquitectura escritas como ADR, cada una con su contexto y sus consecuencias
+    source: Carpeta docs/adr del repositorio, octubre de 2026
+  - value: '80 kB'
+    label: tope de JavaScript del cliente comprimido, revisado en cada build
+    source: scripts/check-bundle.mjs del repositorio, octubre de 2026
+featured: true
+order: 5
+status: published
+confidentiality: public
+links:
+  - label: Código en GitHub
+    url: https://github.com/juanpacj-wq/juancespedes.dev
+story:
+  hook: 'Un portafolio dice que sabes hacer frontend. Este tenía que demostrarlo con su propio código, abierto para que cualquiera lo revise.'
+  shifts:
+    - before: 'Capturas de proyectos que nadie puede inspeccionar.'
+      after: 'Un repositorio público donde cada decisión está escrita y cada regla se verifica.'
+    - before: 'Un sitio que se ve bien en el equipo de quien lo hizo.'
+      after: 'Rendimiento, accesibilidad y contraste medidos en cada cambio, como los ve un visitante.'
+    - before: 'Agregar un proyecto exigía tocar código.'
+      after: 'Un proyecto es contenido validado: dos archivos y sus imágenes.'
+problem: Un portafolio de desarrollador suele ser una plantilla con capturas, y no muestra cómo trabaja quien lo hizo. Quería que el sitio mismo fuera la muestra principal de frontend, que un reclutador o un líder técnico pudiera abrir el repositorio y encontrar el mismo rigor que pondría en un producto, en español y en inglés, rápido en un teléfono de gama media y accesible para cualquiera.
+responsibilities:
+  - Diseñé la identidad visual y el sistema de diseño sobre tokens, con contraste comprobado por pruebas.
+  - Definí la arquitectura por capas y las reglas que la hacen cumplir en cada pull request.
+  - Construí las páginas, los casos de estudio con diagramas desde datos, la paleta de comandos y el chat.
+  - Monté la entrega en Cloudflare Workers, el CI con sus presupuestos y la operación con monitoreo y runbooks.
+constraints:
+  - Un sitio casi estático no justifica servidores ni bases de datos que haya que mantener.
+  - Cada página debe cargar rápido en un teléfono con una conexión lenta, con fuentes e imágenes propias.
+  - Contenido bilingüe sin que una traducción quede atrás de la otra.
+  - Los proyectos hechos para empleadores no pueden revelar sistemas internos ni datos reales.
+decisions:
+  - title: Astro estático con islas de React
+    rationale: Casi todo el sitio es contenido, así que se entrega como HTML sin JavaScript, y solo lo interactivo, como el chat o la paleta de comandos, se hidrata cuando hace falta.
+    alternatives:
+      - Una aplicación de una sola página en React
+      - Next.js con renderizado en el servidor en cada visita
+  - title: Arquitectura por capas aunque el sitio sea pequeño
+    rationale: Dominio, casos de uso, infraestructura e interfaz están separados, y dos herramientas independientes rechazan cualquier importación que cruce una frontera en el sentido equivocado.
+    alternatives:
+      - Organizar por carpetas y confiar en la disciplina
+  - title: Los proyectos son contenido tipado, no páginas
+    rationale: Cada caso de estudio es un archivo validado por esquema y por reglas de dominio, incluido el diagrama de arquitectura, que se describe como datos y se dibuja accesible en los dos idiomas.
+    alternatives:
+      - Un CMS externo
+      - Una página escrita a mano por proyecto
+  - title: Medir el rendimiento como lo recibe un visitante
+    rationale: Lighthouse corre sobre el build servido con Brotli, igual que en Cloudflare, y una revisión previa falla con hojas de estilo bloqueantes, imágenes que bajan con la página o HTML por encima de su presupuesto.
+    alternatives:
+      - Medir el HTML sin comprimir en el servidor de vista previa
+      - Revisar el rendimiento a mano antes de cada lanzamiento
+architecture:
+  summary: El contenido en MDX y YAML se valida y se convierte en páginas estáticas con Astro. Cloudflare Workers sirve esas páginas con encabezados de seguridad y atiende las pocas rutas dinámicas, como el formulario de contacto y el chat, mientras GitHub Actions verifica y despliega cada cambio.
+  layers:
+    - name: Contenido
+      nodes:
+        - {
+            id: content,
+            label: 'Contenido bilingüe',
+            detail: 'Proyectos, notas y perfil en MDX y YAML',
+          }
+    - name: Build
+      nodes:
+        - {
+            id: astro,
+            label: 'Astro con islas de React',
+            detail: 'Esquemas, capas y páginas estáticas',
+          }
+        - { id: ci, label: 'GitHub Actions', detail: 'Pruebas, axe, Lighthouse y presupuestos' }
+    - name: Borde
+      nodes:
+        - {
+            id: worker,
+            label: 'Cloudflare Workers',
+            detail: 'Páginas, encabezados de seguridad y API',
+          }
+    - name: Servicios
+      nodes:
+        - {
+            id: chat,
+            label: 'Chat sobre el trabajo',
+            detail: 'Modelo de lenguaje con cuotas diarias',
+          }
+        - { id: email, label: 'Formulario de contacto', detail: 'Envío de correo con antispam' }
+  flows:
+    - { from: content, to: astro, label: 'Validado en cada build' }
+    - { from: astro, to: ci, label: 'Build de producción' }
+    - { from: ci, to: worker, label: 'Despliegue si todo pasa' }
+    - { from: worker, to: chat, label: 'Preguntas de visitantes' }
+    - { from: worker, to: email, label: 'Mensajes de contacto' }
+outcomes:
+  - El sitio está en producción en dos idiomas, con cada página por encima de su presupuesto de rendimiento y sin errores de axe.
+  - Agregar un proyecto no toca código, y una traducción incompleta o un dato interno no pasa las pruebas de contenido.
+  - El repositorio cuenta las decisiones en ADR y runbooks, así que se puede revisar como se revisaría el trabajo en un equipo.
+lessons:
+  - Mediría el rendimiento con compresión desde el primer día, porque medir el HTML sin comprimir costó varias rondas de CI por cambios que estaban bien.
+  - Definiría los presupuestos de estilos por página antes del rediseño, no después, para no mover hojas de estilo bloqueantes a mitad de camino.
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

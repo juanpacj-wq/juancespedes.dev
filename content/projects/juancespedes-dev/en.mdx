@@ -1,0 +1,116 @@
+---
+kind: case-study
+title: This portfolio, built in public as a frontend work sample
+summary: The site you are reading, bilingual, static in Astro with React islands and built like a product, with enforced layers, performance budgets that block the merge and accessibility tested on every page.
+role: Sole author, from the design and design system to the infrastructure and operations
+period: { start: '2026-10', end: null }
+capabilities: [frontend, infrastructure]
+stack:
+  - Astro
+  - React
+  - TypeScript
+  - Tailwind CSS
+  - WCAG 2.2
+  - Cloudflare Workers
+  - GitHub Actions
+  - Playwright
+  - Docker
+  - LLM integration
+metrics:
+  - value: '0.95'
+    label: minimum Lighthouse performance score per page, measured in CI and required to merge
+    source: lighthouserc.json and the repository's CI workflow, October 2026
+  - value: '24'
+    label: architecture decisions written as ADRs, each with its context and consequences
+    source: The repository's docs/adr folder, October 2026
+  - value: '80 kB'
+    label: cap on compressed client JavaScript, checked on every build
+    source: The repository's scripts/check-bundle.mjs, October 2026
+featured: true
+order: 5
+status: published
+confidentiality: public
+links:
+  - label: Code on GitHub
+    url: https://github.com/juanpacj-wq/juancespedes.dev
+story:
+  hook: 'A portfolio says you can do frontend. This one had to prove it with its own code, open for anyone to review.'
+  shifts:
+    - before: 'Screenshots of projects nobody can inspect.'
+      after: 'A public repository where every decision is written down and every rule is checked.'
+    - before: "A site that looks good on its author's machine."
+      after: 'Performance, accessibility and contrast measured on every change, as a visitor gets them.'
+    - before: 'Adding a project meant touching code.'
+      after: 'A project is validated content: two files and their images.'
+problem: A developer portfolio is usually a template with screenshots, and it does not show how its author works. I wanted the site itself to be my main frontend work sample, so a recruiter or a tech lead could open the repository and find the same rigor I would bring to a product, in Spanish and English, fast on a mid-range phone and accessible to anyone.
+responsibilities:
+  - Designed the visual identity and the design system on tokens, with contrast checked by tests.
+  - Defined the layered architecture and the rules that enforce it on every pull request.
+  - Built the pages, the case studies with diagrams drawn from data, the command palette and the chat.
+  - Set up delivery on Cloudflare Workers, CI with its budgets and operations with monitoring and runbooks.
+constraints:
+  - A mostly static site does not justify servers or databases that need upkeep.
+  - Every page must load fast on a phone with a slow connection, with its own fonts and images.
+  - Bilingual content, with neither translation falling behind the other.
+  - Projects built for employers cannot reveal internal systems or real data.
+decisions:
+  - title: Static Astro with React islands
+    rationale: Almost the whole site is content, so it ships as HTML without JavaScript, and only the interactive parts, such as the chat or the command palette, hydrate when they are needed.
+    alternatives:
+      - A React single-page application
+      - Next.js rendering on the server for every visit
+  - title: A layered architecture even for a small site
+    rationale: Domain, use cases, infrastructure and interface are separate, and two independent tools reject any import that crosses a boundary in the wrong direction.
+    alternatives:
+      - Organizing by folders and trusting discipline
+  - title: Projects are typed content, not pages
+    rationale: Each case study is a file validated by schema and by domain rules, including the architecture diagram, which is described as data and drawn accessibly in both languages.
+    alternatives:
+      - An external CMS
+      - A hand-written page per project
+  - title: Measure performance as a visitor gets it
+    rationale: Lighthouse runs on the build served with Brotli, the way Cloudflare serves it, and an earlier check fails on render-blocking stylesheets, images that download with the page or HTML over its budget.
+    alternatives:
+      - Measuring uncompressed HTML on the preview server
+      - Checking performance by hand before each release
+architecture:
+  summary: The MDX and YAML content is validated and turned into static pages by Astro. Cloudflare Workers serves those pages with security headers and handles the few dynamic routes, such as the contact form and the chat, while GitHub Actions checks and deploys every change.
+  layers:
+    - name: Content
+      nodes:
+        - {
+            id: content,
+            label: 'Bilingual content',
+            detail: 'Projects, notes and profile in MDX and YAML',
+          }
+    - name: Build
+      nodes:
+        - {
+            id: astro,
+            label: 'Astro with React islands',
+            detail: 'Schemas, layers and static pages',
+          }
+        - { id: ci, label: 'GitHub Actions', detail: 'Tests, axe, Lighthouse and budgets' }
+    - name: Edge
+      nodes:
+        - { id: worker, label: 'Cloudflare Workers', detail: 'Pages, security headers and API' }
+    - name: Services
+      nodes:
+        - { id: chat, label: 'Chat about the work', detail: 'Language model with daily quotas' }
+        - { id: email, label: 'Contact form', detail: 'Email delivery with anti-spam' }
+  flows:
+    - { from: content, to: astro, label: 'Validated on every build' }
+    - { from: astro, to: ci, label: 'Production build' }
+    - { from: ci, to: worker, label: 'Deploy when everything passes' }
+    - { from: worker, to: chat, label: 'Visitor questions' }
+    - { from: worker, to: email, label: 'Contact messages' }
+outcomes:
+  - The site is in production in two languages, with every page above its performance budget and no axe violations.
+  - Adding a project touches no code, and an incomplete translation or an internal detail does not pass the content tests.
+  - The repository tells its decisions through ADRs and runbooks, so it can be reviewed the way work is reviewed on a team.
+lessons:
+  - I would measure performance with compression from day one, because measuring uncompressed HTML cost several CI rounds for changes that were fine.
+  - I would set per-page style budgets before the redesign, not after, so render-blocking stylesheets do not move halfway through.
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

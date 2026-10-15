@@ -1,0 +1,7 @@
+{
+  "cover": {
+    "es": "Recreación con datos ficticios: el agente encola trabajos de lectura y escritura, el plugin los toma en Figma de escritorio y el puente rechaza borrar un nodo que no creó.",
+    "en": "A recreation with fictitious data: the agent queues read and write jobs, the plugin picks them up in Figma desktop and the bridge refuses to delete a node it did not create.",
+    "frame": "none"
+  }
+}
