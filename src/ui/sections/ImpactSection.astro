@@ -1,0 +1,60 @@
+---
+import type { Achievement } from '../../domain/project/achievement';
+import type { Education, Experience } from '../../domain/profile/profile';
+import type { Locale } from '../../domain/shared/locale';
+import type { Dictionary } from '../i18n/dictionary';
+import { formatPeriod } from '../i18n/format';
+import AchievementCard from '../impact/AchievementCard.astro';
+import Section from '../primitives/Section.astro';
+
+/**
+ * Results told for the people who hire: a bento of achievements, each with its figure, its
+ * chart and its source, and one line underneath saying where they happened. The full work
+ * history lives in the CV; this section replaced the CV-style list (ADR 0025).
+ */
+interface Props {
+  t: Dictionary;
+  locale: Locale;
+  achievements: readonly Achievement[];
+  /** Most recent first; the first entry of each frames the results. */
+  experience: readonly Experience[];
+  education: readonly Education[];
+}
+
+const { t, locale, achievements, experience, education } = Astro.props;
+const [job] = experience;
+const [degree] = education;
+---
+
+{achievements.length > 0 && (
+  <Section id="impact" title={t.impact.title}>
+    <p slot="description">{t.impact.description}</p>
+
+    <ul class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+      {achievements.map((achievement) => (
+        <AchievementCard t={t} locale={locale} achievement={achievement} />
+      ))}
+    </ul>
+
+    {(job ?? degree) && (
+      <div class="reveal mt-10 flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-baseline sm:gap-8">
+        <p class="shrink-0 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+          {t.impact.where}
+        </p>
+        <ul class="flex flex-col gap-2 text-small text-muted sm:flex-row sm:flex-wrap sm:gap-x-8">
+          {job && (
+            <li>
+              <span class="font-medium text-ink">{job.role}</span>, {job.organization}
+              <span class="font-mono text-subtle"> · {formatPeriod(locale, job.period, t)}</span>
+            </li>
+          )}
+          {degree && (
+            <li>
+              <span class="font-medium text-ink">{degree.degree}</span>, {degree.institution}
+            </li>
+          )}
+        </ul>
+      </div>
+    )}
+  </Section>
+)}

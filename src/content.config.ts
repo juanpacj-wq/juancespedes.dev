@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { file, glob } from 'astro/loaders';
 
 import {
-  headlineMetricSchema,
+  achievementSchema,
   noteFrontmatterSchema,
   nowSchema,
   profileSchema,
@@ -19,9 +19,9 @@ export const collections = {
     loader: glob({ pattern: '*/{es,en}.mdx', base: './content/projects' }),
     schema: projectFrontmatterSchema,
   }),
-  headlineMetrics: defineCollection({
-    loader: file('./content/headline-metrics.yaml'),
-    schema: headlineMetricSchema,
+  achievements: defineCollection({
+    loader: file('./content/achievements.yaml'),
+    schema: achievementSchema,
   }),
   profile: defineCollection({
     loader: glob({ pattern: '{es,en}.yaml', base: './content/profile' }),

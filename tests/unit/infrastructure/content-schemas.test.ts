@@ -5,7 +5,7 @@ import {
   toProject,
 } from '../../../src/infrastructure/content/project-mapper';
 import {
-  headlineMetricSchema,
+  achievementSchema,
   projectFrontmatterSchema,
   technologySchema,
 } from '../../../src/infrastructure/content/schemas';
@@ -135,7 +135,7 @@ describe('toProject', () => {
   });
 });
 
-describe('catalog and headline metric schemas', () => {
+describe('catalog schema', () => {
   it('validates technologies against the capability list', () => {
     expect(
       technologySchema.safeParse({ id: 'react', name: 'React', capability: 'frontend' }).success,
@@ -144,18 +144,41 @@ describe('catalog and headline metric schemas', () => {
       technologySchema.safeParse({ id: 'react', name: 'React', capability: 'design' }).success,
     ).toBe(false);
   });
+});
 
-  it('requires both languages for headline metrics', () => {
-    const metric = {
-      id: 'systems',
-      order: 1,
-      value: { es: '6', en: '6' },
-      label: { es: 'sistemas', en: 'systems' },
-      source: { es: 'auditoría', en: 'audit' },
-    };
-    expect(headlineMetricSchema.safeParse(metric).success).toBe(true);
-    expect(headlineMetricSchema.safeParse({ ...metric, label: { es: 'sistemas' } }).success).toBe(
-      false,
-    );
+describe('achievement schema', () => {
+  const both = (text: string) => ({ es: text, en: text });
+  const entry = {
+    id: 'telemetry-latency',
+    order: 1,
+    kind: 'performance',
+    value: both('44×'),
+    title: both('Faster readings'),
+    summary: both('Readings take 25 ms.'),
+    context: both('Telemetry'),
+    source: both('Latency measurements'),
+    project: 'plant-telemetry',
+    chart: {
+      kind: 'compare',
+      before: { amount: 1100, display: both('1.1 s'), label: both('Before') },
+      after: { amount: 25, display: both('25 ms'), label: both('After') },
+    },
+  };
+
+  it('accepts a complete entry and fills the defaults', () => {
+    expect(achievementSchema.safeParse(entry).success).toBe(true);
+    const bare = { ...entry, project: undefined, chart: undefined };
+    expect(achievementSchema.parse(bare)).toMatchObject({
+      featured: false,
+      project: null,
+      chart: null,
+    });
+  });
+
+  it('rejects unknown kinds, missing translations and charts that contradict themselves', () => {
+    expect(achievementSchema.safeParse({ ...entry, kind: 'vibes' }).success).toBe(false);
+    expect(achievementSchema.safeParse({ ...entry, title: { es: 'Solo' } }).success).toBe(false);
+    const progress = { kind: 'progress', done: 40, total: 39, label: both('closed') };
+    expect(achievementSchema.safeParse({ ...entry, chart: progress }).success).toBe(false);
   });
 });

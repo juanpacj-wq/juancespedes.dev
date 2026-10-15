@@ -1,0 +1,97 @@
+---
+import { getImage } from 'astro:assets';
+
+import type { Locale } from '../../domain/shared/locale';
+import type { Dictionary } from '../i18n/dictionary';
+import { captionFor, frameFor, type ProjectImage } from './media';
+import { SCREENSHOT_QUALITY, SCREENSHOT_WIDTHS } from './screenshots';
+
+/**
+ * The same product on phones and a tablet, side by side: proof that the site is responsive, not a
+ * claim. The intro comes from the project's captions.json ("responsive"), each capture's caption
+ * is its text alternative. The devices wrap instead of scrolling, so the row needs no focus stop
+ * and no script. Like the gallery, the addresses wait in data attributes until the case study
+ * script starts (CLAUDE.md, the performance budget); without JavaScript the noscript copy shows.
+ */
+interface Props {
+  t: Dictionary;
+  slug: string;
+  locale: Locale;
+  images: readonly ProjectImage[];
+}
+
+const { t, slug, locale, images } = Astro.props;
+const intro = captionFor(slug, 'responsive', locale);
+const screens = await Promise.all(
+  images.map(async (image) => {
+    const tablet = frameFor(slug, image) === 'tablet';
+    const widths = [...(tablet ? SCREENSHOT_WIDTHS.tablet : SCREENSHOT_WIDTHS.phone)];
+    const sizes = tablet ? '(min-width: 640px) 22rem, 92vw' : '(min-width: 640px) 13rem, 44vw';
+    const [avif, webp] = await Promise.all(
+      (['avif', 'webp'] as const).map((format) =>
+        getImage({ src: image.src, widths, sizes, format, quality: SCREENSHOT_QUALITY[format] }),
+      ),
+    );
+    return {
+      tablet,
+      sizes,
+      avif: avif?.srcSet.attribute ?? '',
+      webp: {
+        src: webp?.src ?? '',
+        srcset: webp?.srcSet.attribute ?? '',
+        width: image.src.width,
+        height: image.src.height,
+      },
+      caption: captionFor(slug, image.slot, locale) ?? '',
+    };
+  }),
+);
+---
+
+<div class="cs-screens">
+  <div class="flex max-w-2xl flex-col gap-3">
+    <h3 class="font-display text-title font-light text-balance text-ink sm:text-quote">
+      {t.project.responsive}
+    </h3>
+    {intro && <p class="text-body text-pretty text-muted">{intro}</p>}
+  </div>
+  <ul class="cs-screens-row" aria-label={t.project.screens}>
+    {screens.map(({ tablet, sizes, avif, webp, caption }) => (
+      <li class:list={['cs-screen', tablet && 'cs-screen--tablet']}>
+        <figure class="flex flex-col gap-3">
+          <div class:list={['cs-frame', tablet ? 'cs-frame--tablet' : 'cs-frame--phone']}>
+            <picture>
+              <source type="image/avif" data-srcset={avif} sizes={sizes} />
+              <source type="image/webp" data-srcset={webp.srcset} sizes={sizes} />
+              <img
+                data-deferred
+                data-src={webp.src}
+                alt={caption}
+                width={webp.width}
+                height={webp.height}
+                decoding="async"
+                class="block h-auto w-full"
+              />
+            </picture>
+            <noscript>
+              <img
+                src={webp.src}
+                srcset={webp.srcset}
+                sizes={sizes}
+                alt={caption}
+                width={webp.width}
+                height={webp.height}
+                loading="lazy"
+                decoding="async"
+                class="block h-auto w-full"
+              />
+            </noscript>
+          </div>
+          <figcaption class="cs-screen-caption text-small text-pretty text-muted">
+            {caption}
+          </figcaption>
+        </figure>
+      </li>
+    ))}
+  </ul>
+</div>

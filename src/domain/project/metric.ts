@@ -17,9 +17,3 @@ export const validateMetric = (metric: Metric): readonly MetricIssue[] =>
   (['value', 'label', 'source'] as const)
     .filter((field) => metric[field].trim() === '')
     .map((field) => ({ field, message: `metric ${field} must not be blank` }));
-
-/** A headline figure shown on the home page, outside any single project. */
-export interface HeadlineMetric extends Metric {
-  readonly id: string;
-  readonly order: number;
-}

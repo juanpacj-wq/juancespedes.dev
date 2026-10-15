@@ -4,7 +4,7 @@ import type { ProjectKind } from '../../domain/project/project';
 import type { Locale } from '../../domain/shared/locale';
 
 /*
- * Interface strings. Content (projects, profile, metrics) lives in content/; this file only holds
+ * Interface strings. Content (projects, profile) lives in content/; this file only holds
  * the words of the interface itself. English is typed against Spanish, so a missing or extra key
  * in either language is a compile error.
  */
@@ -87,10 +87,6 @@ const es = {
     ],
     localTime: 'Hora local',
   },
-  metrics: {
-    eyebrow: 'En cifras',
-    title: 'Resultados que se pueden verificar',
-  },
   projects: {
     eyebrow: 'Proyectos',
     title: 'Sistemas en producción y código abierto',
@@ -106,22 +102,33 @@ const es = {
   },
   capabilities: {
     eyebrow: 'Capacidades',
-    title: 'Cada habilidad, con el proyecto que la demuestra',
-    description: 'Sin porcentajes ni barras: cada tecnología enlaza al trabajo donde la usé.',
-    provenBy: 'Demostrado en',
+    title: 'Las herramientas con las que construyo',
+    description:
+      'Organizadas por área. Cada caso de estudio cuenta dónde y cómo usé cada una, con el resultado.',
   },
-  experience: {
-    eyebrow: 'Trayectoria',
-    title: 'Experiencia y formación',
-    work: 'Experiencia',
-    education: 'Formación',
+  impact: {
+    title: 'Impacto en el negocio',
+    description:
+      'Lo que cambió para la operación con cada entrega: cuánto, dónde y con qué evidencia. Cada cifra lleva su fuente y su caso de estudio.',
+    kinds: {
+      security: 'Seguridad',
+      performance: 'Rendimiento',
+      efficiency: 'Eficiencia',
+      delivery: 'Entrega',
+      reliability: 'Confiabilidad',
+      quality: 'Calidad',
+    },
+    caseLink: 'Ver el caso',
+    of: 'de',
+    where: 'Dónde lo logré',
   },
   services: {
     eyebrow: 'Servicios',
     title: 'Servicios y precios',
     description:
-      'Cuatro formas de trabajar conmigo, cada una con un precio de partida claro. Los detalles los ajustamos a tu proyecto en la primera conversación.',
+      'Tres formas de trabajar conmigo. Datos y automatización tienen un precio de partida claro; las aplicaciones a la medida se cotizan según tu requerimiento. Los detalles los ajustamos en la primera conversación.',
     from: 'desde',
+    quoted: 'Por cotización',
     scope: 'Alcance',
     featured: 'Lo que más hago',
     currencyNote: 'Valores en pesos colombianos (COP).',
@@ -216,6 +223,8 @@ const es = {
     previousImage: 'Imagen anterior',
     nextImage: 'Imagen siguiente',
     closeImage: 'Cerrar imagen',
+    responsive: 'Se adapta a cada pantalla',
+    screens: 'Capturas en teléfono y tableta',
     overview: 'En resumen',
     before: 'Antes',
     after: 'Después',
@@ -422,10 +431,6 @@ const en: Dictionary = {
     ],
     localTime: 'Local time',
   },
-  metrics: {
-    eyebrow: 'By the numbers',
-    title: 'Results you can verify',
-  },
   projects: {
     eyebrow: 'Projects',
     title: 'Systems in production and open source',
@@ -441,22 +446,33 @@ const en: Dictionary = {
   },
   capabilities: {
     eyebrow: 'Capabilities',
-    title: 'Every skill, with the project that proves it',
-    description: 'No percentages or bars: each technology links to the work where I used it.',
-    provenBy: 'Proven in',
+    title: 'The tools I build with',
+    description:
+      'Grouped by area. Each case study tells where and how I used each one, and what came of it.',
   },
-  experience: {
-    eyebrow: 'Background',
-    title: 'Experience and education',
-    work: 'Experience',
-    education: 'Education',
+  impact: {
+    title: 'Business impact',
+    description:
+      'What changed for the operation with each delivery: how much, where and with what evidence. Every figure carries its source and its case study.',
+    kinds: {
+      security: 'Security',
+      performance: 'Performance',
+      efficiency: 'Efficiency',
+      delivery: 'Delivery',
+      reliability: 'Reliability',
+      quality: 'Quality',
+    },
+    caseLink: 'Read the case',
+    of: 'of',
+    where: 'Where I did it',
   },
   services: {
     eyebrow: 'Services',
     title: 'Services and prices',
     description:
-      'Four ways to work with me, each with a clear starting price. We adjust the details to your project in the first conversation.',
+      'Three ways to work with me. Data and automation have a clear starting price; custom applications are quoted from your requirement. We adjust the details in the first conversation.',
     from: 'from',
+    quoted: 'Custom quote',
     scope: 'Scope',
     featured: 'My core work',
     currencyNote: 'Prices in US dollars (USD).',
@@ -550,6 +566,8 @@ const en: Dictionary = {
     previousImage: 'Previous image',
     nextImage: 'Next image',
     closeImage: 'Close image',
+    responsive: 'Fits every screen',
+    screens: 'Captures on a phone and a tablet',
     overview: 'At a glance',
     before: 'Before',
     after: 'After',

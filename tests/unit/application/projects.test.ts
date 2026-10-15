@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import type { HeadlineMetricRepository } from '../../../src/application/ports/headline-metric-repository';
+import type { AchievementRepository } from '../../../src/application/ports/achievement-repository';
 import type { ProjectRepository } from '../../../src/application/ports/project-repository';
 import type { TechnologyCatalog } from '../../../src/application/ports/technology-catalog';
 import { makeBuildSkillEvidenceMatrix } from '../../../src/application/use-cases/build-skill-evidence-matrix';
 import { makeGetProject } from '../../../src/application/use-cases/get-project';
 import { makeGetProjectPage } from '../../../src/application/use-cases/get-project-page';
+import { makeListAchievements } from '../../../src/application/use-cases/list-achievements';
 import { makeListFeaturedProjects } from '../../../src/application/use-cases/list-featured-projects';
-import { makeListHeadlineMetrics } from '../../../src/application/use-cases/list-headline-metrics';
 import { makeListProjects } from '../../../src/application/use-cases/list-projects';
 import type { Project } from '../../../src/domain/project/project';
 import {
@@ -169,17 +169,41 @@ describe('buildSkillEvidenceMatrix', () => {
   });
 });
 
-describe('listHeadlineMetrics', () => {
-  const metrics: HeadlineMetricRepository = {
+describe('listAchievements', () => {
+  const base = {
+    kind: 'security',
+    value: '0',
+    title: 'Title',
+    summary: 'Summary',
+    context: 'Context',
+    source: 'Source',
+    chart: null,
+    featured: false,
+  } as const;
+  const achievements: AchievementRepository = {
     findAll: () =>
       Promise.resolve([
-        { id: 'b', order: 2, value: '2 s', label: 'polling', source: 's' },
-        { id: 'a', order: 1, value: '6', label: 'systems', source: 's' },
+        { ...base, id: 'linked', order: 2, project: 'telemetry' },
+        { ...base, id: 'draft-link', order: 3, project: 'draft-tool' },
+        { ...base, id: 'featured', order: 4, project: null, featured: true },
+        { ...base, id: 'unlinked', order: 1, project: null },
       ]),
   };
+  const list = makeListAchievements({ achievements, listProjects });
 
-  it('returns figures in the configured order', async () => {
-    const list = makeListHeadlineMetrics(metrics);
-    expect((await list('en')).map((m) => m.id)).toEqual(['a', 'b']);
+  it('puts the featured achievement first and keeps the author order', async () => {
+    expect((await list('en')).map((a) => a.id)).toEqual([
+      'featured',
+      'unlinked',
+      'linked',
+      'draft-link',
+    ]);
+  });
+
+  it('links only to case studies published in the same language', async () => {
+    const byId = new Map((await list('en')).map((a) => [a.id, a.project]));
+    expect(byId.get('linked')).toBe('telemetry');
+    expect(byId.get('draft-link')).toBeNull();
+    expect((await list('es')).map((a) => a.project)).not.toContain('telemetry');
   });
 });

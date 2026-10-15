@@ -1,11 +1,12 @@
 import { getCollection, getEntry, render } from 'astro:content';
 
-import type { HeadlineMetricRepository } from '../../application/ports/headline-metric-repository';
+import type { AchievementRepository } from '../../application/ports/achievement-repository';
 import type { ProfileRepository } from '../../application/ports/profile-repository';
 import type { ProjectRepository } from '../../application/ports/project-repository';
 import type { TechnologyCatalog } from '../../application/ports/technology-catalog';
 import type { NoteRepository, NowRepository } from '../../application/ports/writing-repositories';
 import type { Locale } from '../../domain/shared/locale';
+import { toAchievement } from './achievement-mapper';
 import { toProfile } from './profile-mapper';
 import { toProject } from './project-mapper';
 import { toNote, toNowPage } from './writing-mappers';
@@ -21,16 +22,10 @@ export const astroProjectRepository: ProjectRepository = {
   },
 };
 
-export const astroHeadlineMetricRepository: HeadlineMetricRepository = {
+export const astroAchievementRepository: AchievementRepository = {
   async findAll(locale) {
-    const entries = await getCollection('headlineMetrics');
-    return entries.map(({ data }) => ({
-      id: data.id,
-      order: data.order,
-      value: data.value[locale],
-      label: data.label[locale],
-      source: data.source[locale],
-    }));
+    const entries = await getCollection('achievements');
+    return entries.map(({ data }) => toAchievement(data, locale));
   },
 };
 

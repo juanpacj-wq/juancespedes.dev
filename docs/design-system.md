@@ -59,6 +59,11 @@ nodes and flows as text, and `case-study-motion.ts` adds the wires, highlights a
 walk on top. Motion on these pages is scroll-driven CSS plus that one deferred script, and no
 starting state lowers text contrast ([ADR 0021](adr/0021-case-study-redesign.md)).
 
+Impact (`src/ui/impact`): `AchievementCard` is a bevelled card with a kind and place rule, a
+figure in the tone of the win (verdigris for security and reliability, ochre for speed and savings)
+and its source; `AchievementChart` draws a before and after, a breakdown or progress as bars that
+grow on scroll ([ADR 0025](adr/0025-business-impact-section.md)).
+
 Site chrome (`src/ui/chrome`): `SiteHeader`, `SiteFooter`, `ThemeToggle`. Page layout:
 `src/ui/layouts/BaseLayout.astro` (meta, theme bootstrap, skip link, header, footer).
 

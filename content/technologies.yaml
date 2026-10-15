@@ -12,6 +12,7 @@
 - { id: vite, name: Vite, capability: frontend }
 - { id: accessibility, name: WCAG 2.2, capability: frontend }
 - { id: customtkinter, name: CustomTkinter, capability: frontend }
+- { id: javascript, name: JavaScript, capability: frontend }
 
 # Backend
 - { id: nodejs, name: Node.js, capability: backend }
@@ -45,6 +46,7 @@
 - { id: selenium, name: Selenium, capability: automation-ai }
 - { id: microsoft-graph, name: Microsoft Graph, capability: automation-ai }
 - { id: llm-integration, name: LLM integration, capability: automation-ai }
+- { id: figma, name: Figma, capability: automation-ai }
 
 # Infrastructure
 - { id: linux, name: Linux, capability: infrastructure }

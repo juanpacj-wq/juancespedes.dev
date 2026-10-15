@@ -72,6 +72,13 @@ describe('buildCorpus', () => {
           price: { from: 6000000, scope: 'Un módulo' },
           featured: true,
         },
+        {
+          title: 'Apps',
+          summary: 'A la medida.',
+          deliverables: ['Aplicación'],
+          price: { from: null, scope: 'Según el requerimiento' },
+          featured: false,
+        },
       ],
       process: [{ title: 'Conversación', description: 'Hablamos.' }],
       currency: 'COP',
@@ -96,6 +103,7 @@ describe('buildCorpus', () => {
       expect(corpus).toContain(fragment);
     }
     expect(corpus).toMatch(/Desde \$\s6\.000\.000 COP \(Un módulo\)/);
+    expect(corpus).toContain('Precio por cotización (Según el requerimiento).');
   });
 
   it('is deterministic, so the prompt cache can reuse it', () => {

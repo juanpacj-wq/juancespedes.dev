@@ -30,10 +30,10 @@
   locale: en
   question: Has he used Apache Airflow?
   links: [/en/projects/invoice-etl-rescue]
-- id: pdf
+- id: figma
   locale: es
-  question: ¿Ha automatizado la extracción de datos de PDF?
-  links: [/proyectos/invoice-parser]
+  question: ¿Ha automatizado trabajo en Figma?
+  links: [/proyectos/figma-bridge]
 - id: mcp
   locale: en
   question: Has he built MCP servers?

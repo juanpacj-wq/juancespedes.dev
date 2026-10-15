@@ -63,6 +63,12 @@ const proxy = createServer((incoming, outgoing) => {
       headers: { ...incoming.headers, 'accept-encoding': 'identity' },
     },
     (response) => {
+      // The client may have left while the preview answered (a test that navigates on): piping
+      // into its closed socket throws at once and would take the whole server down.
+      if (outgoing.destroyed) {
+        response.resume();
+        return;
+      }
       const headers = { ...response.headers };
       const type = String(headers['content-type'] ?? '');
       const wantsBrotli = /\bbr\b/.test(String(incoming.headers['accept-encoding'] ?? ''));

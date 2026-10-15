@@ -8,9 +8,8 @@ import AboutSection from '../../ui/sections/AboutSection.astro';
 import CapabilitiesSection from '../../ui/sections/CapabilitiesSection.astro';
 import ContactSection from '../../ui/sections/ContactSection.astro';
 import CredentialsSection from '../../ui/sections/CredentialsSection.astro';
-import ExperienceSection from '../../ui/sections/ExperienceSection.astro';
 import HeroSection from '../../ui/sections/HeroSection.astro';
-import MetricsSection from '../../ui/sections/MetricsSection.astro';
+import ImpactSection from '../../ui/sections/ImpactSection.astro';
 import ProjectsSection from '../../ui/sections/ProjectsSection.astro';
 import ServicesSection from '../../ui/sections/ServicesSection.astro';
 import { homeGraph } from '../../ui/seo/structured-data';
@@ -24,11 +23,11 @@ interface Props {
 const { locale } = Astro.props;
 const t = dictionaryFor(locale);
 
-const [metrics, projects, matrix, profile] = await Promise.all([
-  container.listHeadlineMetrics(locale),
+const [projects, matrix, profile, achievements] = await Promise.all([
   container.listProjects(locale),
   container.buildSkillEvidenceMatrix(locale),
   container.getProfile(locale),
+  container.listAchievements(locale),
 ]);
 
 const navItems = [
@@ -58,13 +57,13 @@ const jsonLd = homeGraph({
   jsonLd={jsonLd}
 >
   <HeroSection t={t} locale={locale} />
-  <MetricsSection t={t} metrics={metrics} />
   <ProjectsSection t={t} projects={projects} />
   <AboutSection t={t} />
-  <CapabilitiesSection t={t} locale={locale} matrix={matrix} />
-  <ExperienceSection
+  <CapabilitiesSection t={t} matrix={matrix} />
+  <ImpactSection
     t={t}
     locale={locale}
+    achievements={achievements}
     experience={profile.experience}
     education={profile.education}
   />

@@ -80,6 +80,8 @@ This site's budget is 75 kB of JavaScript in total, and it was at 72.3 kB.
   works in both themes without another colour. The note under the cards states that every
   amount is a starting point and that the final price is fixed in writing. The amounts live in
   `content/profile/*.yaml`, so changing them needs no code. The chat corpus includes them.
+  Amended 2026-10-15: `price.from` may be `null` for a service quoted per requirement (custom
+  applications); its card shows "Por cotización" / "Custom quote" in place of the amount.
 - **New primitives and tokens.** `Frame` (frame and stage with concentric radii and a bevel
   instead of a border), `shadow-bevel`, `shadow-glow`, `frame`, `ascii`, `radius-frame`,
   `radius-stage`, `text-quote`, `text-price`, `font-display`. Buttons become pills that scale

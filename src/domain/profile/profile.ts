@@ -32,8 +32,11 @@ export interface Service {
   readonly title: string;
   readonly summary: string;
   readonly deliverables: readonly string[];
-  /** A floor, not a quote: "from" this amount, for the scope described in `scope`. */
-  readonly price: { readonly from: number; readonly scope: string };
+  /**
+   * A floor, not a quote: "from" this amount, for the scope described in `scope`. `null` when
+   * the work varies too much for a floor to mean anything, so it is quoted per requirement.
+   */
+  readonly price: { readonly from: number | null; readonly scope: string };
   /** The service shown with emphasis, the core of the work. At most one. */
   readonly featured: boolean;
 }

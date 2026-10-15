@@ -45,11 +45,18 @@ test.describe('hero art', () => {
     await expect(page.locator('.ascii-canvas')).toHaveAttribute('data-lit', '');
   });
 
-  test('prices start from a floor in each language and currency', async ({ page }) => {
+  test('prices start from a floor or are quoted, in each language and currency', async ({
+    page,
+  }) => {
     await page.goto('/#services');
-    await expect(page.locator('#services').getByText(/^\$\s6\.000\.000$/)).toBeVisible();
+    const services = page.locator('#services');
+    await expect(services.getByText(/^\$\s2\.500\.000$/)).toBeVisible();
+    await expect(services.getByText('Por cotización', { exact: true })).toBeVisible();
     await page.goto('/en#services');
-    await expect(page.locator('#services').getByText('$1,500', { exact: true })).toBeVisible();
+    await expect(page.locator('#services').getByText('$650', { exact: true })).toBeVisible();
+    await expect(
+      page.locator('#services').getByText('Custom quote', { exact: true }),
+    ).toBeVisible();
   });
 });
 
@@ -58,16 +65,30 @@ test.describe('home sections', () => {
     await page.goto('/');
     const headings = page.locator('main h2');
     await expect(headings).toHaveText([
-      'Resultados que se pueden verificar',
       'Casos de estudio destacados',
       'Quién está detrás',
-      'Cada habilidad, con el proyecto que la demuestra',
-      'Experiencia y formación',
+      'Las herramientas con las que construyo',
+      'Impacto en el negocio',
       'Servicios y precios',
       'Formación y certificaciones',
       'Cuéntame qué necesitas',
     ]);
-    await expect(page.getByText('Fuente:').first()).toBeVisible();
+  });
+
+  test('impact cards tell a figure with its source and open the case behind it', async ({
+    page,
+  }) => {
+    await page.goto('/#impact');
+    const cards = page.locator('#impact li:has(h3)');
+    await expect(cards).toHaveCount(8);
+    const featured = cards.first();
+    await expect(featured.getByRole('heading', { level: 3 })).toHaveText(
+      'Cero vulnerabilidades graves en una auditoría externa',
+    );
+    await expect(featured.getByText(/^Fuente: /)).toBeVisible();
+    await expect(page.locator('#impact')).toContainText('Universidad del Norte');
+    await featured.getByRole('link').click();
+    await expect(page).toHaveURL(/\/proyectos\/corporate-portal$/);
   });
 
   test('header links jump to their sections', async ({ page, isMobile }) => {
@@ -81,17 +102,23 @@ test.describe('home sections', () => {
     await expect(page.getByRole('heading', { name: 'Servicios y precios' })).toBeInViewport();
   });
 
-  test('skill evidence links open the project that proves them', async ({ page }) => {
+  test('the stack lists each area with its technologies and loads its logos on approach', async ({
+    page,
+  }) => {
     await page.goto('/');
-    const evidence = page
-      .locator('#capabilities')
-      .getByRole('link', { name: /Telemetría/ })
-      .first();
-    await expect(evidence).toHaveAttribute('href', '/proyectos/plant-telemetry');
-    await evidence.click();
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      'Telemetría de generación eléctrica en tiempo real',
-    );
+    const stack = page.locator('#capabilities');
+    await expect(stack.getByRole('heading', { level: 3 })).toContainText([
+      'Frontend',
+      'Backend',
+      'Datos y BI',
+    ]);
+    await expect(stack.getByRole('listitem').filter({ hasText: 'PostgreSQL' })).toBeVisible();
+    await expect(stack.getByRole('link')).toHaveCount(0);
+    // The sprite waits until the section comes near, so it is not part of the first load.
+    const logo = stack.locator('use').first();
+    await expect(logo).not.toHaveAttribute('href', /./);
+    await stack.scrollIntoViewIfNeeded();
+    await expect(logo).toHaveAttribute('href', /^\/tech-logos\.svg#[a-z0-9-]+$/);
   });
 });
 
@@ -121,7 +148,7 @@ test.describe('hero headline', () => {
 test.describe('project cards', () => {
   test('featured cases get the wide card and the rest share a grid', async ({ page }) => {
     await page.goto('/#projects');
-    await expect(page.locator('#projects .project-card--feature')).toHaveCount(4);
+    await expect(page.locator('#projects .project-card--feature')).toHaveCount(5);
     await expect(page.locator('#projects .project-card--compact')).toHaveCount(3);
     // One link per card, named by the project's title.
     const card = page.locator('#project-operations-logbook');

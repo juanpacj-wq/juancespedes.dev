@@ -24,7 +24,8 @@ can be grabbed and dragged, showing each technology's logo instead of its name.
   technology, and its name appears under it on hover.
 - **No invented marks.** A technology without a free, faithful logo (Microsoft products, systemd,
   Oracle, protocols and practices) shows its name as a wordmark in the display face, sized to weigh
-  about what a logo weighs. The mapping lives in `src/ui/project/tech-logos.ts`.
+  about what a logo weighs. The mapping lives in `src/ui/icons/tech-logos.ts` (moved there by
+  [0026](0026-stack-by-area.md)).
 
 ## Consequences
 

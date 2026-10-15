@@ -14,7 +14,7 @@ const IMAGES_DIR = join(process.cwd(), 'src', 'assets', 'projects');
 const hasScreenshots = (slug: string) => {
   try {
     return readdirSync(join(IMAGES_DIR, slug)).some((name) =>
-      /^gallery-\d+\.(?:avif|webp|png|jpe?g)$/.test(name),
+      /^(?:gallery|mobile)-\d+\.(?:avif|webp|png|jpe?g)$/.test(name),
     );
   } catch {
     return false;
@@ -138,7 +138,7 @@ test.describe('project pages', () => {
     const solution = page.locator('#solution');
     await solution.scrollIntoViewIfNeeded();
     const slides = solution.locator('[data-slide]');
-    await expect(slides).toHaveCount(4);
+    await expect(slides).toHaveCount(3);
     // Every screenshot says what it shows: the caption is also its text alternative.
     for (const image of await solution.locator('[data-slide] img').all()) {
       await expect(image).not.toHaveAttribute('alt', '');
@@ -151,11 +151,46 @@ test.describe('project pages', () => {
     await solution.locator('[data-zoom]').first().click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
-    await expect(dialog.locator('[data-lightbox-caption]')).toContainText('Figma');
+    await expect(dialog.locator('[data-lightbox-caption]')).toContainText('Transparencia');
     await dialog.getByRole('button', { name: 'Imagen siguiente' }).click();
-    await expect(dialog.locator('[data-lightbox-caption]')).toContainText('WordPress');
+    await expect(dialog.locator('[data-lightbox-caption]')).toContainText('regulatoria');
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
+  });
+
+  test.describe('on a 2x screen', () => {
+    test.use({ deviceScaleFactor: 2 });
+
+    test('a responsive product shows itself on phones and a tablet, sharp on a 2x screen', async ({
+      page,
+    }) => {
+      await page.goto('/proyectos/event-platform');
+      const screens = page.locator('.cs-screens');
+      await screens.scrollIntoViewIfNeeded();
+      await expect(
+        screens.getByRole('heading', { name: 'Se adapta a cada pantalla' }),
+      ).toBeVisible();
+      await expect(screens).toContainText('responsive');
+      const devices = screens.getByRole('list', { name: 'Capturas en teléfono y tableta' });
+      await expect(devices.getByRole('listitem')).toHaveCount(4);
+      await expect(devices.locator('.cs-frame--tablet')).toHaveCount(1);
+      for (const image of await devices.locator('img[data-deferred]').all()) {
+        await expect(image).not.toHaveAttribute('alt', '');
+        // The file has at least twice the pixels of the box it fills: no enlarged, blurred capture.
+        await expect
+          .poll(() =>
+            image.evaluate(async (img: HTMLImageElement) => {
+              if (!img.complete || !img.currentSrc) return 0;
+              // naturalWidth is corrected by the srcset density; a plain copy gives the file's.
+              const file = new Image();
+              file.src = img.currentSrc;
+              await file.decode();
+              return file.naturalWidth / img.clientWidth;
+            }),
+          )
+          .toBeGreaterThanOrEqual(2);
+      }
+    });
   });
 
   test.describe('without JavaScript', () => {

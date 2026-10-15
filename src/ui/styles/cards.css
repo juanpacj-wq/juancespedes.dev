@@ -1,4 +1,5 @@
 @import './screen-placeholder.css';
+@import './impact.css';
 
 /*
  * Project cards (src/ui/project/ProjectCard.astro). Not part of the stylesheet every page waits
