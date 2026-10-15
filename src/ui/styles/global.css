@@ -330,3 +330,66 @@
     background-color: var(--color-surface-raised);
   }
 }
+
+/*
+ * The stack by area (CapabilitiesSection.astro). Each logo wears its brand colour where that
+ * colour keeps 3:1 against the theme's canvas (tech-logos.ts) and the ink colour otherwise; on
+ * hover its tile rises and glows in the same tone (the accent for a monogram or a dark brand).
+ */
+@layer components {
+  .stack-item {
+    --tone: var(--color-accent);
+  }
+
+  :root:not([data-theme='light']) .stack-item[data-on-dark],
+  :root[data-theme='light'] .stack-item[data-on-light] {
+    --tone: var(--brand);
+  }
+
+  .stack-logo {
+    color: var(--color-ink);
+  }
+
+  :root:not([data-theme='light']) .stack-item[data-on-dark] .stack-logo,
+  :root[data-theme='light'] .stack-item[data-on-light] .stack-logo {
+    color: var(--brand);
+  }
+
+  .stack-tile {
+    transition:
+      translate 400ms var(--ease-out),
+      box-shadow 400ms var(--ease-out),
+      background-color 300ms ease;
+  }
+
+  .stack-number,
+  .stack-name,
+  .stack-monogram {
+    transition: color 300ms ease;
+  }
+
+  @media (hover: hover) {
+    .stack-item:hover .stack-tile {
+      background-color: var(--color-surface-raised);
+      box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--tone) 45%, transparent),
+        0 10px 28px -10px color-mix(in srgb, var(--tone) 55%, transparent),
+        var(--shadow-bevel);
+    }
+
+    .stack-row:hover .stack-number,
+    .stack-item:hover .stack-monogram {
+      color: var(--color-accent-ink);
+    }
+
+    .stack-item:hover .stack-name {
+      color: var(--color-ink);
+    }
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .stack-item:hover .stack-tile {
+      translate: 0 -3px;
+    }
+  }
+}

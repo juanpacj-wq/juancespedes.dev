@@ -169,18 +169,18 @@
     total: 39
     label: { es: hallazgos cerrados, en: findings closed }
 
-- id: invoice-parser-consolidation
+- id: figma-bridge-quota
   order: 8
   kind: efficiency
-  project: invoice-parser
-  value: { es: '4 en 1', en: '4 in 1' }
+  project: figma-bridge
+  value: { es: '0 llamadas', en: '0 calls' }
   title:
-    es: Cuatro herramientas convertidas en una
-    en: Four tools turned into one
+    es: Diseño a código sin gastar la cuota de Figma
+    en: Design to code without spending Figma's quota
   summary:
-    es: Unifiqué cuatro extractores de facturas de energía, uno por empresa, en una sola aplicación protegida por 73 facturas reales con 26 campos verificados en cada una.
-    en: I merged four energy-invoice extractors, one per company, into a single application guarded by 73 real invoices with 26 fields checked in each.
-  context: { es: Extractor de facturas, en: Invoice extractor }
+    es: El plan disponible solo permitía 6 consultas al mes a la API de Figma. Construí un puente que deja a un agente de IA leer y editar Figma de escritorio sin usar esa API, con salidas idénticas byte a byte a las del flujo anterior.
+    en: The available plan allowed only 6 Figma API calls a month. I built a bridge that lets an AI agent read and edit desktop Figma without that API, with output identical byte for byte to the previous flow.
+  context: { es: Puente con Figma, en: Figma bridge }
   source:
-    es: Historial de git y suite de regresión del repositorio, junio de 2026
-    en: Git history and the repository's regression suite, June 2026
+    es: Pruebas del puente contra Figma real y documentación de límites de Figma, julio de 2026
+    en: Bridge tests against real Figma and Figma's rate limit documentation, July 2026

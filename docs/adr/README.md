@@ -30,5 +30,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0023](0023-technology-logo-band.md)               | Technologies as one draggable band of logos                              | Accepted |
 | [0024](0024-faster-deploys.md)                     | Faster deploys: compressed Lighthouse, local budgets, parallel CI        | Accepted |
 | [0025](0025-business-impact-section.md)            | Business impact instead of a CV-style history                            | Accepted |
+| [0026](0026-stack-by-area.md)                      | The capabilities section as a stack of logos by area                     | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.
