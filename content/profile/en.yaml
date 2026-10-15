@@ -57,16 +57,6 @@ credentials:
 currency: USD
 
 services:
-  - title: Custom web applications
-    summary: Portals, internal platforms and systems with corporate sign-in, from the database to deployment.
-    deliverables:
-      - Application in production with automated tests
-      - Source code and architecture documentation
-      - Reproducible deployment and an operations guide
-    price:
-      from: 1500
-      scope: One module in production
-    featured: true
   - title: Data, dashboards and reports
     summary: Data models, ETL and Power BI dashboards that answer concrete business questions.
     deliverables:
@@ -76,6 +66,16 @@ services:
     price:
       from: 650
       scope: One dashboard and its sources
+  - title: Custom web applications
+    summary: Portals, internal platforms and systems with corporate sign-in, from the database to deployment.
+    deliverables:
+      - Application in production with automated tests
+      - Source code and architecture documentation
+      - Reproducible deployment and an operations guide
+    price:
+      from: null
+      scope: Depends on the requirement
+    featured: true
   - title: Automation and AI integration
     summary: Bots, document data extraction, integrations between systems and MCP servers for AI assistants.
     deliverables:
@@ -85,15 +85,6 @@ services:
     price:
       from: 400
       scope: One automated process
-  - title: Legacy system rescue
-    summary: Diagnosis, tests and modernization of software nobody dares to touch, without stopping operations.
-    deliverables:
-      - Diagnosis report with prioritized risks
-      - Test suite that protects what already works
-      - Improvements delivered in stages
-    price:
-      from: 300
-      scope: Diagnosis and a staged plan
 
 process:
   - title: Conversation

@@ -57,16 +57,6 @@ credentials:
 currency: COP
 
 services:
-  - title: Aplicaciones web a la medida
-    summary: Portales, plataformas internas y sistemas con inicio de sesión corporativo, de la base de datos al despliegue.
-    deliverables:
-      - Aplicación en producción con pruebas automatizadas
-      - Código fuente y documentación de arquitectura
-      - Despliegue reproducible y guía de operación
-    price:
-      from: 6000000
-      scope: Un módulo en producción
-    featured: true
   - title: Datos, dashboards y reportes
     summary: Modelos de datos, ETL y tableros de Power BI que responden preguntas concretas del negocio.
     deliverables:
@@ -76,6 +66,16 @@ services:
     price:
       from: 2500000
       scope: Un tablero con sus fuentes
+  - title: Aplicaciones web a la medida
+    summary: Portales, plataformas internas y sistemas con inicio de sesión corporativo, de la base de datos al despliegue.
+    deliverables:
+      - Aplicación en producción con pruebas automatizadas
+      - Código fuente y documentación de arquitectura
+      - Despliegue reproducible y guía de operación
+    price:
+      from: null
+      scope: Según el requerimiento
+    featured: true
   - title: Automatización e integración con IA
     summary: Bots, extracción de datos de documentos, integraciones entre sistemas y servidores MCP para asistentes de IA.
     deliverables:
@@ -85,15 +85,6 @@ services:
     price:
       from: 1500000
       scope: Un proceso automatizado
-  - title: Rescate de sistemas heredados
-    summary: Diagnóstico, pruebas y modernización de software que nadie se atreve a tocar, sin detener la operación.
-    deliverables:
-      - Informe de diagnóstico con riesgos priorizados
-      - Suite de pruebas que protege lo que ya funciona
-      - Mejoras entregadas por etapas
-    price:
-      from: 1200000
-      scope: Diagnóstico y plan por etapas
 
 process:
   - title: Conversación

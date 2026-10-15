@@ -45,11 +45,18 @@ test.describe('hero art', () => {
     await expect(page.locator('.ascii-canvas')).toHaveAttribute('data-lit', '');
   });
 
-  test('prices start from a floor in each language and currency', async ({ page }) => {
+  test('prices start from a floor or are quoted, in each language and currency', async ({
+    page,
+  }) => {
     await page.goto('/#services');
-    await expect(page.locator('#services').getByText(/^\$\s6\.000\.000$/)).toBeVisible();
+    const services = page.locator('#services');
+    await expect(services.getByText(/^\$\s2\.500\.000$/)).toBeVisible();
+    await expect(services.getByText('Por cotización', { exact: true })).toBeVisible();
     await page.goto('/en#services');
-    await expect(page.locator('#services').getByText('$1,500', { exact: true })).toBeVisible();
+    await expect(page.locator('#services').getByText('$650', { exact: true })).toBeVisible();
+    await expect(
+      page.locator('#services').getByText('Custom quote', { exact: true }),
+    ).toBeVisible();
   });
 });
 

@@ -155,7 +155,7 @@ export const profileSchema = z.strictObject({
         title: text,
         summary: text,
         deliverables: z.array(text).min(1),
-        price: z.strictObject({ from: z.number().int().positive(), scope: text }),
+        price: z.strictObject({ from: z.number().int().positive().nullable(), scope: text }),
         featured: z.boolean().default(false),
       }),
     )
