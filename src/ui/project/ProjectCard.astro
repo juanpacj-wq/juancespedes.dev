@@ -8,6 +8,7 @@ import { projectPath } from '../i18n/routes';
 import Icon from '../icons/Icon.astro';
 import { mediaFor } from './media';
 import ScreenPlaceholder from './ScreenPlaceholder.astro';
+import { SCREENSHOT_QUALITY } from './screenshots';
 
 /**
  * A project as a card that opens its page (the reference's case-study card). `feature` is the
@@ -39,7 +40,12 @@ const cta = variant === 'feature' ? t.projects.viewCase : t.projects.viewProject
 const sizes =
   variant === 'feature' ? '(min-width: 1024px) 40vw, 90vw' : '(min-width: 768px) 30vw, 90vw';
 const shot = media.card
-  ? await getImage({ src: media.card.src, widths: [480, 800, 1200], sizes })
+  ? await getImage({
+      src: media.card.src,
+      widths: [480, 800, 1200, 1600],
+      sizes,
+      quality: SCREENSHOT_QUALITY.webp,
+    })
   : null;
 ---
 
