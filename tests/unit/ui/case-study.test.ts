@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
 import { formatFigure, parseFigure } from '../../../src/ui/project/figure';
@@ -5,6 +7,7 @@ import {
   logoFor,
   luminance,
   monogramFor,
+  rasterLogoFor,
   techId,
   techLogoSprite,
 } from '../../../src/ui/icons/tech-logos';
@@ -118,5 +121,27 @@ describe('tech logos', () => {
   it('gives a technology without a logo a short monogram', () => {
     expect(monogramFor('SQL Server')).toBe('SQL');
     expect(monogramFor('Some Tool')).toBe('SO');
+  });
+
+  it('points a brand Simple Icons lacks at its raster file in public/tech', () => {
+    const names = [
+      'Excel',
+      'Microsoft Entra ID',
+      'Microsoft Fabric',
+      'Microsoft Graph',
+      'Oracle',
+      'Playwright',
+      'Power BI',
+      'SQL Server',
+      'systemd',
+      'WCAG 2.2',
+      'WebSockets',
+    ];
+    for (const name of names) {
+      const address = rasterLogoFor(name);
+      expect(address).toBe(`/tech/${techId(name)}.webp`);
+      expect(existsSync(`public${String(address)}`)).toBe(true);
+    }
+    expect(rasterLogoFor('Some Tool')).toBeNull();
   });
 });

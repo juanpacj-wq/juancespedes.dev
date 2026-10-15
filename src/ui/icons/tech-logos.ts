@@ -35,9 +35,9 @@ import {
  * Technology logos, for the band of a case study (ADR 0023) and the stack on the home page.
  * Paths come from Simple Icons (CC0). The band inlines them at build time; the home page reads
  * them from one sprite (src/pages/tech-logos.svg.ts) once the section comes near, so the logos
- * do not weigh on its HTML. A technology without a free, faithful logo (Microsoft products,
- * systemd, Oracle, protocols, practices) is shown by its name or a monogram instead, so no
- * page shows a wrong or invented mark.
+ * do not weigh on its HTML. Brands Simple Icons lacks (Microsoft products, systemd, Oracle) use
+ * the raster files below on the home page; anything else (protocols, practices) is shown by its
+ * name or a monogram, so no page shows a wrong or invented mark.
  */
 
 const LOGOS: Readonly<Record<string, SimpleIcon>> = {
@@ -138,6 +138,29 @@ const MONOGRAMS: Readonly<Record<string, string>> = {
   'WCAG 2.2': 'A11Y',
   WebSockets: 'WS',
 };
+
+/*
+ * Logos that Simple Icons does not carry, as the brands publish them: small raster files in
+ * public/tech/<techId>.webp (96 px, twice the tile), named here so a missing one fails a test
+ * instead of a page.
+ */
+const RASTER_LOGOS: ReadonlySet<string> = new Set([
+  'Excel',
+  'Microsoft Entra ID',
+  'Microsoft Fabric',
+  'Microsoft Graph',
+  'Oracle',
+  'Playwright',
+  'Power BI',
+  'SQL Server',
+  'systemd',
+  'WCAG 2.2',
+  'WebSockets',
+]);
+
+/** Address of a technology's raster logo, or null when it has none. */
+export const rasterLogoFor = (name: string): string | null =>
+  RASTER_LOGOS.has(name) ? `/tech/${techId(name)}.webp` : null;
 
 export const monogramFor = (name: string): string =>
   MONOGRAMS[name] ??

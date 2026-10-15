@@ -1,7 +1,7 @@
 ---
 import type { Capability } from '../../domain/project/capability';
 import type { Dictionary } from '../i18n/dictionary';
-import { logoFor, monogramFor, techId } from '../icons/tech-logos';
+import { logoFor, monogramFor, rasterLogoFor, techId } from '../icons/tech-logos';
 import Section from '../primitives/Section.astro';
 
 /**
@@ -14,7 +14,8 @@ import Section from '../primitives/Section.astro';
  * `data-href` until the section comes within a screen: the section sits below the first screen,
  * so the logos never compete with the first paint and add nothing to the HTML (CLAUDE.md, the
  * performance budget). Each logo wears its brand colour where it keeps 3:1 against the canvas
- * (global.css, `.stack-*`). A technology without a free logo shows a monogram.
+ * (global.css, `.stack-*`). A brand Simple Icons lacks shows its own small raster logo
+ * (public/tech), held in `data-src` the same way; anything else shows a monogram.
  */
 export interface CapabilityStackView {
   readonly capability: Capability;
@@ -37,6 +38,7 @@ const rows = matrix
       name,
       id: techId(name),
       logo: logoFor(name),
+      raster: rasterLogoFor(name),
       monogram: monogramFor(name),
     })),
   }));
@@ -72,6 +74,15 @@ const rows = matrix
                     <svg viewBox="0 0 24 24" class="stack-logo size-6">
                       <use data-href={`${sprite}#${technology.id}`} />
                     </svg>
+                  ) : technology.raster ? (
+                    <img
+                      data-src={technology.raster}
+                      alt=""
+                      width="24"
+                      height="24"
+                      decoding="async"
+                      class="size-6 object-contain"
+                    />
                   ) : (
                     <span class="stack-monogram font-mono text-eyebrow font-medium text-muted">
                       {technology.monogram}
@@ -98,6 +109,9 @@ const rows = matrix
   const load = () => {
     for (const use of document.querySelectorAll<SVGUseElement>('use[data-href]')) {
       use.setAttribute('href', use.dataset.href ?? '');
+    }
+    for (const img of document.querySelectorAll<HTMLImageElement>('[data-stack] img[data-src]')) {
+      img.src = img.dataset.src ?? '';
     }
   };
   const stack = document.querySelector('[data-stack]');
