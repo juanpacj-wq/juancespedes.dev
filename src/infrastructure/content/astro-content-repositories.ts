@@ -1,7 +1,6 @@
 import { getCollection, getEntry, render } from 'astro:content';
 
 import type { AchievementRepository } from '../../application/ports/achievement-repository';
-import type { HeadlineMetricRepository } from '../../application/ports/headline-metric-repository';
 import type { ProfileRepository } from '../../application/ports/profile-repository';
 import type { ProjectRepository } from '../../application/ports/project-repository';
 import type { TechnologyCatalog } from '../../application/ports/technology-catalog';
@@ -20,19 +19,6 @@ export const astroProjectRepository: ProjectRepository = {
     return entries
       .map((entry) => toProject(entry.id, entry.data))
       .filter((p) => p.locale === locale);
-  },
-};
-
-export const astroHeadlineMetricRepository: HeadlineMetricRepository = {
-  async findAll(locale) {
-    const entries = await getCollection('headlineMetrics');
-    return entries.map(({ data }) => ({
-      id: data.id,
-      order: data.order,
-      value: data.value[locale],
-      label: data.label[locale],
-      source: data.source[locale],
-    }));
   },
 };
 

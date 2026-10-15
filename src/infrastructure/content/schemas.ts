@@ -111,16 +111,6 @@ export type ProjectFrontmatter = z.output<typeof projectFrontmatterSchema>;
 
 const localized = z.strictObject({ es: text, en: text });
 
-export const headlineMetricSchema = z.strictObject({
-  id: z.string().regex(/^[a-z0-9-]+$/),
-  order: z.number().int().min(0),
-  value: localized,
-  label: localized,
-  source: localized,
-});
-
-export type HeadlineMetricEntry = z.output<typeof headlineMetricSchema>;
-
 const amount = z.strictObject({ amount: z.number().min(0), display: localized, label: localized });
 
 const achievementChart = z.discriminatedUnion('kind', [

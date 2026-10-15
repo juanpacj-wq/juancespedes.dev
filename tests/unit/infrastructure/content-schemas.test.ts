@@ -6,7 +6,6 @@ import {
 } from '../../../src/infrastructure/content/project-mapper';
 import {
   achievementSchema,
-  headlineMetricSchema,
   projectFrontmatterSchema,
   technologySchema,
 } from '../../../src/infrastructure/content/schemas';
@@ -136,7 +135,7 @@ describe('toProject', () => {
   });
 });
 
-describe('catalog and headline metric schemas', () => {
+describe('catalog schema', () => {
   it('validates technologies against the capability list', () => {
     expect(
       technologySchema.safeParse({ id: 'react', name: 'React', capability: 'frontend' }).success,
@@ -144,20 +143,6 @@ describe('catalog and headline metric schemas', () => {
     expect(
       technologySchema.safeParse({ id: 'react', name: 'React', capability: 'design' }).success,
     ).toBe(false);
-  });
-
-  it('requires both languages for headline metrics', () => {
-    const metric = {
-      id: 'systems',
-      order: 1,
-      value: { es: '6', en: '6' },
-      label: { es: 'sistemas', en: 'systems' },
-      source: { es: 'auditoría', en: 'audit' },
-    };
-    expect(headlineMetricSchema.safeParse(metric).success).toBe(true);
-    expect(headlineMetricSchema.safeParse({ ...metric, label: { es: 'sistemas' } }).success).toBe(
-      false,
-    );
   });
 });
 

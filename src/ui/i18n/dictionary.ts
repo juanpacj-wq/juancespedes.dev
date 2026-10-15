@@ -4,7 +4,7 @@ import type { ProjectKind } from '../../domain/project/project';
 import type { Locale } from '../../domain/shared/locale';
 
 /*
- * Interface strings. Content (projects, profile, metrics) lives in content/; this file only holds
+ * Interface strings. Content (projects, profile) lives in content/; this file only holds
  * the words of the interface itself. English is typed against Spanish, so a missing or extra key
  * in either language is a compile error.
  */
@@ -86,10 +86,6 @@ const es = {
       'Soy ingeniero de sistemas de la Universidad del Norte, con matrícula profesional COPNIA. Trabajo por entregables, a precio fijo y en remoto, y me gusta que el resultado se pueda medir: menos horas manuales, menos errores y datos a tiempo.',
     ],
     localTime: 'Hora local',
-  },
-  metrics: {
-    eyebrow: 'En cifras',
-    title: 'Resultados que se pueden verificar',
   },
   projects: {
     eyebrow: 'Proyectos',
@@ -434,10 +430,6 @@ const en: Dictionary = {
       'I am a systems engineer from Universidad del Norte, with a professional license (COPNIA). I work per deliverable, at a fixed price and remotely, and I like results you can measure: fewer manual hours, fewer errors and data on time.',
     ],
     localTime: 'Local time',
-  },
-  metrics: {
-    eyebrow: 'By the numbers',
-    title: 'Results you can verify',
   },
   projects: {
     eyebrow: 'Projects',

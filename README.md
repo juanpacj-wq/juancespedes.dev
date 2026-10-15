@@ -148,7 +148,6 @@ its shape, its business rules, its translation and the anonymization policy. Ful
 content/
   projects/<slug>/ one folder per project: es.mdx, en.mdx and images
   technologies.yaml   technology catalog, mapped to capabilities
-  headline-metrics.yaml   home page figures, each with its source
 src/
   domain/          entities and rules, framework-free
   application/     use cases and ports

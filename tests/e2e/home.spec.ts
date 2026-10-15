@@ -65,7 +65,6 @@ test.describe('home sections', () => {
     await page.goto('/');
     const headings = page.locator('main h2');
     await expect(headings).toHaveText([
-      'Resultados que se pueden verificar',
       'Casos de estudio destacados',
       'Quién está detrás',
       'Las herramientas con las que construyo',
@@ -74,7 +73,6 @@ test.describe('home sections', () => {
       'Formación y certificaciones',
       'Cuéntame qué necesitas',
     ]);
-    await expect(page.getByText('Fuente:').first()).toBeVisible();
   });
 
   test('impact cards tell a figure with its source and open the case behind it', async ({

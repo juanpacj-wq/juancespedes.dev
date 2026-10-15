@@ -3,100 +3,185 @@ flowchart LR
 subgraph src["src"]
   subgraph src_application["application"]
     subgraph src_application_ports["ports"]
+      src_application_ports_achievement_repository_ts["achievement-repository.ts"]
+      src_application_ports_chat_ts["chat.ts"]
       src_application_ports_clock_ts["clock.ts"]
       src_application_ports_contact_ts["contact.ts"]
-      src_application_ports_headline_metric_repository_ts["headline-metric-repository.ts"]
       src_application_ports_profile_repository_ts["profile-repository.ts"]
       src_application_ports_project_repository_ts["project-repository.ts"]
       src_application_ports_technology_catalog_ts["technology-catalog.ts"]
+      src_application_ports_writing_repositories_ts["writing-repositories.ts"]
     end
     subgraph src_application_use_cases["use-cases"]
+      src_application_use_cases_answer_portfolio_question_ts["answer-portfolio-question.ts"]
       src_application_use_cases_build_skill_evidence_matrix_ts["build-skill-evidence-matrix.ts"]
       src_application_use_cases_list_projects_ts["list-projects.ts"]
+      src_application_use_cases_get_chat_status_ts["get-chat-status.ts"]
       src_application_use_cases_get_health_status_ts["get-health-status.ts"]
+      src_application_use_cases_get_now_page_ts["get-now-page.ts"]
       src_application_use_cases_get_profile_ts["get-profile.ts"]
+      src_application_use_cases_get_project_page_ts["get-project-page.ts"]
       src_application_use_cases_get_project_ts["get-project.ts"]
+      src_application_use_cases_list_achievements_ts["list-achievements.ts"]
       src_application_use_cases_list_featured_projects_ts["list-featured-projects.ts"]
-      src_application_use_cases_list_headline_metrics_ts["list-headline-metrics.ts"]
+      src_application_use_cases_notes_ts["notes.ts"]
       src_application_use_cases_submit_contact_request_ts["submit-contact-request.ts"]
     end
   end
   subgraph src_domain["domain"]
-    subgraph src_domain_contact["contact"]
-      src_domain_contact_contact_request_ts["contact-request.ts"]
-    end
-    subgraph src_domain_shared["shared"]
-      src_domain_shared_result_ts["result.ts"]
-      src_domain_shared_locale_ts["locale.ts"]
-      src_domain_shared_year_month_ts["year-month.ts"]
-      src_domain_shared_slug_ts["slug.ts"]
-    end
     subgraph src_domain_project["project"]
-      src_domain_project_metric_ts["metric.ts"]
+      src_domain_project_achievement_ts["achievement.ts"]
       src_domain_project_project_ts["project.ts"]
+      src_domain_project_architecture_ts["architecture.ts"]
       src_domain_project_capability_ts["capability.ts"]
+      src_domain_project_metric_ts["metric.ts"]
       src_domain_project_technology_ts["technology.ts"]
       src_domain_project_project_ordering_ts["project-ordering.ts"]
+    end
+    subgraph src_domain_shared["shared"]
+      src_domain_shared_locale_ts["locale.ts"]
+      src_domain_shared_result_ts["result.ts"]
+      src_domain_shared_year_month_ts["year-month.ts"]
+      src_domain_shared_slug_ts["slug.ts"]
+      src_domain_shared_iso_date_ts["iso-date.ts"]
+    end
+    subgraph src_domain_chat["chat"]
+      src_domain_chat_question_ts["question.ts"]
+    end
+    subgraph src_domain_contact["contact"]
+      src_domain_contact_contact_request_ts["contact-request.ts"]
     end
     subgraph src_domain_profile["profile"]
       src_domain_profile_profile_ts["profile.ts"]
     end
+    subgraph src_domain_now["now"]
+      src_domain_now_now_page_ts["now-page.ts"]
+    end
+    subgraph src_domain_writing["writing"]
+      src_domain_writing_note_ts["note.ts"]
+    end
   end
   src_cloudflare_d_ts["cloudflare.d.ts"]
   subgraph src_composition["composition"]
+    src_composition_chat_ts["chat.ts"]
+    src_composition_client_errors_ts["client-errors.ts"]
     src_composition_contact_ts["contact.ts"]
     src_composition_container_ts["container.ts"]
   end
   subgraph src_infrastructure["infrastructure"]
+    subgraph src_infrastructure_ai["ai"]
+      src_infrastructure_ai_anthropic_chat_model_ts["anthropic-chat-model.ts"]
+      src_infrastructure_ai_chat_instructions_ts["chat-instructions.ts"]
+      src_infrastructure_ai_asset_portfolio_corpus_ts["asset-portfolio-corpus.ts"]
+      src_infrastructure_ai_deepseek_budget_ts["deepseek-budget.ts"]
+      src_infrastructure_ai_deepseek_chat_model_ts["deepseek-chat-model.ts"]
+      src_infrastructure_ai_fake_chat_model_ts["fake-chat-model.ts"]
+    end
+    subgraph src_infrastructure_security["security"]
+      src_infrastructure_security_kv_chat_quota_ts["kv-chat-quota.ts"]
+      src_infrastructure_security_cloudflare_rate_limiter_ts["cloudflare-rate-limiter.ts"]
+      src_infrastructure_security_turnstile_verifier_ts["turnstile-verifier.ts"]
+    end
+    subgraph src_infrastructure_http["http"]
+      src_infrastructure_http_chat_endpoint_ts["chat-endpoint.ts"]
+      src_infrastructure_http_chat_status_endpoint_ts["chat-status-endpoint.ts"]
+      src_infrastructure_http_client_error_endpoint_ts["client-error-endpoint.ts"]
+      src_infrastructure_http_contact_endpoint_ts["contact-endpoint.ts"]
+      src_infrastructure_http_security_headers_ts["security-headers.ts"]
+    end
     subgraph src_infrastructure_email["email"]
       src_infrastructure_email_cloudflare_email_gateway_ts["cloudflare-email-gateway.ts"]
       src_infrastructure_email_mime_ts["mime.ts"]
-    end
-    subgraph src_infrastructure_http["http"]
-      src_infrastructure_http_contact_endpoint_ts["contact-endpoint.ts"]
-    end
-    subgraph src_infrastructure_security["security"]
-      src_infrastructure_security_cloudflare_rate_limiter_ts["cloudflare-rate-limiter.ts"]
-      src_infrastructure_security_turnstile_verifier_ts["turnstile-verifier.ts"]
     end
     subgraph src_infrastructure_system["system"]
       src_infrastructure_system_system_clock_ts["system-clock.ts"]
     end
     subgraph src_infrastructure_content["content"]
       src_infrastructure_content_astro_content_repositories_ts["astro-content-repositories.ts"]
-      src_infrastructure_content_profile_mapper_ts["profile-mapper.ts"]
+      src_infrastructure_content_achievement_mapper_ts["achievement-mapper.ts"]
       src_infrastructure_content_schemas_ts["schemas.ts"]
+      src_infrastructure_content_profile_mapper_ts["profile-mapper.ts"]
       src_infrastructure_content_project_mapper_ts["project-mapper.ts"]
+      src_infrastructure_content_writing_mappers_ts["writing-mappers.ts"]
     end
   end
   src_content_config_ts["content.config.ts"]
+  src_middleware_ts["middleware.ts"]
   subgraph src_pages["pages"]
+    subgraph src_pages__views["_views"]
+      src_pages__views_site_nav_ts["site-nav.ts"]
+    end
     subgraph src_pages_api["api"]
+      src_pages_api_chat_status_ts["chat-status.ts"]
+      src_pages_api_chat_ts["chat.ts"]
+      src_pages_api_client_errors_ts["client-errors.ts"]
       src_pages_api_contact_ts["contact.ts"]
       src_pages_api_health_ts["health.ts"]
     end
+    subgraph src_pages_chat_corpus["chat-corpus"]
+      src_pages_chat_corpus__locale__txt_ts["[locale].txt.ts"]
+    end
+    subgraph src_pages_palette["palette"]
+      src_pages_palette__locale__json_ts["[locale].json.ts"]
+    end
+    src_pages_sitemap_xml_ts["sitemap.xml.ts"]
+    src_pages_tech_logos_svg_ts["tech-logos.svg.ts"]
   end
   subgraph src_ui["ui"]
     subgraph src_ui_i18n["i18n"]
       src_ui_i18n_dictionary_ts["dictionary.ts"]
+      src_ui_i18n_routes_ts["routes.ts"]
       src_ui_i18n_format_ts["format.ts"]
     end
+    subgraph src_ui_chat["chat"]
+      src_ui_chat_build_corpus_ts["build-corpus.ts"]
+      src_ui_chat_chat_drawer_ts["chat-drawer.ts"]
+      src_ui_chat_linkify_ts["linkify.ts"]
+    end
+    src_ui_site_ts["site.ts"]
+    subgraph src_ui_palette["palette"]
+      src_ui_palette_palette_index_ts["palette-index.ts"]
+      src_ui_palette_search_ts["search.ts"]
+    end
+    subgraph src_ui_seo["seo"]
+      src_ui_seo_sitemap_ts["sitemap.ts"]
+      src_ui_seo_structured_data_ts["structured-data.ts"]
+    end
     subgraph src_ui_icons["icons"]
+      src_ui_icons_tech_logos_ts["tech-logos.ts"]
       src_ui_icons_icons_ts["icons.ts"]
     end
+    subgraph src_ui_art["art"]
+      src_ui_art_not_found_field_ts["not-found-field.ts"]
+    end
     subgraph src_ui_islands["islands"]
+      src_ui_islands_turnstile_ts["turnstile.ts"]
       src_ui_islands_ContactForm_tsx["ContactForm.tsx"]
+    end
+    subgraph src_ui_project["project"]
+      src_ui_project_case_study_motion_ts["case-study-motion.ts"]
+      src_ui_project_figure_ts["figure.ts"]
+      src_ui_project_wires_ts["wires.ts"]
+      src_ui_project_media_ts["media.ts"]
+      src_ui_project_screenshots_ts["screenshots.ts"]
     end
   end
 end
 subgraph astro:env["astro:env"]
   astro:env_server["server"]
 end
-cloudflare:email["cloudflare:email"]
 cloudflare:workers["cloudflare:workers"]
-astro:content["astro:content"]
 subgraph node_modules["node_modules"]
   subgraph node_modules__pnpm[".pnpm"]
+    subgraph node_modules__pnpm__anthropic_ai+sdk_0_129_0_zod_4_6_6["@anthropic-ai+sdk@0.129.0_zod@4.6.6"]
+      subgraph node_modules__pnpm__anthropic_ai+sdk_0_129_0_zod_4_6_6_node_modules["node_modules"]
+        subgraph node_modules__pnpm__anthropic_ai+sdk_0_129_0_zod_4_6_6_node_modules__anthropic_ai["@anthropic-ai"]
+          subgraph node_modules__pnpm__anthropic_ai+sdk_0_129_0_zod_4_6_6_node_modules__anthropic_ai_sdk["sdk"]
+            node_modules__pnpm__anthropic_ai+sdk_0_129_0_zod_4_6_6_node_modules__anthropic_ai_sdk_index_d_ts["index.d.ts"]
+          end
+        end
+      end
+    end
     subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae["astro@7.3.8_@types+node@26._d6314243a930c10c84b1626d555854ae"]
       subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules["node_modules"]
         subgraph node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro["astro"]
@@ -112,6 +197,13 @@ subgraph node_modules["node_modules"]
         end
       end
     end
+    subgraph node_modules__pnpm_simple_icons_16_35_0["simple-icons@16.35.0"]
+      subgraph node_modules__pnpm_simple_icons_16_35_0_node_modules["node_modules"]
+        subgraph node_modules__pnpm_simple_icons_16_35_0_node_modules_simple_icons["simple-icons"]
+          node_modules__pnpm_simple_icons_16_35_0_node_modules_simple_icons_index_d_ts["index.d.ts"]
+        end
+      end
+    end
     subgraph node_modules__pnpm_react_19_3_0["react@19.3.0"]
       subgraph node_modules__pnpm_react_19_3_0_node_modules["node_modules"]
         subgraph node_modules__pnpm_react_19_3_0_node_modules_react["react"]
@@ -121,12 +213,18 @@ subgraph node_modules["node_modules"]
     end
   end
 end
+cloudflare:email["cloudflare:email"]
+astro:content["astro:content"]
+astro:middleware["astro:middleware"]
+src_application_ports_achievement_repository_ts-->src_domain_project_achievement_ts
+src_application_ports_achievement_repository_ts-->src_domain_shared_locale_ts
+src_domain_shared_locale_ts-->src_domain_shared_result_ts
+src_application_ports_chat_ts-->src_domain_chat_question_ts
+src_application_ports_chat_ts-->src_domain_shared_locale_ts
+src_domain_chat_question_ts-->src_domain_shared_result_ts
 src_application_ports_contact_ts-->src_domain_contact_contact_request_ts
 src_application_ports_contact_ts-->src_domain_shared_locale_ts
 src_domain_contact_contact_request_ts-->src_domain_shared_result_ts
-src_domain_shared_locale_ts-->src_domain_shared_result_ts
-src_application_ports_headline_metric_repository_ts-->src_domain_project_metric_ts
-src_application_ports_headline_metric_repository_ts-->src_domain_shared_locale_ts
 src_application_ports_profile_repository_ts-->src_domain_profile_profile_ts
 src_application_ports_profile_repository_ts-->src_domain_shared_locale_ts
 src_domain_profile_profile_ts-->src_domain_shared_year_month_ts
@@ -137,12 +235,29 @@ src_domain_project_project_ts-->src_domain_shared_locale_ts
 src_domain_project_project_ts-->src_domain_shared_result_ts
 src_domain_project_project_ts-->src_domain_shared_slug_ts
 src_domain_project_project_ts-->src_domain_shared_year_month_ts
+src_domain_project_project_ts-->src_domain_project_architecture_ts
 src_domain_project_project_ts-->src_domain_project_capability_ts
 src_domain_project_project_ts-->src_domain_project_metric_ts
 src_domain_project_project_ts-->src_domain_project_technology_ts
 src_domain_shared_slug_ts-->src_domain_shared_result_ts
+src_domain_project_architecture_ts-->src_domain_shared_slug_ts
 src_domain_project_technology_ts-->src_domain_project_capability_ts
 src_application_ports_technology_catalog_ts-->src_domain_project_technology_ts
+src_application_ports_writing_repositories_ts-->src_domain_now_now_page_ts
+src_application_ports_writing_repositories_ts-->src_domain_shared_locale_ts
+src_application_ports_writing_repositories_ts-->src_domain_writing_note_ts
+src_domain_now_now_page_ts-->src_domain_shared_iso_date_ts
+src_domain_now_now_page_ts-->src_domain_shared_result_ts
+src_domain_shared_iso_date_ts-->src_domain_shared_result_ts
+src_domain_writing_note_ts-->src_domain_shared_iso_date_ts
+src_domain_writing_note_ts-->src_domain_shared_locale_ts
+src_domain_writing_note_ts-->src_domain_shared_result_ts
+src_domain_writing_note_ts-->src_domain_shared_slug_ts
+src_application_use_cases_answer_portfolio_question_ts-->src_domain_chat_question_ts
+src_application_use_cases_answer_portfolio_question_ts-->src_domain_shared_locale_ts
+src_application_use_cases_answer_portfolio_question_ts-->src_domain_shared_result_ts
+src_application_use_cases_answer_portfolio_question_ts-->src_application_ports_chat_ts
+src_application_use_cases_answer_portfolio_question_ts-->src_application_ports_contact_ts
 src_application_use_cases_build_skill_evidence_matrix_ts-->src_domain_project_capability_ts
 src_application_use_cases_build_skill_evidence_matrix_ts-->src_domain_project_project_ts
 src_application_use_cases_build_skill_evidence_matrix_ts-->src_domain_project_technology_ts
@@ -156,25 +271,77 @@ src_application_use_cases_list_projects_ts-->src_domain_shared_locale_ts
 src_application_use_cases_list_projects_ts-->src_application_ports_project_repository_ts
 src_domain_project_project_ordering_ts-->src_domain_shared_year_month_ts
 src_domain_project_project_ordering_ts-->src_domain_project_project_ts
+src_application_use_cases_get_chat_status_ts-->src_application_ports_chat_ts
 src_application_use_cases_get_health_status_ts-->src_application_ports_clock_ts
+src_application_use_cases_get_now_page_ts-->src_domain_now_now_page_ts
+src_application_use_cases_get_now_page_ts-->src_domain_shared_locale_ts
+src_application_use_cases_get_now_page_ts-->src_application_ports_writing_repositories_ts
 src_application_use_cases_get_profile_ts-->src_domain_profile_profile_ts
 src_application_use_cases_get_profile_ts-->src_domain_shared_locale_ts
 src_application_use_cases_get_profile_ts-->src_application_ports_profile_repository_ts
+src_application_use_cases_get_project_page_ts-->src_domain_project_project_ts
+src_application_use_cases_get_project_page_ts-->src_domain_project_project_ordering_ts
+src_application_use_cases_get_project_page_ts-->src_domain_shared_locale_ts
+src_application_use_cases_get_project_page_ts-->src_domain_shared_result_ts
+src_application_use_cases_get_project_page_ts-->src_application_use_cases_get_project_ts
+src_application_use_cases_get_project_page_ts-->src_application_use_cases_list_projects_ts
 src_application_use_cases_get_project_ts-->src_domain_project_project_ts
 src_application_use_cases_get_project_ts-->src_domain_shared_locale_ts
 src_application_use_cases_get_project_ts-->src_domain_shared_result_ts
 src_application_use_cases_get_project_ts-->src_application_use_cases_list_projects_ts
+src_application_use_cases_list_achievements_ts-->src_domain_project_achievement_ts
+src_application_use_cases_list_achievements_ts-->src_domain_project_project_ts
+src_application_use_cases_list_achievements_ts-->src_domain_shared_locale_ts
+src_application_use_cases_list_achievements_ts-->src_application_ports_achievement_repository_ts
 src_application_use_cases_list_featured_projects_ts-->src_domain_project_project_ts
 src_application_use_cases_list_featured_projects_ts-->src_domain_shared_locale_ts
 src_application_use_cases_list_featured_projects_ts-->src_application_use_cases_list_projects_ts
-src_application_use_cases_list_headline_metrics_ts-->src_domain_project_metric_ts
-src_application_use_cases_list_headline_metrics_ts-->src_domain_shared_locale_ts
-src_application_use_cases_list_headline_metrics_ts-->src_application_ports_headline_metric_repository_ts
+src_application_use_cases_notes_ts-->src_domain_shared_locale_ts
+src_application_use_cases_notes_ts-->src_domain_shared_result_ts
+src_application_use_cases_notes_ts-->src_domain_writing_note_ts
+src_application_use_cases_notes_ts-->src_application_ports_writing_repositories_ts
 src_application_use_cases_submit_contact_request_ts-->src_domain_contact_contact_request_ts
 src_application_use_cases_submit_contact_request_ts-->src_domain_shared_locale_ts
 src_application_use_cases_submit_contact_request_ts-->src_domain_shared_result_ts
 src_application_use_cases_submit_contact_request_ts-->src_application_ports_clock_ts
 src_application_use_cases_submit_contact_request_ts-->src_application_ports_contact_ts
+src_composition_chat_ts-->src_application_use_cases_answer_portfolio_question_ts
+src_composition_chat_ts-->src_application_use_cases_get_chat_status_ts
+src_composition_chat_ts-->src_infrastructure_ai_anthropic_chat_model_ts
+src_composition_chat_ts-->src_infrastructure_ai_asset_portfolio_corpus_ts
+src_composition_chat_ts-->src_infrastructure_ai_deepseek_budget_ts
+src_composition_chat_ts-->src_infrastructure_ai_deepseek_chat_model_ts
+src_composition_chat_ts-->src_infrastructure_ai_fake_chat_model_ts
+src_composition_chat_ts-->src_infrastructure_http_chat_endpoint_ts
+src_composition_chat_ts-->src_infrastructure_http_chat_status_endpoint_ts
+src_composition_chat_ts-->src_infrastructure_security_cloudflare_rate_limiter_ts
+src_composition_chat_ts-->src_infrastructure_security_kv_chat_quota_ts
+src_composition_chat_ts-->src_infrastructure_security_turnstile_verifier_ts
+src_composition_chat_ts-->astro:env_server
+src_composition_chat_ts-->cloudflare:workers
+src_infrastructure_ai_anthropic_chat_model_ts-->src_application_ports_chat_ts
+src_infrastructure_ai_anthropic_chat_model_ts-->src_infrastructure_ai_chat_instructions_ts
+src_infrastructure_ai_anthropic_chat_model_ts-->node_modules__pnpm__anthropic_ai+sdk_0_129_0_zod_4_6_6_node_modules__anthropic_ai_sdk_index_d_ts
+src_infrastructure_ai_chat_instructions_ts-->src_domain_shared_locale_ts
+src_infrastructure_ai_asset_portfolio_corpus_ts-->src_application_ports_chat_ts
+src_infrastructure_ai_asset_portfolio_corpus_ts-->src_domain_shared_locale_ts
+src_infrastructure_ai_deepseek_budget_ts-->src_application_ports_chat_ts
+src_infrastructure_ai_deepseek_budget_ts-->src_infrastructure_security_kv_chat_quota_ts
+src_infrastructure_security_kv_chat_quota_ts-->src_application_ports_chat_ts
+src_infrastructure_ai_deepseek_chat_model_ts-->src_application_ports_chat_ts
+src_infrastructure_ai_deepseek_chat_model_ts-->src_infrastructure_ai_chat_instructions_ts
+src_infrastructure_ai_fake_chat_model_ts-->src_application_ports_chat_ts
+src_infrastructure_http_chat_endpoint_ts-->src_application_ports_chat_ts
+src_infrastructure_http_chat_endpoint_ts-->src_application_use_cases_answer_portfolio_question_ts
+src_infrastructure_http_chat_endpoint_ts-->src_domain_shared_locale_ts
+src_infrastructure_http_chat_status_endpoint_ts-->src_application_ports_contact_ts
+src_infrastructure_http_chat_status_endpoint_ts-->src_application_use_cases_get_chat_status_ts
+src_infrastructure_security_cloudflare_rate_limiter_ts-->src_application_ports_contact_ts
+src_infrastructure_security_turnstile_verifier_ts-->src_application_ports_contact_ts
+src_composition_client_errors_ts-->src_infrastructure_http_client_error_endpoint_ts
+src_composition_client_errors_ts-->src_infrastructure_security_cloudflare_rate_limiter_ts
+src_composition_client_errors_ts-->cloudflare:workers
+src_infrastructure_http_client_error_endpoint_ts-->src_application_ports_contact_ts
 src_composition_contact_ts-->src_application_use_cases_submit_contact_request_ts
 src_composition_contact_ts-->src_infrastructure_email_cloudflare_email_gateway_ts
 src_composition_contact_ts-->src_infrastructure_http_contact_endpoint_ts
@@ -188,50 +355,128 @@ src_infrastructure_email_cloudflare_email_gateway_ts-->src_application_ports_con
 src_infrastructure_email_cloudflare_email_gateway_ts-->src_infrastructure_email_mime_ts
 src_infrastructure_http_contact_endpoint_ts-->src_application_use_cases_submit_contact_request_ts
 src_infrastructure_http_contact_endpoint_ts-->src_domain_shared_locale_ts
-src_infrastructure_security_cloudflare_rate_limiter_ts-->src_application_ports_contact_ts
-src_infrastructure_security_turnstile_verifier_ts-->src_application_ports_contact_ts
 src_infrastructure_system_system_clock_ts-->src_application_ports_clock_ts
 src_composition_container_ts-->src_application_use_cases_build_skill_evidence_matrix_ts
 src_composition_container_ts-->src_application_use_cases_get_health_status_ts
+src_composition_container_ts-->src_application_use_cases_get_now_page_ts
 src_composition_container_ts-->src_application_use_cases_get_profile_ts
 src_composition_container_ts-->src_application_use_cases_get_project_ts
+src_composition_container_ts-->src_application_use_cases_get_project_page_ts
+src_composition_container_ts-->src_application_use_cases_list_achievements_ts
 src_composition_container_ts-->src_application_use_cases_list_featured_projects_ts
-src_composition_container_ts-->src_application_use_cases_list_headline_metrics_ts
 src_composition_container_ts-->src_application_use_cases_list_projects_ts
+src_composition_container_ts-->src_application_use_cases_notes_ts
 src_composition_container_ts-->src_infrastructure_content_astro_content_repositories_ts
 src_composition_container_ts-->src_infrastructure_system_system_clock_ts
 src_composition_container_ts-->astro:env_server
-src_infrastructure_content_astro_content_repositories_ts-->src_application_ports_headline_metric_repository_ts
+src_infrastructure_content_astro_content_repositories_ts-->src_application_ports_achievement_repository_ts
 src_infrastructure_content_astro_content_repositories_ts-->src_application_ports_profile_repository_ts
 src_infrastructure_content_astro_content_repositories_ts-->src_application_ports_project_repository_ts
 src_infrastructure_content_astro_content_repositories_ts-->src_application_ports_technology_catalog_ts
+src_infrastructure_content_astro_content_repositories_ts-->src_application_ports_writing_repositories_ts
+src_infrastructure_content_astro_content_repositories_ts-->src_domain_shared_locale_ts
+src_infrastructure_content_astro_content_repositories_ts-->src_infrastructure_content_achievement_mapper_ts
 src_infrastructure_content_astro_content_repositories_ts-->src_infrastructure_content_profile_mapper_ts
 src_infrastructure_content_astro_content_repositories_ts-->src_infrastructure_content_project_mapper_ts
+src_infrastructure_content_astro_content_repositories_ts-->src_infrastructure_content_writing_mappers_ts
 src_infrastructure_content_astro_content_repositories_ts-->astro:content
+src_infrastructure_content_achievement_mapper_ts-->src_domain_project_achievement_ts
+src_infrastructure_content_achievement_mapper_ts-->src_domain_shared_locale_ts
+src_infrastructure_content_achievement_mapper_ts-->src_infrastructure_content_schemas_ts
+src_infrastructure_content_schemas_ts-->src_domain_project_achievement_ts
+src_infrastructure_content_schemas_ts-->src_domain_project_capability_ts
+src_infrastructure_content_schemas_ts-->src_domain_project_project_ts
+src_infrastructure_content_schemas_ts-->src_domain_shared_locale_ts
+src_infrastructure_content_schemas_ts-->src_domain_writing_note_ts
+src_infrastructure_content_schemas_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_zod_js
 src_infrastructure_content_profile_mapper_ts-->src_domain_profile_profile_ts
 src_infrastructure_content_profile_mapper_ts-->src_domain_shared_year_month_ts
 src_infrastructure_content_profile_mapper_ts-->src_infrastructure_content_schemas_ts
-src_infrastructure_content_schemas_ts-->src_domain_project_capability_ts
-src_infrastructure_content_schemas_ts-->src_domain_project_project_ts
-src_infrastructure_content_schemas_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_zod_js
 src_infrastructure_content_project_mapper_ts-->src_domain_project_project_ts
 src_infrastructure_content_project_mapper_ts-->src_domain_shared_locale_ts
 src_infrastructure_content_project_mapper_ts-->src_infrastructure_content_schemas_ts
+src_infrastructure_content_writing_mappers_ts-->src_domain_now_now_page_ts
+src_infrastructure_content_writing_mappers_ts-->src_domain_shared_locale_ts
+src_infrastructure_content_writing_mappers_ts-->src_domain_writing_note_ts
+src_infrastructure_content_writing_mappers_ts-->src_infrastructure_content_schemas_ts
 src_content_config_ts-->src_infrastructure_content_schemas_ts
 src_content_config_ts-->astro:content
 src_content_config_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_content_loaders_index_js
-src_pages_api_contact_ts-->src_composition_contact_ts
-src_pages_api_contact_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
-src_pages_api_health_ts-->src_composition_container_ts
-src_pages_api_health_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_middleware_ts-->src_infrastructure_http_security_headers_ts
+src_middleware_ts-->astro:middleware
+src_pages__views_site_nav_ts-->src_domain_shared_locale_ts
+src_pages__views_site_nav_ts-->src_ui_i18n_dictionary_ts
+src_pages__views_site_nav_ts-->src_ui_i18n_routes_ts
 src_ui_i18n_dictionary_ts-->src_domain_contact_contact_request_ts
 src_ui_i18n_dictionary_ts-->src_domain_project_capability_ts
 src_ui_i18n_dictionary_ts-->src_domain_project_project_ts
 src_ui_i18n_dictionary_ts-->src_domain_shared_locale_ts
+src_ui_i18n_routes_ts-->src_domain_shared_locale_ts
+src_pages_api_chat_status_ts-->src_composition_chat_ts
+src_pages_api_chat_status_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_pages_api_chat_ts-->src_composition_chat_ts
+src_pages_api_chat_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_pages_api_client_errors_ts-->src_composition_client_errors_ts
+src_pages_api_client_errors_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_pages_api_contact_ts-->src_composition_contact_ts
+src_pages_api_contact_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_pages_api_health_ts-->src_composition_container_ts
+src_pages_api_health_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_pages_chat_corpus__locale__txt_ts-->src_composition_container_ts
+src_pages_chat_corpus__locale__txt_ts-->src_domain_shared_locale_ts
+src_pages_chat_corpus__locale__txt_ts-->src_ui_chat_build_corpus_ts
+src_pages_chat_corpus__locale__txt_ts-->src_ui_i18n_dictionary_ts
+src_pages_chat_corpus__locale__txt_ts-->src_ui_site_ts
+src_pages_chat_corpus__locale__txt_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_ui_chat_build_corpus_ts-->src_domain_now_now_page_ts
+src_ui_chat_build_corpus_ts-->src_domain_profile_profile_ts
+src_ui_chat_build_corpus_ts-->src_domain_project_project_ts
+src_ui_chat_build_corpus_ts-->src_domain_shared_locale_ts
+src_ui_chat_build_corpus_ts-->src_domain_writing_note_ts
+src_ui_chat_build_corpus_ts-->src_ui_i18n_dictionary_ts
+src_ui_chat_build_corpus_ts-->src_ui_i18n_format_ts
+src_ui_chat_build_corpus_ts-->src_ui_i18n_routes_ts
 src_ui_i18n_format_ts-->src_domain_shared_locale_ts
 src_ui_i18n_format_ts-->src_domain_shared_year_month_ts
 src_ui_i18n_format_ts-->src_ui_i18n_dictionary_ts
+src_pages_palette__locale__json_ts-->src_composition_container_ts
+src_pages_palette__locale__json_ts-->src_domain_shared_locale_ts
+src_pages_palette__locale__json_ts-->src_ui_i18n_dictionary_ts
+src_pages_palette__locale__json_ts-->src_ui_palette_palette_index_ts
+src_pages_palette__locale__json_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_ui_palette_palette_index_ts-->src_domain_project_project_ts
+src_ui_palette_palette_index_ts-->src_domain_shared_locale_ts
+src_ui_palette_palette_index_ts-->src_domain_writing_note_ts
+src_ui_palette_palette_index_ts-->src_ui_i18n_dictionary_ts
+src_ui_palette_palette_index_ts-->src_ui_i18n_routes_ts
+src_ui_palette_palette_index_ts-->src_ui_site_ts
+src_pages_sitemap_xml_ts-->src_composition_container_ts
+src_pages_sitemap_xml_ts-->src_domain_shared_locale_ts
+src_pages_sitemap_xml_ts-->src_ui_i18n_routes_ts
+src_pages_sitemap_xml_ts-->src_ui_seo_sitemap_ts
+src_pages_sitemap_xml_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_ui_seo_sitemap_ts-->src_domain_shared_locale_ts
+src_ui_seo_sitemap_ts-->src_ui_i18n_routes_ts
+src_ui_seo_sitemap_ts-->src_ui_site_ts
+src_pages_tech_logos_svg_ts-->src_ui_icons_tech_logos_ts
+src_pages_tech_logos_svg_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_ui_icons_tech_logos_ts-->node_modules__pnpm_simple_icons_16_35_0_node_modules_simple_icons_index_d_ts
+src_ui_chat_chat_drawer_ts-->src_domain_chat_question_ts
+src_ui_chat_chat_drawer_ts-->src_ui_islands_turnstile_ts
+src_ui_chat_chat_drawer_ts-->src_ui_chat_linkify_ts
 src_ui_islands_ContactForm_tsx-->src_domain_contact_contact_request_ts
 src_ui_islands_ContactForm_tsx-->src_domain_shared_locale_ts
 src_ui_islands_ContactForm_tsx-->src_ui_i18n_dictionary_ts
+src_ui_islands_ContactForm_tsx-->src_ui_islands_turnstile_ts
 src_ui_islands_ContactForm_tsx-->node_modules__pnpm_react_19_3_0_node_modules_react_index_js
+src_ui_palette_search_ts-->src_ui_palette_palette_index_ts
+src_ui_project_case_study_motion_ts-->src_domain_shared_locale_ts
+src_ui_project_case_study_motion_ts-->src_ui_project_figure_ts
+src_ui_project_case_study_motion_ts-->src_ui_project_wires_ts
+src_ui_project_figure_ts-->src_domain_shared_locale_ts
+src_ui_project_media_ts-->src_domain_shared_locale_ts
+src_ui_project_media_ts-->node_modules__pnpm_astro_7_3_8__types+node_26__d6314243a930c10c84b1626d555854ae_node_modules_astro_dist_index_js
+src_ui_seo_structured_data_ts-->src_domain_project_project_ts
+src_ui_seo_structured_data_ts-->src_domain_shared_locale_ts
+src_ui_seo_structured_data_ts-->src_domain_writing_note_ts
+src_ui_seo_structured_data_ts-->src_ui_site_ts

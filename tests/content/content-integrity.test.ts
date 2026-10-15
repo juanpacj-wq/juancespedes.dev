@@ -9,7 +9,6 @@ import { normalizeTechnologyName } from '../../src/domain/project/technology';
 import { toProfile } from '../../src/infrastructure/content/profile-mapper';
 import {
   achievementSchema,
-  headlineMetricSchema,
   noteFrontmatterSchema,
   nowSchema,
   profileSchema,
@@ -171,17 +170,6 @@ describe('technology catalog', () => {
       ),
     );
     expect(unknown).toEqual([]);
-  });
-});
-
-describe('headline metrics', () => {
-  const metrics = headlineMetricSchema
-    .array()
-    .parse(readYaml(join(CONTENT, 'headline-metrics.yaml')));
-
-  it('has unique ids and orders', () => {
-    expect(new Set(metrics.map((m) => m.id)).size).toBe(metrics.length);
-    expect(new Set(metrics.map((m) => m.order)).size).toBe(metrics.length);
   });
 });
 
