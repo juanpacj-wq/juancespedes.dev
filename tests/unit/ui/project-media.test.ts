@@ -1,7 +1,7 @@
 import type { ImageMetadata } from 'astro';
 import { describe, expect, it } from 'vitest';
 
-import { groupMedia } from '../../../src/ui/project/media';
+import { groupCaptions, groupMedia } from '../../../src/ui/project/media';
 
 const image = (name: string): ImageMetadata => ({
   src: `/${name}`,
@@ -37,8 +37,8 @@ describe('project media', () => {
     });
 
     const portal = media.get('corporate-portal');
-    expect(portal?.cover).toEqual({ src: image('real-cover'), stock: false });
-    expect(portal?.gallery).toEqual([{ src: image('stock-1'), stock: true }]);
+    expect(portal?.cover).toEqual({ src: image('real-cover'), stock: false, slot: 'cover' });
+    expect(portal?.gallery).toEqual([{ src: image('stock-1'), stock: true, slot: 'gallery-1' }]);
   });
 
   it('keeps the real image whatever order the files are found in', () => {
@@ -56,5 +56,22 @@ describe('project media', () => {
       [`${BASE}/Bad_Slug/cover.png`]: image('bad'),
     });
     expect(media.size).toBe(0);
+  });
+
+  it('reads captions in both languages and refuses one that is missing a language', () => {
+    const captions = groupCaptions({
+      [`${BASE}/corporate-portal/captions.json`]: {
+        'gallery-1': { es: 'Menú móvil', en: 'Mobile menu' },
+      },
+    });
+    expect(captions.get('corporate-portal')?.['gallery-1']?.en).toBe('Mobile menu');
+    expect(() =>
+      groupCaptions({ [`${BASE}/corporate-portal/captions.json`]: { cover: { es: 'Portada' } } }),
+    ).toThrow('"cover" needs a caption in en');
+    expect(() =>
+      groupCaptions({
+        [`${BASE}/corporate-portal/captions.json`]: { cover: { es: 'a', en: 'b', frame: 'tv' } },
+      }),
+    ).toThrow('unknown frame "tv"');
   });
 });

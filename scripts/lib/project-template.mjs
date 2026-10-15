@@ -19,6 +19,10 @@ const kindFields = (kind, locale) => {
   switch (kind) {
     case 'case-study':
       return [
+        'story:',
+        `  hook: ${quote(todo)}`,
+        '  shifts:',
+        `    - { before: ${quote(todo)}, after: ${quote(todo)} }`,
         `problem: ${quote(todo)}`,
         'responsibilities: []',
         'constraints:',

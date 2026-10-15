@@ -106,5 +106,10 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    // `astro dev` keeps its own dependency cache. When it shared node_modules/.vite with build,
+    // sync and check, any of those run while the dev server was open re-optimized the deps and left
+    // the dev server pointing at files that no longer existed ("The file does not exist ... in the
+    // optimize deps directory").
+    cacheDir: process.argv.includes('dev') ? 'node_modules/.vite-dev' : 'node_modules/.vite',
   },
 });

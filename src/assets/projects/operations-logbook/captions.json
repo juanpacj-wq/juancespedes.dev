@@ -1,0 +1,14 @@
+{
+  "cover": {
+    "es": "Bitácora de un turno abierto: cada entrada guarda su autor y quiénes conformaban el turno (personas, unidad y datos ficticios en esta captura).",
+    "en": "The log of an open shift: each entry stores its author and who was on the shift (fictitious people, unit and data in this capture)."
+  },
+  "gallery-1": {
+    "es": "Operación 24 horas: autorizaciones, pruebas y redespachos por periodo, con el libro del día listo para descargar.",
+    "en": "24-hour operation: authorizations, tests and redispatches per period, with the day's workbook ready to download."
+  },
+  "gallery-2": {
+    "es": "La misma bitácora en un teléfono, con el cierre de turno a la mano.",
+    "en": "The same log on a phone, with shift closing at hand."
+  }
+}

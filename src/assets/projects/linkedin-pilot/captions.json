@@ -1,0 +1,17 @@
+{
+  "cover": {
+    "es": "Prueba del servidor MCP: arranca, expone sus 39 herramientas y bloquea una acción visible para otras personas que no trae confirmación.",
+    "en": "The MCP server test: it starts, exposes its 39 tools and blocks an action other people can see when it comes without confirmation.",
+    "frame": "none"
+  },
+  "gallery-1": {
+    "es": "Pruebas del emparejado bilingüe: un campo pedido en español se encuentra en la interfaz en inglés, y al revés.",
+    "en": "Tests of the bilingual matching: a field asked for in Spanish is found in the English interface, and the other way around.",
+    "frame": "none"
+  },
+  "gallery-2": {
+    "es": "El motor de formularios contra una página de LinkedIn guardada: detecta campos y botones por su nombre visible.",
+    "en": "The form engine against a saved LinkedIn page: it finds fields and buttons by their visible names.",
+    "frame": "none"
+  }
+}

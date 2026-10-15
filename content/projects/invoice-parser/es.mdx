@@ -27,6 +27,15 @@ featured: false
 order: 6
 status: published
 confidentiality: anonymized
+story:
+  hook: 'En cada ciclo de facturación alguien digitaba a mano decenas de facturas en PDF y las comparaba una por una contra la base de datos.'
+  shifts:
+    - before: 'Digitar las facturas una por una.'
+      after: 'Seleccionar una carpeta y revisar solo las diferencias que marca el Excel.'
+    - before: 'Comparar a mano contra la base corporativa.'
+      after: 'Las diferencias salen campo por campo en una hoja de comparación.'
+    - before: 'Cuatro scripts que hacían partes del trabajo.'
+      after: 'Una sola aplicación de escritorio que corre sin instalar Python.'
 problem: En cada ciclo de facturación había que digitar y verificar a mano decenas de facturas de energía en PDF, de dos contrapartes con formatos completamente distintos, y compararlas contra los valores registrados en la base de datos corporativa. Era lento, propenso a errores y estaba repartido en cuatro scripts que hacían partes del trabajo.
 responsibilities:
   - Analicé las plantillas de cada contraparte, incluida la de notas crédito de reliquidación.
@@ -46,12 +55,12 @@ decisions:
     rationale: En el formato tabular, el texto se reconstruye agrupando las líneas por su posición vertical, lo que mantiene unidas las columnas que una extracción plana mezcla.
     alternatives:
       - Extraer texto plano y separarlo solo con expresiones regulares
-  - title: Corpus dorado antes de tocar un patrón
+  - title: Corpus de regresión antes de tocar un patrón
     rationale: 73 facturas reales congeladas en un snapshot hacen fallar la suite ante cualquier cambio de valor, y el snapshot solo se regenera después de una verificación manual.
     alternatives:
       - Probar con unas pocas facturas de ejemplo
   - title: Los campos no extraídos también son datos
-    rationale: Cada factura lleva la lista de conceptos que la plantilla no trajo, así una plantilla nueva se detecta en el Excel en lugar de convertirse en ceros silenciosos.
+    rationale: Cada factura lleva la lista de conceptos que la plantilla no trajo. Si llega una plantilla nueva, el Excel lo muestra en esa lista y los conceptos faltantes no aparecen como ceros.
     alternatives:
       - Rellenar con cero lo que no se encuentre
 architecture:
@@ -97,7 +106,7 @@ outcomes:
   - Un ejecutable de Windows funciona sin instalar Python ni dependencias.
 lessons:
   - Separaría desde el inicio el núcleo de extracción de la interfaz, para poder correrlo también por línea de comandos o programado en un servidor.
-  - Construiría el corpus dorado antes de unificar los proyectos previos; habría hecho la unificación más rápida y más segura.
+  - Construiría el corpus de regresión antes de unificar los proyectos previos, para hacer la unificación con pruebas desde el principio.
 ---
 
 {/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

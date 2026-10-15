@@ -1,0 +1,1054 @@
+@import './screen-placeholder.css';
+
+/*
+ * Case study pages (src/ui/project/ProjectArticle.astro, ADR 0021).
+ *
+ * The page is complete without any of the motion below. Scroll-driven effects run only where
+ * the browser supports view timelines, everything that moves stops with prefers-reduced-motion,
+ * and no starting state lowers the contrast of text the accessibility checks can read: words
+ * that light up start at the `subtle` ink (AA on both themes), never at a fainter one.
+ */
+
+@layer components {
+  /* ---------- Chapters ---------- */
+
+  .cs-hook {
+    view-timeline: --cs-hook block;
+    color: var(--color-ink);
+  }
+
+  /* Figure cards, constraint tiles: a bevelled surface with a light that follows the pointer. */
+  .cs-stat,
+  .cs-tile {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background-color: var(--color-surface-raised);
+    box-shadow: var(--shadow-bevel);
+    transition:
+      box-shadow 400ms var(--ease-out),
+      translate 400ms var(--ease-out);
+  }
+
+  .cs-stat {
+    gap: 1rem;
+    padding: 1.75rem;
+  }
+
+  .cs-tile {
+    gap: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .cs-stat--solo {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      column-gap: 2.5rem;
+      align-items: end;
+      padding: 2.5rem;
+    }
+
+    .cs-stat--solo > :first-child {
+      grid-row: span 2;
+      font-size: var(--text-display);
+      line-height: 1;
+    }
+  }
+
+  .cs-stat::before,
+  .cs-tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      22rem circle at var(--gx, 50%) var(--gy, 0%),
+      color-mix(in srgb, var(--color-accent) 12%, transparent),
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 400ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cs-stat:hover,
+    .cs-tile:hover {
+      box-shadow: var(--shadow-bevel), var(--shadow-lift);
+    }
+
+    .cs-stat:hover::before,
+    .cs-tile:hover::before {
+      opacity: 1;
+    }
+  }
+
+  /* Before and after: what changed for the people involved. */
+  .cs-before,
+  .cs-after {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-radius: var(--radius-card);
+    padding: 1.25rem 1.5rem;
+    text-wrap: pretty;
+  }
+
+  .cs-before {
+    border: 1px dashed var(--color-line-strong);
+    color: var(--color-muted);
+  }
+
+  .cs-after {
+    position: relative;
+    background:
+      linear-gradient(
+        120deg,
+        color-mix(in srgb, var(--color-success) 14%, transparent),
+        transparent 60%
+      ),
+      var(--color-surface-raised);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-bevel);
+  }
+
+  .cs-shift-arrow {
+    display: grid;
+    place-items: center;
+    color: var(--color-accent-ink);
+  }
+
+  .cs-shift-arrow svg {
+    rotate: 90deg;
+  }
+
+  @media (min-width: 40rem) {
+    .cs-shift-arrow svg {
+      rotate: 0deg;
+    }
+  }
+
+  /* My role: a rail that fills as the reader goes down it. */
+  .cs-rail {
+    position: relative;
+  }
+
+  /* The steps sit above the line: each one is its own layer (the reveal animates it), and the
+     fill is painted after them, so without this the line crosses the numbers. */
+  .cs-rail > li {
+    z-index: 1;
+  }
+
+  .cs-rail::before,
+  .cs-rail::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 1.25rem;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    width: 1px;
+    translate: -50% 0;
+    background-color: var(--color-line-strong);
+  }
+
+  .cs-rail::after {
+    transform-origin: 50% 0;
+    background: linear-gradient(var(--color-accent), var(--color-success));
+    scale: 1 0;
+  }
+
+  .cs-rail-dot {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    place-items: center;
+    border-radius: var(--radius-chip);
+    background-color: var(--color-surface-raised);
+    color: var(--color-accent-ink);
+    box-shadow: var(--shadow-bevel);
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+  }
+
+  /* Decisions: cards that stack on wide screens as the reader scrolls past them. */
+  .cs-decision {
+    display: grid;
+    gap: 2rem;
+    border-radius: var(--radius-panel);
+    background:
+      radial-gradient(
+        50% 80% at 0% 0%,
+        color-mix(in srgb, var(--color-accent) 7%, transparent),
+        transparent 70%
+      ),
+      var(--color-surface-raised);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-bevel), var(--shadow-card);
+  }
+
+  @media (min-width: 40rem) {
+    .cs-decision {
+      padding: 2.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .cs-decision {
+      position: sticky;
+      top: calc(6.5rem + var(--i) * 1.25rem);
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 3rem;
+      padding: 3rem;
+    }
+
+    .cs-decisions {
+      padding-bottom: 2rem;
+    }
+  }
+
+  .cs-choice {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    padding: 1rem 1.25rem;
+  }
+
+  /* Headline figures in the sans face: the display cut has no "+" and figures read as data. */
+  .cs-figure {
+    letter-spacing: -0.035em;
+  }
+
+  /* Results: a ledger of what is true now. */
+  .cs-outcome {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.25rem;
+    border-bottom: 1px solid var(--color-line);
+    padding-block: 1.5rem;
+  }
+
+  .cs-outcome:first-child {
+    padding-top: 0;
+  }
+
+  .cs-outcome-check {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    margin-top: 0.125rem;
+    place-items: center;
+    border-radius: var(--radius-chip);
+    background-color: color-mix(in srgb, var(--color-success) 16%, transparent);
+    color: var(--color-success);
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* What I would do differently: set like quotations. */
+  .cs-lesson {
+    position: relative;
+    padding-left: 2.25rem;
+  }
+
+  .cs-lesson::before {
+    content: '\201C';
+    position: absolute;
+    top: -0.35em;
+    left: 0;
+    color: var(--color-accent-ink);
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    line-height: 1;
+  }
+
+  /* ---------- The solution: screenshots (ProjectGallery.astro, ADR 0022) ---------- */
+
+  .cs-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* A row that snaps each slide to the centre; the next one peeks in from the side. */
+  .cs-gallery-track {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding-block: 0.5rem 1rem;
+    scroll-padding-inline: 8%;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .cs-gallery-track:focus-visible {
+    outline-offset: 6px;
+    border-radius: var(--radius-panel);
+  }
+
+  .cs-slide {
+    flex: 0 0 min(100%, 64rem);
+    scroll-snap-align: center;
+  }
+
+  /* A tall capture stays about as high as a wide one beside it, so the row has no empty band. */
+  .cs-slide--tall {
+    flex-basis: min(46%, 22rem);
+  }
+
+  @media (min-width: 40rem) {
+    .cs-slide--tall {
+      flex-basis: min(78%, 22rem);
+    }
+  }
+
+  .cs-frame {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-bevel), var(--shadow-lift);
+    cursor: zoom-in;
+    transition: translate 500ms var(--ease-out);
+  }
+
+  .cs-frame--none {
+    background-color: transparent;
+    box-shadow: var(--shadow-lift);
+  }
+
+  .cs-frame--phone {
+    border: 0.5rem solid var(--color-frame);
+    border-radius: 2.25rem;
+  }
+
+  /* A screenshot waiting for its address (ProjectGallery.astro): nothing to show yet, and without
+     JavaScript the noscript copy next to it shows instead. */
+  .cs-frame img[data-deferred]:not([src]) {
+    display: none;
+  }
+
+  .cs-frame--phone img {
+    border-radius: 1.75rem;
+  }
+
+  .cs-frame-bar {
+    display: flex;
+    height: 2.25rem;
+    align-items: center;
+    gap: 0.375rem;
+    border-bottom: 1px solid var(--color-line);
+    background-color: var(--color-frame);
+    padding-inline: 1rem;
+  }
+
+  .cs-frame-bar i {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: var(--radius-chip);
+    background-color: var(--color-line-strong);
+  }
+
+  .cs-frame-bar span {
+    overflow: hidden;
+    margin-left: 0.5rem;
+    border-radius: var(--radius-chip);
+    background-color: var(--color-surface-raised);
+    padding: 0.125rem 0.75rem;
+    color: var(--color-subtle);
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .cs-frame-zoom {
+    position: absolute;
+    right: 0.875rem;
+    bottom: 0.875rem;
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border-radius: var(--radius-chip);
+    background: color-mix(in srgb, var(--color-surface-raised) 80%, transparent);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-bevel);
+    opacity: 0;
+    backdrop-filter: blur(10px);
+    transition: opacity 300ms ease;
+  }
+
+  .cs-frame:hover .cs-frame-zoom,
+  .cs-frame:focus-visible .cs-frame-zoom {
+    opacity: 1;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cs-frame:hover {
+      translate: 0 -4px;
+    }
+  }
+
+  /* Tabs with a bar that fills while a slide is on screen, then the gallery moves on. */
+  .cs-gallery-tabs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.75rem;
+  }
+
+  .cs-gallery-tabs[hidden] {
+    display: none;
+  }
+
+  /* On phones the caption already sits under each slide: the tabs shrink to numbered bars (the
+     tab's caption is hidden in the markup). */
+  @media (max-width: 39.99rem) {
+    .cs-gallery-tabs {
+      grid-template-columns: none;
+      grid-auto-columns: 1fr;
+      grid-auto-flow: column;
+    }
+  }
+
+  .cs-gallery-tab {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 0.5rem 0.75rem;
+    border-radius: var(--radius-control);
+    padding: 0.25rem 0.25rem 0.5rem;
+    color: var(--color-muted);
+    transition: color 300ms ease;
+  }
+
+  .cs-gallery-tab:hover,
+  .cs-gallery-tab[aria-current] {
+    color: var(--color-ink);
+  }
+
+  .cs-gallery-tab-bar {
+    grid-column: 1 / -1;
+    height: 2px;
+    overflow: hidden;
+    border-radius: var(--radius-chip);
+    background-color: var(--color-line);
+  }
+
+  .cs-gallery-tab-bar span {
+    display: block;
+    height: 100%;
+    transform-origin: 0 50%;
+    background-color: var(--color-accent);
+    scale: 0 1;
+  }
+
+  .cs-gallery-tab[aria-current] .cs-gallery-tab-bar span {
+    scale: 1 1;
+  }
+
+  .cs-gallery[data-playing] .cs-gallery-tab[aria-current] .cs-gallery-tab-bar span {
+    animation: cs-tab-fill var(--cs-dwell, 6s) linear both;
+  }
+
+  .cs-gallery[data-paused] .cs-gallery-tab[aria-current] .cs-gallery-tab-bar span {
+    animation-play-state: paused;
+  }
+
+  /* The enlarged view. */
+  .cs-lightbox {
+    width: min(100% - 2rem, 90rem);
+    max-width: none;
+    max-height: calc(100dvh - 2rem);
+    margin: auto;
+    border-radius: var(--radius-panel);
+    background-color: var(--color-surface);
+    padding: 1rem;
+    color: var(--color-ink);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .cs-lightbox::backdrop {
+    background: color-mix(in srgb, var(--color-canvas) 82%, transparent);
+    backdrop-filter: blur(8px);
+  }
+
+  .cs-lightbox-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .cs-lightbox img {
+    width: 100%;
+    max-height: calc(100dvh - 9rem);
+    object-fit: contain;
+    border-radius: var(--radius-card);
+  }
+
+  /* ---------- Architecture ---------- */
+
+  .cs-arch {
+    background-image: radial-gradient(
+      color-mix(in srgb, var(--color-ink) 9%, transparent) 1px,
+      transparent 1.5px
+    );
+    background-size: 20px 20px;
+  }
+
+  .cs-wires {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  @media (min-width: 64rem) {
+    .cs-wires {
+      display: block;
+    }
+  }
+
+  .cs-wire-line,
+  .cs-wire-flow {
+    fill: none;
+    stroke-linecap: round;
+    transition:
+      stroke 300ms ease,
+      opacity 300ms ease;
+  }
+
+  .cs-wire-line {
+    stroke: var(--color-line-strong);
+    stroke-width: 1.5;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .cs-wire-flow {
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    stroke-dasharray: 2 10;
+    opacity: 0;
+  }
+
+  .cs-wire-packet {
+    fill: var(--color-accent);
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  [data-drawn] .cs-wire-line {
+    stroke-dashoffset: 0;
+    transition:
+      stroke-dashoffset 1.2s var(--ease-out) calc(var(--i) * 90ms),
+      stroke 300ms ease,
+      opacity 300ms ease;
+  }
+
+  [data-drawn] .cs-wire-flow {
+    opacity: 0.55;
+    transition: opacity 600ms ease calc(900ms + var(--i) * 90ms);
+  }
+
+  [data-drawn] .cs-wire-packet {
+    opacity: 0.9;
+  }
+
+  .cs-node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border-radius: var(--radius-control);
+    background-color: var(--color-canvas);
+    padding: 0.875rem 1rem 0.875rem 1.75rem;
+    box-shadow:
+      var(--shadow-bevel),
+      0 0 0 1px var(--color-line);
+    transition:
+      box-shadow 300ms ease,
+      opacity 300ms ease,
+      translate 300ms var(--ease-out);
+  }
+
+  .cs-node-dot {
+    position: absolute;
+    top: 1.25rem;
+    left: 0.875rem;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: var(--radius-chip);
+    background-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 18%, transparent);
+  }
+
+  .cs-flow {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    border-radius: var(--radius-card);
+    padding: 1rem 1.25rem;
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    transition:
+      background-color 300ms ease,
+      box-shadow 300ms ease;
+  }
+
+  .cs-step {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border-radius: var(--radius-chip);
+    background-color: var(--color-surface-raised);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-bevel);
+    transition: background-color 300ms ease;
+  }
+
+  .cs-step:hover {
+    background-color: var(--color-frame);
+  }
+
+  /* Focus on one part of the system: its wires and nodes light up, the rest steps back. */
+  [data-focus] .cs-node:not([data-on]) {
+    opacity: 0.45;
+  }
+
+  [data-focus] .cs-wire:not([data-on]) {
+    opacity: 0.25;
+  }
+
+  .cs-node[data-on] {
+    translate: 0 -2px;
+    box-shadow:
+      var(--shadow-bevel),
+      0 0 0 1px var(--color-accent),
+      0 0 24px -6px var(--color-accent);
+  }
+
+  .cs-wire[data-on] .cs-wire-line {
+    stroke: var(--color-accent);
+  }
+
+  .cs-wire[data-on] .cs-wire-flow {
+    opacity: 1;
+  }
+
+  .cs-flow[data-on] {
+    background-color: var(--color-surface-raised);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent),
+      var(--shadow-bevel);
+  }
+
+  /* ---------- Closing ---------- */
+
+  /* The stack as one band of logos that moves and can be dragged (TechBand.astro, ADR 0023).
+     It spans the whole window; the article clips the overflow. */
+  .cs-bleed {
+    margin-inline: calc(50% - 50vw);
+  }
+
+  .cs-band {
+    width: min(100%, var(--cs-band-width, 100%));
+    margin-inline: auto;
+    overflow-x: auto;
+    border-block: 1px solid var(--color-line);
+    padding-block: 2.5rem;
+    cursor: grab;
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      black 4rem,
+      black calc(100% - 4rem),
+      transparent
+    );
+    scrollbar-width: none;
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  .cs-band[data-live] {
+    overflow-x: hidden;
+  }
+
+  .cs-band[data-dragging] {
+    cursor: grabbing;
+  }
+
+  .cs-band-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .cs-band-row {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    padding-right: 4rem;
+  }
+
+  .cs-band-item {
+    position: relative;
+    display: grid;
+    height: 4.5rem;
+    place-items: center;
+  }
+
+  .cs-band-logo {
+    width: auto;
+    height: 3.25rem;
+    color: var(--color-ink);
+    transition:
+      scale 400ms var(--ease-out),
+      filter 400ms ease;
+  }
+
+  /* The brand colour where it keeps 3:1 against the theme's canvas, the ink colour otherwise. */
+  :root:not([data-theme='light']) .cs-band-logo[data-on-dark],
+  :root[data-theme='light'] .cs-band-logo[data-on-light] {
+    color: var(--brand);
+  }
+
+  /* A technology without a free logo: its name, sized to weigh about what a logo weighs. */
+  .cs-band-word {
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: var(--text-quote);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .cs-band-name {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 50%;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+    white-space: nowrap;
+    opacity: 0;
+    translate: -50% -0.25rem;
+    transition:
+      opacity 300ms ease,
+      translate 300ms var(--ease-out);
+  }
+
+  .cs-band-item:has(.cs-band-word) .cs-band-name {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cs-band:not([data-dragging]) .cs-band-item:hover .cs-band-logo {
+      scale: 1.12;
+    }
+
+    .cs-band:not([data-dragging]) .cs-band-item:hover .cs-band-name {
+      opacity: 1;
+      translate: -50% 0;
+    }
+  }
+
+  .cs-cta {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow: hidden;
+    border-radius: var(--radius-panel);
+    background:
+      radial-gradient(
+        55% 90% at 100% 100%,
+        color-mix(in srgb, var(--color-accent) 20%, transparent),
+        transparent 70%
+      ),
+      var(--color-surface);
+    padding: 2rem;
+    box-shadow: var(--shadow-bevel);
+  }
+
+  @media (min-width: 40rem) {
+    .cs-cta {
+      padding: 3.5rem;
+    }
+  }
+
+  /* The next case: a card with its screen leaning out of the right edge, like the home page. */
+  .cs-next {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-panel);
+    background:
+      radial-gradient(
+        50% 70% at 85% 70%,
+        color-mix(in srgb, var(--color-success) 14%, transparent),
+        transparent 75%
+      ),
+      var(--color-surface-raised);
+    box-shadow: var(--shadow-bevel);
+    transition: box-shadow 500ms var(--ease-out);
+  }
+
+  .cs-next-stage {
+    position: relative;
+    height: 16rem;
+  }
+
+  .cs-next-screen {
+    position: absolute;
+    inset: 2rem -3rem -3rem 1.5rem;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-lift);
+    transform: rotate(-3deg);
+    transform-origin: 0 0;
+    transition: transform 700ms var(--ease-out);
+  }
+
+  @media (min-width: 64rem) {
+    .cs-next {
+      flex-direction: row;
+      min-height: 26rem;
+    }
+
+    .cs-next-stage {
+      height: auto;
+      flex: 1;
+    }
+
+    .cs-next-screen {
+      inset: 4rem -6rem -4rem 1rem;
+    }
+  }
+
+  .cs-next-cta {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    border-radius: var(--radius-chip);
+    background-color: var(--color-ink);
+    padding-inline: 1.25rem;
+    color: var(--color-canvas);
+    font-size: var(--text-small);
+    font-weight: 500;
+    transition: background-color 400ms var(--ease-out);
+  }
+
+  .cs-next-cta svg {
+    transition: translate 400ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cs-next:hover {
+      box-shadow: var(--shadow-bevel), var(--shadow-lift);
+    }
+
+    .cs-next:hover .cs-next-screen {
+      transform: rotate(-1deg) translate(-0.5rem, -0.75rem);
+    }
+
+    .cs-next:hover .cs-next-cta {
+      background-color: var(--color-accent);
+      color: var(--color-on-accent);
+    }
+
+    .cs-next:hover .cs-next-cta svg {
+      translate: 0.25rem 0;
+    }
+  }
+
+  .cs-next:focus-visible {
+    outline-offset: 4px;
+    border-radius: var(--radius-panel);
+  }
+
+  /* ---------- Floating chapter nav ---------- */
+
+  /* Left of the chat sphere and of the label it shows the first time (chat.css). */
+  .cs-chapters {
+    position: fixed;
+    right: 6rem;
+    bottom: 1.25rem;
+    left: 1rem;
+    z-index: 40;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  @media (min-width: 64rem) {
+    .cs-chapters {
+      right: 18rem;
+      left: 2rem;
+    }
+  }
+
+  .cs-chapters-list {
+    display: flex;
+    max-width: 100%;
+    gap: 0.125rem;
+    overflow-x: auto;
+    border-radius: var(--radius-chip);
+    background: color-mix(in srgb, var(--color-surface-raised) 78%, transparent);
+    padding: 0.3125rem;
+    box-shadow: var(--shadow-bevel), var(--shadow-lift);
+    pointer-events: auto;
+    scrollbar-width: none;
+    backdrop-filter: blur(16px) saturate(140%);
+    transition:
+      translate 600ms var(--ease-out),
+      opacity 400ms ease,
+      visibility 0s linear 600ms;
+  }
+
+  .cs-chapters[data-state='away'] .cs-chapters-list {
+    visibility: hidden;
+    opacity: 0;
+    translate: 0 calc(100% + 2rem);
+  }
+
+  .cs-chapters[data-state='in'] .cs-chapters-list {
+    transition:
+      translate 600ms var(--ease-out),
+      opacity 400ms ease,
+      visibility 0s;
+  }
+
+  .cs-chapters-link {
+    display: block;
+    min-height: 2.25rem;
+    border-radius: var(--radius-chip);
+    padding: 0.5rem 0.75rem;
+    color: var(--color-muted);
+    font-size: var(--text-small);
+    line-height: 1.25rem;
+    white-space: nowrap;
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+
+  .cs-chapters-link:hover {
+    color: var(--color-ink);
+  }
+
+  .cs-chapters-link[aria-current] {
+    background-color: var(--color-ink);
+    color: var(--color-canvas);
+  }
+}
+
+/* ---------- Motion ---------- */
+
+@layer utilities {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      /* The hook lights up word by word as it crosses the screen. */
+      .cs-hook .cs-w {
+        animation: cs-lit linear both;
+        animation-timeline: --cs-hook;
+        animation-range: cover calc(12% + var(--p) * 34%) cover calc(18% + var(--p) * 34%);
+      }
+
+      .cs-heading {
+        animation: cs-heading linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 90%;
+      }
+
+      .cs-rail::after {
+        animation: cs-fill linear both;
+        animation-timeline: view();
+        animation-range: entry 60% cover 70%;
+      }
+
+      /* Slides away from the centre of the row step back a little: the frame shrinks and only the
+         picture dims, so the address bar and the caption keep full contrast. */
+      .cs-slide .cs-frame {
+        animation: cs-slide-scale linear both;
+        animation-timeline: view(inline);
+      }
+
+      .cs-slide .cs-frame img {
+        animation: cs-slide-dim linear both;
+        animation-timeline: view(inline);
+      }
+    }
+  }
+}
+
+@keyframes cs-lit {
+  from {
+    color: var(--color-subtle);
+  }
+}
+
+@keyframes cs-heading {
+  from {
+    filter: blur(8px);
+    translate: 0 0.3em;
+  }
+}
+
+@keyframes cs-fill {
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes cs-tab-fill {
+  from {
+    scale: 0 1;
+  }
+
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes cs-slide-scale {
+  0%,
+  100% {
+    scale: 0.94;
+  }
+
+  35%,
+  65% {
+    scale: 1;
+  }
+}
+
+@keyframes cs-slide-dim {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  35%,
+  65% {
+    opacity: 1;
+  }
+}

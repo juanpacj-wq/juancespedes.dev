@@ -4,9 +4,13 @@ import type { Dictionary } from '../i18n/dictionary';
 import Icon from '../icons/Icon.astro';
 
 /**
- * Draws a case study's architecture from data: layers left to right on wide screens, top to
- * bottom on phones, then the flows as a list. It is real text, so it follows the theme, scales
- * with the reader's font size and reads in order with a screen reader. No JavaScript.
+ * Draws a case study's architecture from data (ADR 0011, ADR 0021). The markup is the diagram:
+ * layers as columns on wide screens (a stack on phones), nodes as real text, the flows as a
+ * numbered list. It reads complete without JavaScript and with a screen reader.
+ *
+ * On top of that, the case study script (case-study-motion.ts) measures the nodes and draws the
+ * flows as wires with data moving along them, lights a node's connections on hover or focus, and
+ * walks the flows one step at a time. All of it is decoration over the same text.
  */
 interface Props {
   t: Dictionary;
@@ -15,49 +19,75 @@ interface Props {
 
 const { t, architecture } = Astro.props;
 const labels = nodeLabels(architecture);
-const lastLayer = architecture.layers.length - 1;
+const two = (n: number) => String(n + 1).padStart(2, '0');
 ---
 
-<figure class="flex flex-col gap-10">
-  <figcaption class="max-w-3xl text-muted">{architecture.summary}</figcaption>
+<figure class="flex flex-col gap-10" data-arch>
+  <figcaption class="max-w-3xl text-lead text-pretty text-muted">{architecture.summary}</figcaption>
 
-  <ol
-    aria-label={t.project.diagram}
-    class="grid gap-10 rounded-panel border border-line bg-surface p-5 sm:p-8 lg:grid-flow-col lg:auto-cols-fr"
-  >
-    {architecture.layers.map((layer, index) => (
-      <li class="relative flex flex-col gap-3">
-        <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">{layer.name}</p>
-        <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-          {layer.nodes.map((node) => (
-            <li class="flex flex-col gap-1 rounded-control border border-line-strong bg-canvas px-3 py-2.5">
-              <span class="text-small font-medium text-ink">{node.label}</span>
-              {node.detail && <span class="text-eyebrow text-muted">{node.detail}</span>}
-            </li>
-          ))}
-        </ul>
-        {index < lastLayer && (
-          <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 rotate-90 text-subtle lg:top-8 lg:-right-7 lg:bottom-auto lg:left-auto lg:translate-x-0 lg:rotate-0">
-            <Icon name="arrow-right" size={18} />
-          </span>
-        )}
-      </li>
-    ))}
-  </ol>
+  <div class="cs-arch relative isolate overflow-hidden rounded-panel bg-surface p-5 shadow-bevel sm:p-8 lg:p-12">
+    <svg class="cs-wires" aria-hidden="true" data-wires></svg>
+    <ol
+      aria-label={t.project.diagram}
+      class="relative grid gap-10 lg:grid-flow-col lg:auto-cols-fr lg:gap-20"
+    >
+      {architecture.layers.map((layer, index) => (
+        <li class="flex flex-col gap-4">
+          <p class="flex items-center gap-3 font-mono text-eyebrow tracking-widest uppercase">
+            <span class="text-accent-ink">{two(index)}</span>
+            <span class="text-muted">{layer.name}</span>
+            <span class="h-px flex-1 bg-line" aria-hidden="true" />
+          </p>
+          <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            {layer.nodes.map((node) => (
+              <li class="cs-node" data-node={node.id}>
+                <span class="cs-node-dot" aria-hidden="true" />
+                <span class="text-small font-medium text-ink">{node.label}</span>
+                {node.detail && <span class="text-small text-muted">{node.detail}</span>}
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ol>
+  </div>
 
   {architecture.flows.length > 0 && (
-    <div class="flex flex-col gap-4">
-      <h3 class="text-title font-medium">{t.project.flows}</h3>
-      <ol class="grid gap-x-8 gap-y-4 md:grid-cols-2">
-        {architecture.flows.map((flow) => (
-          <li class="flex flex-col gap-1 border-l-2 border-line-strong pl-4">
-            <span class="flex flex-wrap items-center gap-x-2 text-small font-medium text-ink">
-              {labels.get(flow.from)}
-              <Icon name="arrow-right" size={14} class="text-accent-ink" />
-              <span class="sr-only">{t.project.flowTo}</span>
-              {labels.get(flow.to)}
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="flex flex-col gap-2">
+          <h3 class="font-display text-title font-light text-ink">{t.project.flows}</h3>
+          <p class="text-small text-subtle" hidden data-arch-hint>
+            {t.project.diagramHint}
+          </p>
+        </div>
+        <div class="flex items-center gap-2" hidden data-arch-steps>
+          <button type="button" class="cs-step" data-step="-1" aria-label={t.project.previousStep}>
+            <Icon name="arrow-right" size={16} class="rotate-180" />
+          </button>
+          <span class="min-w-16 text-center font-mono text-eyebrow text-muted" data-step-count>
+            {`00 / ${two(architecture.flows.length - 1)}`}
+          </span>
+          <button type="button" class="cs-step" data-step="1" aria-label={t.project.nextStep}>
+            <Icon name="arrow-right" size={16} />
+          </button>
+        </div>
+      </div>
+      <ol class="grid gap-3 md:grid-cols-2">
+        {architecture.flows.map((flow, index) => (
+          <li class="cs-flow" data-flow={index} data-from={flow.from} data-to={flow.to}>
+            <span class="font-mono text-eyebrow text-subtle" aria-hidden="true">
+              {two(index)}
             </span>
-            <span class="text-small text-muted">{flow.label}</span>
+            <span class="flex flex-col gap-1">
+              <span class="flex flex-wrap items-center gap-x-2 text-small font-medium text-ink">
+                {labels.get(flow.from)}
+                <Icon name="arrow-right" size={14} class="text-accent-ink" />
+                <span class="sr-only">{t.project.flowTo}</span>
+                {labels.get(flow.to)}
+              </span>
+              <span class="text-small text-muted">{flow.label}</span>
+            </span>
           </li>
         ))}
       </ol>

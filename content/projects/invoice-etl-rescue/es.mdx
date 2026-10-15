@@ -1,7 +1,7 @@
 ---
 kind: case-study
-title: Rescate de un ETL de facturación electrónica que fallaba en silencio
-summary: Recibí un pipeline heredado que perdía facturas reportando éxito. Lo audité contra producción y lo puse bajo pruebas, CI y despliegue por etiqueta; hoy falla en rojo, avisa solo y se audita factura por factura.
+title: Rescate de un ETL de facturación electrónica que perdía facturas sin reportar error
+summary: Recibí un pipeline heredado que perdía facturas y reportaba éxito. Lo audité contra producción y lo puse bajo pruebas, CI y despliegue por etiqueta. Hoy, si falla, termina en error y avisa por correo.
 role: Ingeniero de datos a cargo del rescate y la operación del sistema
 period: { start: '2026-08', end: null }
 capabilities: [legacy-systems, data-bi, automation-ai]
@@ -31,9 +31,18 @@ featured: true
 order: 4
 status: published
 confidentiality: anonymized
+story:
+  hook: 'Un proceso que cargaba las facturas de proveedores al sistema contable podía perder facturas y aun así decir que todo había salido bien.'
+  shifts:
+    - before: 'Perdía facturas y la corrida terminaba como exitosa.'
+      after: 'Si una tarea no carga lo esperado, la corrida termina en error y avisa por correo.'
+    - before: 'Nada comparaba lo descargado con lo cargado en el ERP.'
+      after: 'Se verificaron una a una cerca de 1.050 facturas de un mes contra el destino.'
+    - before: 'Llegó sin control de versiones ni pruebas.'
+      after: 'Cada cambio pasa por pruebas automáticas y cada ejecución dice qué versión corrió.'
 problem: Un pipeline construido por un tercero descargaba las facturas electrónicas de proveedores desde el portal del operador de facturación, las convertía y las cargaba en el ERP financiero de dos empresas, tres veces al día. Llegó sin control de versiones, sin pruebas y con un defecto grave, porque podía perder facturas y aun así terminar en verde.
 responsibilities:
-  - Audité el sistema de punta a punta y documenté 74 hallazgos, con un resumen en el lenguaje del área usuaria.
+  - Audité el sistema completo y documenté 74 hallazgos, con un resumen para el área usuaria.
   - Lo puse bajo git, pruebas, CI con protección de rama y despliegue por etiqueta, sin detener las corridas diarias.
   - Corregí las fallas que perdían facturas y migré la llave primaria de las tablas de destino, con ensayo previo en desarrollo.
   - Opero el sistema, con incidentes, conciliaciones, despliegues y comunicación con el área financiera.
@@ -44,14 +53,14 @@ constraints:
   - El orquestador lo comparten otros seis flujos de trabajo.
 decisions:
   - title: Auditar y medir antes de corregir
-    rationale: Una línea base medida contra producción permitió priorizar por impacto de negocio y demostrar cada mejora con cifras, en lugar de reescribir por intuición.
+    rationale: Una línea base medida contra producción permitió priorizar por impacto de negocio y demostrar cada mejora con cifras.
     alternatives:
       - Reescribir el pipeline desde cero
   - title: Extraer un dominio puro y probado del código de scraping
     rationale: Las reglas de calendario, paginación y clasificación salieron a módulos sin red ni secretos, con doctests como contrato. Se prueban en menos de un segundo sin tocar el portal.
     alternatives:
       - Probar solo de punta a punta contra el portal real
-  - title: Una corrida que no hizo nada termina en rojo
+  - title: Una corrida que no cargó nada termina en error
     rationale: El defecto de origen era reportar éxito sin haber cargado nada. Ahora cada tarea verifica su resultado y, si el conteo no cuadra, falla y avisa por correo.
     alternatives:
       - Agregar más reintentos y dejar el estado en verde
@@ -105,12 +114,12 @@ architecture:
     - { from: reconciler, to: oracle, label: 'Verifica factura por factura' }
     - { from: mcp-server, to: download, label: 'Lee corridas y logs por la API del orquestador' }
 outcomes:
-  - El proceso que reportaba éxito habiendo perdido facturas hoy falla en rojo y avisa por correo.
+  - Si una corrida no carga lo que descargó, termina en error y avisa por correo.
   - Un incidente de cambio de mes se cuantificó el mismo día, con 63 facturas pendientes exactas, respuesta al área usuaria antes del mediodía y corrección de fondo probada en vivo.
   - Se verificaron una a una cerca de 1.050 facturas de un mes contra la base de destino.
   - Cada log de producción se asocia a su commit, porque el despliegue es por etiqueta y cada corrida imprime la versión.
 lessons:
-  - Construiría el conciliador entre almacenes antes que cualquier corrección; es la herramienta que convierte una sospecha en un número.
+  - Construiría el conciliador entre almacenes antes que cualquier corrección. Fue lo que permitió contar las facturas afectadas en cada incidente.
   - Negociaría desde el inicio un entorno de pruebas del portal de origen, porque buena parte del riesgo vino de no poder ensayar descargas sin tocar el proceso real.
 ---
 

@@ -9,10 +9,25 @@ const SLUGS = readdirSync(PROJECTS_DIR).filter((name) =>
   statSync(join(PROJECTS_DIR, name)).isDirectory(),
 );
 
+/** A project with real screenshots gets a "solution" chapter right after the problem. */
+const IMAGES_DIR = join(process.cwd(), 'src', 'assets', 'projects');
+const hasScreenshots = (slug: string) => {
+  try {
+    return readdirSync(join(IMAGES_DIR, slug)).some((name) =>
+      /^gallery-\d+\.(?:avif|webp|png|jpe?g)$/.test(name),
+    );
+  } catch {
+    return false;
+  }
+};
+const withSolution = (sections: readonly string[], solution: string, slug: string) =>
+  hasScreenshots(slug) ? [...sections.slice(0, 2), solution, ...sections.slice(2)] : [...sections];
+
 const TEMPLATE = {
   es: {
     path: (slug: string) => `/proyectos/${slug}`,
     sections: [
+      'En resumen',
       'El problema',
       'Mi rol',
       'Restricciones',
@@ -22,12 +37,14 @@ const TEMPLATE = {
       'Qué haría distinto',
       'Tecnologías',
     ],
+    solution: 'La solución',
     diagram: 'Diagrama de arquitectura',
     source: 'Fuente:',
   },
   en: {
     path: (slug: string) => `/en/projects/${slug}`,
     sections: [
+      'At a glance',
       'The problem',
       'My role',
       'Constraints',
@@ -37,6 +54,7 @@ const TEMPLATE = {
       'What I would do differently',
       'Technologies',
     ],
+    solution: 'The solution',
     diagram: 'Architecture diagram',
     source: 'Source:',
   },
@@ -51,7 +69,9 @@ test.describe('project pages', () => {
 
         await expect(page.locator('html')).toHaveAttribute('lang', locale);
         await expect(page.getByRole('heading', { level: 1 })).not.toBeEmpty();
-        await expect(page.locator('main section[id] > h2')).toHaveText([...template.sections]);
+        await expect(page.locator('main section[data-chapter] h2')).toHaveText(
+          withSolution(template.sections, template.solution, slug),
+        );
         await expect(page.getByRole('list', { name: template.diagram })).toBeVisible();
         await expect(page.getByText(template.source).first()).toBeVisible();
         await expect(page).toHaveTitle(/\| Juan Céspedes$/);
@@ -59,12 +79,109 @@ test.describe('project pages', () => {
     }
   }
 
+  test('the problem is told in plain words, with what changed for the people involved', async ({
+    page,
+  }) => {
+    await page.goto('/proyectos/operations-logbook');
+    const problem = page.locator('#problem');
+    await expect(problem.getByText('Antes:').first()).toBeAttached();
+    await expect(
+      problem.getByText(
+        'El reporte se genera desde los datos, con el formato de la plantilla oficial.',
+      ),
+    ).toBeVisible();
+    await expect(page.locator('#overview .cs-hook')).toContainText('copiando celdas a mano');
+  });
+
+  test('the chapter nav appears after the hero and follows the chapter being read', async ({
+    page,
+  }) => {
+    await page.goto('/proyectos/operations-logbook');
+    const nav = page.getByRole('navigation', { name: 'Secciones del caso' });
+    await expect(nav.getByRole('link', { name: 'Decisiones' })).toBeHidden();
+
+    await page.locator('#decisions').scrollIntoViewIfNeeded();
+    const decisions = nav.getByRole('link', { name: 'Decisiones' });
+    await expect(decisions).toBeVisible();
+    await expect(decisions).toHaveAttribute('aria-current', 'true');
+
+    await nav.getByRole('link', { name: 'Arquitectura' }).click();
+    await expect(page).toHaveURL(/#architecture$/);
+  });
+
+  test('the diagram draws a wire per flow and the steps light one flow at a time', async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name === 'mobile',
+      'wires are drawn only when layers sit side by side',
+    );
+    await page.goto('/proyectos/operations-logbook');
+    await page.locator('.cs-arch').scrollIntoViewIfNeeded();
+    const flows = page.locator('#architecture [data-flow]');
+    await expect(page.locator('.cs-wire')).toHaveCount(await flows.count());
+
+    await page.getByRole('button', { name: 'Paso siguiente' }).click();
+    await expect(flows.first()).toHaveAttribute('data-on', '');
+    await expect(page.locator('[data-node="operator-app"]')).toHaveAttribute('data-on', '');
+    await expect(page.locator('[data-node="identity"]')).not.toHaveAttribute('data-on', '');
+  });
+
+  test('the solution shows real screenshots with captions, tabs and an enlarged view', async ({
+    page,
+  }) => {
+    await page.goto('/proyectos/corporate-portal');
+    const solution = page.locator('#solution');
+    await solution.scrollIntoViewIfNeeded();
+    const slides = solution.locator('[data-slide]');
+    await expect(slides).toHaveCount(4);
+    // Every screenshot says what it shows: the caption is also its text alternative.
+    for (const image of await solution.locator('[data-slide] img').all()) {
+      await expect(image).not.toHaveAttribute('alt', '');
+    }
+
+    const tabs = solution.locator('[data-go]');
+    await tabs.nth(2).click();
+    await expect(tabs.nth(2)).toHaveAttribute('aria-current', 'true');
+
+    await solution.locator('[data-zoom]').first().click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator('[data-lightbox-caption]')).toContainText('Figma');
+    await dialog.getByRole('button', { name: 'Imagen siguiente' }).click();
+    await expect(dialog.locator('[data-lightbox-caption]')).toContainText('WordPress');
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+  });
+
+  test('the technologies band shows logos and can be dragged', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'mouse drag; touch scrolls the row natively');
+    await page.goto('/proyectos/invoice-etl-rescue');
+    const band = page.locator('[data-band]');
+    await band.scrollIntoViewIfNeeded();
+    const list = page.getByRole('list', { name: 'Tecnologías' });
+    await expect(list.getByRole('img', { name: 'Python' })).toBeVisible();
+
+    const offset = () =>
+      page
+        .locator('[data-band-track]')
+        .evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41);
+    const box = await band.boundingBox();
+    if (!box) throw new Error('band not rendered');
+    const before = await offset();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 - 300, box.y + box.height / 2, { steps: 6 });
+    expect(await offset()).toBeLessThan(before - 200);
+    await page.mouse.up();
+  });
+
   test('a row on the home page opens its project', async ({ page }) => {
     await page.goto('/#projects');
     await page.locator('#project-invoice-etl-rescue').getByRole('link').click();
     await expect(page).toHaveURL(/\/proyectos\/invoice-etl-rescue$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      'Rescate de un ETL de facturación electrónica que fallaba en silencio',
+      'Rescate de un ETL de facturación electrónica que perdía facturas sin reportar error',
     );
   });
 

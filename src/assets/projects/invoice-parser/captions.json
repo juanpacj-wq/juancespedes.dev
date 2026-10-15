@@ -1,0 +1,12 @@
+{
+  "gallery-1": {
+    "es": "La aplicación de escritorio: se elige una carpeta o un PDF, la fecha de consulta y el tipo de factura, y se procesa (nombres de las empresas anonimizados).",
+    "en": "The desktop application: pick a folder or a PDF, the query date and the invoice type, then process (company names anonymized).",
+    "frame": "none"
+  },
+  "gallery-2": {
+    "es": "La misma ventana en tema claro, con el motor de la empresa B seleccionado.",
+    "en": "The same window in the light theme, with company B's engine selected.",
+    "frame": "none"
+  }
+}

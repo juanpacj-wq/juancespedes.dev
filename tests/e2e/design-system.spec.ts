@@ -6,6 +6,8 @@ const PAGES = [
   '/design-system',
   '/privacidad',
   '/proyectos/plant-telemetry',
+  // A case with real screenshots: the gallery, its tabs and captions.
+  '/proyectos/corporate-portal',
   '/proyectos/no-existe',
   '/en',
   '/en/projects/plant-telemetry',

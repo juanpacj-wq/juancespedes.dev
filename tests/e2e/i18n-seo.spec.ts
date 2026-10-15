@@ -79,7 +79,7 @@ test.describe('bilingual site and SEO', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Real-time power generation telemetry',
     );
-    await expect(page.locator('main section[id] > h2').first()).toHaveText('The problem');
+    await expect(page.locator('main section[data-chapter] h2').first()).toHaveText('At a glance');
 
     await page.getByRole('link', { name: /Leer esta página en español/ }).click();
     await expect(page).toHaveURL(/\/proyectos\/plant-telemetry$/);

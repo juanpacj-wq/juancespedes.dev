@@ -32,6 +32,13 @@ featured: true
 order: 2
 status: published
 confidentiality: anonymized
+story:
+  hook: "No screen showed each unit's actual output next to its dispatch, and the readings depended on a central system."
+  shifts:
+    - before: 'Actual output and dispatch were never seen side by side.'
+      after: 'A live screen shows the four units against dispatch, with the projection for the current period.'
+    - before: 'Readings went through a central system, and if that system failed there was no data.'
+      after: 'The service reads the meters directly, in 15 to 25 ms instead of about 1.1 s.'
 problem: Operations needed to see, on a single screen, the actual output of four generating units against the market operator's dispatch, and the existing readings depended on a centralized system that was a single point of failure.
 responsibilities:
   - Designed direct meter reading, per-period energy integration and the comparison against market dispatch.
@@ -48,7 +55,7 @@ decisions:
     alternatives:
       - Keep scraping the centralized system's web interface
   - title: Null means no reading, never zero
-    rationale: Telling missing data apart from a zero value makes a failed meter detectable instead of reporting zero generation. The rule lives in a domain module shared by the backend and the dashboard.
+    rationale: Telling missing data apart from a zero value makes a failed meter detectable. Without that distinction, the dashboard would show zero generation. The rule lives in a domain module shared by the backend and the dashboard.
     alternatives:
       - Fill missing readings with zero
   - title: Statistical validation before using the backup meters
@@ -56,7 +63,7 @@ decisions:
     alternatives:
       - Assume the backup meters read the same
   - title: One build for two plants, configured at load time
-    rationale: Each plant's branding and unit order are read from a configuration file at runtime, so a fix ships once and serves both.
+    rationale: Each plant's branding and unit order are read from a configuration file at startup. A fix is deployed once for both plants.
     alternatives:
       - Compile a separate dashboard per plant
 architecture:
@@ -98,10 +105,10 @@ outcomes:
   - Operations sees on one screen the actual output of four units against dispatch, with a projection for the current period.
   - The single point of failure is gone and read latency dropped from about 1.1 s to 15 to 25 ms (p50).
   - After a restart, the service rebuilds closed periods from the database and loses no integrated energy.
-  - The same telemetry feeds a corporate Power BI report without touching the dashboard.
+  - The same telemetry feeds a corporate Power BI report, separate from the dashboard.
 lessons:
   - I would measure latency and the rate of null readings from day one; those figures justified the protocol change and would have brought the decision forward.
-  - I would keep a single meter-reading service that publishes to both consumers, instead of maintaining the same topology in Node.js and in Python.
+  - Meter reading exists twice today, in Node.js and in Python. I would keep a single service that publishes to both consumers.
 ---
 
 {/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

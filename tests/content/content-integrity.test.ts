@@ -86,6 +86,8 @@ describe('projects', () => {
         confidentiality: p.confidentiality,
         links: p.links.map((link) => link.url),
         metricCount: p.metrics.length,
+        // Each "before" pairs with its "after", so both languages tell the same changes.
+        shiftCount: p.kind === 'case-study' ? p.story.shifts.length : null,
         repository: p.kind === 'open-source' ? p.repository : null,
         // The diagram is the same drawing in every language: only the words change.
         diagram:

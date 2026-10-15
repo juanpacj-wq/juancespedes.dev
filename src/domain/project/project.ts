@@ -20,6 +20,21 @@ export interface ProjectLink {
   readonly url: string;
 }
 
+/** One change the project made, told as the people who use it would see it. */
+export interface Shift {
+  readonly before: string;
+  readonly after: string;
+}
+
+/**
+ * The problem in plain words, for a reader who is not an engineer: one sentence that states the
+ * pain, then what changed for the people involved. The technical fields tell the rest.
+ */
+export interface Story {
+  readonly hook: string;
+  readonly shifts: readonly Shift[];
+}
+
 export interface Decision {
   readonly title: string;
   readonly rationale: string;
@@ -48,6 +63,7 @@ interface CommonContent {
  */
 export interface CaseStudyContent extends CommonContent {
   readonly kind: 'case-study';
+  readonly story: Story;
   readonly problem: string;
   /** What the role meant in practice; `role` is the one-line version. */
   readonly responsibilities: readonly string[];
@@ -132,6 +148,10 @@ const kindIssues = (content: ProjectContent): ProjectIssue[] => {
         ...(content.problem.trim() === ''
           ? [{ field: 'problem', message: 'problem must not be blank' }]
           : []),
+        ...(content.story.hook.trim() === ''
+          ? [{ field: 'story.hook', message: 'story.hook must not be blank' }]
+          : []),
+        ...requireNonEmpty('story.shifts', content.story.shifts),
         ...requireNonEmpty('constraints', content.constraints),
         ...requireNonEmpty('decisions', content.decisions),
         ...validateArchitecture(content.architecture).map((issue) => ({

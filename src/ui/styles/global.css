@@ -83,7 +83,7 @@
 
 @theme {
   --font-display: 'Literata Display', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
 
   /* Fluid type scale: grows with the viewport between 360 px and 1280 px. */
@@ -135,6 +135,20 @@
   font-display: swap;
   font-weight: 300 500;
   src: url('../../assets/fonts/literata-display.woff2') format('woff2');
+}
+
+/*
+ * Arial resized to Geist's metrics (size and line box, measured with @capsizecss/unpack), so text
+ * keeps its lines when Geist arrives and nothing below it moves: no layout shift without making
+ * every page wait for the font. Liberation Sans and Arimo share Arial's metrics.
+ */
+@font-face {
+  font-family: 'Geist Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('Arimo');
+  size-adjust: 104.76%;
+  ascent-override: 95.94%;
+  descent-override: 28.16%;
+  line-gap-override: 0%;
 }
 
 /* ---------- Base ---------- */

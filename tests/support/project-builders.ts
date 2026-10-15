@@ -37,6 +37,10 @@ export const architecture = (overrides: Partial<Architecture> = {}): Architectur
 export const caseStudyContent = (overrides: Partial<CaseStudyContent> = {}): CaseStudyContent => ({
   ...common,
   kind: 'case-study',
+  story: {
+    hook: 'Every shift ended with someone copying cells by hand.',
+    shifts: [{ before: 'One Excel book per shift', after: 'One shared live record' }],
+  },
   problem: 'Shift logs lived in Excel.',
   responsibilities: [],
   constraints: ['Shifts cross midnight'],

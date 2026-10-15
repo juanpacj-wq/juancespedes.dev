@@ -22,27 +22,34 @@ confidentiality: public
 links:
   - label: Code on GitHub
     url: https://github.com/juanpacj-wq/linkedin-mcp
+story:
+  hook: 'I wanted an AI assistant to do my LinkedIn work with my own session, without storing my password.'
+  shifts:
+    - before: 'Updating the profile and applying, all by hand.'
+      after: 'An assistant updates the profile, engages and completes applications with my real session.'
+    - before: 'The official API cannot edit a profile or apply to jobs.'
+      after: 'The server writes through the real interface, with my browser session.'
 problem: The official LinkedIn API cannot write to a profile or apply to jobs, because real access requires a partner program and not even partners can edit work experience. I wanted an AI assistant to do that work with my own session, without storing my password and without surprise actions.
 responsibilities:
   - Designed the split between reading and writing and the form engine.
   - Implemented the MCP server, the CLI and the reusable answer bank.
-  - Published it with installation and diagnostics docs, plus an emergency exit to finish any flow by hand.
+  - Published it with installation and diagnostics docs, and with tools to finish any flow by hand.
 constraints:
-  - There is no official write API, so the only way in is the real interface.
+  - There is no official write API; writing is only possible through the interface.
   - The interface changes its structure and CSS classes without notice, and is served in the account's language.
   - No action visible to other people can happen without explicit confirmation.
   - Sign-in is not automated, because that triggers blocks and would require storing the password.
 decisions:
   - title: Read through the internal API, write through the interface
-    rationale: The internal API the page itself uses returns the profile and job postings as structured data in a single call, with the same browser session. There is no endpoint for writing, so the interface is used, and if one path fails the other takes over.
+    rationale: The internal API the page itself uses returns the profile and job postings as structured data in a single call, with the same browser session. There is no endpoint for writing, so the interface is used. If one of the two paths fails, the server tries the other.
     alternatives:
       - Scrape the HTML for both reading and writing
   - title: Fields identified by their visible label
-    rationale: The form engine reads each control's accessible name and matches it against a bilingual glossary, so it survives HTML changes and works whether the account is in Spanish or English.
+    rationale: The form engine reads each control's accessible name and matches it against a bilingual glossary. It works when the HTML changes and with the account in Spanish or English.
     alternatives:
       - CSS class selectors
   - title: One engine for the profile and for applications
-    rationale: Editing a profile section and filling in an application are the same problem, a form with fields. A single piece solves both, and a new section is supported without code changes.
+    rationale: Editing a profile section and filling in an application both mean filling in a form. The same engine handles both, and a new section needs no code changes.
     alternatives:
       - A hand-written flow for every form
   - title: Dry run by default and explicit confirmation
@@ -82,7 +89,7 @@ architecture:
     - { from: form-engine, to: web-ui, label: 'Fills in and submits forms' }
 outcomes:
   - An assistant can update the whole profile, engage with other people and complete applications with the user's real session.
-  - Direct browser tools make it possible to finish any failing flow by hand, without editing the project.
+  - If a flow fails, direct browser tools make it possible to finish it by hand.
   - The code is public, with installation and diagnostics documentation.
 lessons:
   - I would set conservative daily limits and pauses between actions from day one, because platforms detect automation patterns even when the session is real.

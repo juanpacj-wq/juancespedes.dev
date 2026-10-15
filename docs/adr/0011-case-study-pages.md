@@ -1,6 +1,7 @@
 # 0011. Case study pages: a fixed template, diagrams as data, a private denylist
 
-- Status: accepted
+- Status: accepted; template and diagram rendering amended by
+  [0021](0021-case-study-redesign.md)
 - Date: 2026-10-12
 
 ## Context

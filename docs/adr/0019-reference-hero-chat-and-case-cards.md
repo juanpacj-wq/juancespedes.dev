@@ -1,6 +1,6 @@
 # 0019. A rotating role in the hero, a floating chat and case-study cards
 
-- Status: accepted
+- Status: accepted; stock photos on project pages amended by [0021](0021-case-study-redesign.md)
 - Date: 2026-10-13
 - Amends: [0017](0017-ask-me-chat.md) (where the chat lives), [0018](0018-chiaroscuro-redesign.md)
   (hero content, project list)

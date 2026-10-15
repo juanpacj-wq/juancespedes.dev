@@ -53,6 +53,12 @@ painting's real colours. `NotFoundField` is the 404 backdrop: the display font's
 turning solid of points, drawn in the same ink and glyph ramp on a canvas, mirrored under a
 waterline ([ADR 0020](adr/0020-not-found-reflection.md)).
 
+Case studies (`src/ui/project`, styles in `src/ui/styles/case-study.css`): `DetailSection` is a
+numbered chapter whose title stays pinned on wide screens; `ArchitectureDiagram` draws layers,
+nodes and flows as text, and `case-study-motion.ts` adds the wires, highlights and step-through
+walk on top. Motion on these pages is scroll-driven CSS plus that one deferred script, and no
+starting state lowers text contrast ([ADR 0021](adr/0021-case-study-redesign.md)).
+
 Site chrome (`src/ui/chrome`): `SiteHeader`, `SiteFooter`, `ThemeToggle`. Page layout:
 `src/ui/layouts/BaseLayout.astro` (meta, theme bootstrap, skip link, header, footer).
 
