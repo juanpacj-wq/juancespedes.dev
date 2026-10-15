@@ -130,6 +130,10 @@ test.describe('project pages', () => {
   test('the solution shows real screenshots with captions, tabs and an enlarged view', async ({
     page,
   }) => {
+    // The page scrolls smoothly (scroll-behavior), so every scroll Playwright makes before a click
+    // is animated and, on a slow WebKit, the target is still moving ("not stable"); the gallery's
+    // auto-advance moves the row as well. Reduced motion keeps the tabs and the enlarged view.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/proyectos/corporate-portal');
     const solution = page.locator('#solution');
     await solution.scrollIntoViewIfNeeded();
@@ -152,6 +156,27 @@ test.describe('project pages', () => {
     await expect(dialog.locator('[data-lightbox-caption]')).toContainText('WordPress');
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
+  });
+
+  test.describe('without JavaScript', () => {
+    test.use({ javaScriptEnabled: false });
+
+    // Without the script the band is not a scroll region the keyboard cannot reach (WCAG 2.1.1):
+    // every logo shows within the screen and the copy that closes the loop is hidden. Axe cannot
+    // run here (it needs page scripts), so the layout is checked directly.
+    test('the technologies band wraps instead of scrolling', async ({ page }) => {
+      await page.goto('/proyectos/invoice-etl-rescue');
+      const list = page.getByRole('list', { name: 'Tecnologías' });
+      await expect(list.getByRole('img', { name: 'Python' })).toBeVisible();
+      await expect(page.locator('.cs-band-row[aria-hidden]')).toBeHidden();
+
+      const width = page.viewportSize()?.width ?? 0;
+      for (const item of await list.getByRole('listitem').all()) {
+        const box = await item.boundingBox();
+        expect(box, 'every logo is laid out').not.toBeNull();
+        expect((box?.x ?? -1) >= 0 && (box?.x ?? 0) + (box?.width ?? 0) <= width).toBe(true);
+      }
+    });
   });
 
   test('the technologies band shows logos and can be dragged', async ({ page }, testInfo) => {

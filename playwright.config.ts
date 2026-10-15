@@ -1,13 +1,26 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PORT = '4330';
+const CI = Boolean(process.env.CI);
 
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,
-  forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 2 : 0,
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
+  forbidOnly: CI,
+  // Locally a timeout is retried once before it is reported: a busy workstation is not a bug.
+  // CI keeps two retries and lists every test that needed one (scripts/flaky-summary.mjs), so a
+  // flaky test is visible instead of hidden by the retry.
+  retries: CI ? 2 : 1,
+  // Three browsers and workerd on one machine: the default (half the cores) overloads a
+  // workstation and turns slow pages into timeouts (docs/runbooks/deploy-friction.md).
+  ...(CI ? {} : { workers: 3 }),
+  reporter: CI
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'playwright-report/results.json' }],
+      ]
+    : 'list',
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'on-first-retry',
@@ -21,7 +34,7 @@ export default defineConfig({
   webServer: {
     command: `pnpm preview --port ${PORT}`,
     url: `http://localhost:${PORT}/api/health`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !CI,
     timeout: 120_000,
   },
 });

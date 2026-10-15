@@ -28,5 +28,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0021](0021-case-study-redesign.md)                | Case studies as a told story: plain-language problem, live diagram       | Accepted |
 | [0022](0022-real-screenshots-and-gallery.md)       | Real screenshots in case studies, shown in a framed gallery              | Accepted |
 | [0023](0023-technology-logo-band.md)               | Technologies as one draggable band of logos                              | Accepted |
+| [0024](0024-faster-deploys.md)                     | Faster deploys: compressed Lighthouse, local budgets, parallel CI        | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.

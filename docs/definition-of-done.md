@@ -3,10 +3,11 @@
 A change is done when all of the following are true. The pull request template repeats this list.
 
 1. `pnpm verify` passes: formatting, lint with zero warnings, type checks, architecture rules,
-   unit tests with coverage at or above the thresholds, and the production build.
+   unit tests with coverage at or above the thresholds, the production build, and the JavaScript
+   and page budgets (`pnpm pages:check`).
 2. `pnpm test:e2e` passes on Chromium, WebKit and mobile, including axe accessibility checks.
-3. Lighthouse budgets hold (CI): at least 95 in performance, best practices and SEO, 100 in
-   accessibility.
+3. Lighthouse budgets hold (CI, and `pnpm lighthouse:local` before pushing a change to a gated
+   page): at least 95 in performance, best practices and SEO, 100 in accessibility.
 4. Interactive UI covers loading, empty and error states, works with the keyboard alone and at a
    390 px viewport, and respects `prefers-reduced-motion`.
 5. Spanish and English content and UI strings are updated together.

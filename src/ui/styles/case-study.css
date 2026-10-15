@@ -704,6 +704,30 @@
     padding-right: 4rem;
   }
 
+  /* Without the script (no JavaScript) the band is a still set of logos that wraps, not a row to
+     scroll: a scroll region the keyboard cannot reach fails WCAG 2.1.1, and the lint preset keeps
+     tabindex off non-interactive elements. The copy that closes the loop is not needed. */
+  .cs-band:not([data-live]) {
+    overflow-x: visible;
+    cursor: auto;
+    mask-image: none;
+  }
+
+  .cs-band:not([data-live]) .cs-band-track {
+    width: auto;
+  }
+
+  .cs-band:not([data-live]) .cs-band-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 2.5rem;
+    padding-inline: 2rem;
+  }
+
+  .cs-band:not([data-live]) .cs-band-row[aria-hidden] {
+    display: none;
+  }
+
   .cs-band-item {
     position: relative;
     display: grid;

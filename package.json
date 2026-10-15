@@ -26,9 +26,11 @@
     "test:mutation": "stryker run",
     "eval:chat": "pnpm build && vitest run --config vitest.eval.config.ts",
     "lighthouse": "lhci autorun",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm arch:check && pnpm test:coverage && pnpm build && pnpm bundle:check",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm arch:check && pnpm test:coverage && pnpm build && pnpm bundle:check && pnpm pages:check",
     "prepare": "git config core.hooksPath .githooks || true",
-    "bundle:check": "node scripts/check-bundle.mjs"
+    "bundle:check": "node scripts/check-bundle.mjs",
+    "lighthouse:local": "node scripts/lighthouse-local.mjs",
+    "pages:check": "node scripts/check-pages.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.129.0",
@@ -67,6 +69,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "geist": "1.7.2",
     "globals": "^17.13.0",
+    "lint-staged": "^16.4.0",
     "prettier": "^3.9.10",
     "prettier-plugin-astro": "^1.1.1",
     "prettier-plugin-tailwindcss": "^0.8.1",

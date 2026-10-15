@@ -1,5 +1,5 @@
 ---
-import { Picture } from 'astro:assets';
+import { getImage, Picture } from 'astro:assets';
 
 import type { Project } from '../../domain/project/project';
 import type { Dictionary } from '../i18n/dictionary';
@@ -44,6 +44,17 @@ const media = mediaFor(project.slug);
 // A stock photo says nothing about the product; the drawn screen at least matches the home card.
 const cover = media.cover && !media.cover.stock ? media.cover : null;
 const nextMedia = next ? mediaFor(next.slug) : null;
+// The next case's screen sits at the end of the page: decoration that waits for the chapters to
+// start (case-study-motion.ts); without JavaScript the card keeps its stage, without the picture.
+const nextSizes = '(min-width: 1024px) 40vw, 90vw';
+const nextCard = nextMedia?.card ?? null;
+const nextShot = nextCard
+  ? await Promise.all(
+      (['avif', 'webp'] as const).map((format) =>
+        getImage({ src: nextCard.src, widths: [480, 800], sizes: nextSizes, format }),
+      ),
+    )
+  : null;
 // Same rule for the gallery: only real images; stock stand-ins wait in the folder for their swap.
 const gallery = media.gallery.filter((image) => !image.stock);
 const words = (text: string) => text.split(/\s+/).filter(Boolean);
@@ -571,15 +582,25 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
             </span>
             <span class="cs-next-stage" aria-hidden="true">
               <span class="cs-next-screen">
-                {nextMedia?.card ? (
-                  <Picture
-                    src={nextMedia.card.src}
-                    alt=""
-                    formats={['avif', 'webp']}
-                    widths={[480, 800]}
-                    sizes="(min-width: 1024px) 40vw, 90vw"
-                    class="size-full rounded-card object-cover object-top-left"
-                  />
+                {nextShot ? (
+                  <picture>
+                    {nextShot.map((shot) => (
+                      <source
+                        type={`image/${shot.options.format ?? 'webp'}`}
+                        data-srcset={shot.srcSet.attribute}
+                        sizes={nextSizes}
+                      />
+                    ))}
+                    <img
+                      data-deferred
+                      data-src={nextShot[1]?.src}
+                      alt=""
+                      width={nextCard?.src.width}
+                      height={nextCard?.src.height}
+                      decoding="async"
+                      class="size-full rounded-card object-cover object-top-left"
+                    />
+                  </picture>
                 ) : (
                   <ScreenPlaceholder slug={next.slug} />
                 )}
