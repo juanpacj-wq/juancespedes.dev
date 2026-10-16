@@ -82,12 +82,16 @@ test.describe('layout', () => {
     });
   }
 
-  test('until there is a photo, the about frame holds the profile card', async ({ page }) => {
+  test('without a photo, the about section tells the work as a timeline', async ({ page }) => {
     await page.goto('/');
     const about = page.locator('#about');
     await about.scrollIntoViewIfNeeded();
-    await expect(about.locator('.about-card')).toBeVisible();
-    await expect(about.locator('.about-card')).toContainText('Juan Céspedes');
+    // No placeholder stands in for the face.
+    await expect(about.getByRole('img')).toHaveCount(0);
+    await expect(about.getByRole('region', { name: 'Experiencia' })).toContainText('Gecelca');
+    await expect(about.getByRole('region', { name: 'Formación' })).toContainText(
+      'Universidad del Norte',
+    );
     // The live time in Barranquilla replaces the dashes once the script runs.
     await expect(about.locator('[data-clock-time]')).toHaveText(/\d{1,2}:\d{2}/);
   });

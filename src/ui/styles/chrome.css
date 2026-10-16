@@ -1,7 +1,7 @@
 /*
- * Styles of the contact rail (src/ui/chrome/ContactRail.astro, on every page) and the about
- * card (src/ui/sections/AboutSection.astro). Kept in the shared stylesheet so the home page's
- * own styles stay under the 4 kB that Astro inlines (CLAUDE.md, the performance budget).
+ * Styles of the contact rail (src/ui/chrome/ContactRail.astro, on every page). Kept in the
+ * shared stylesheet so the home page's own styles stay under the 4 kB that Astro inlines
+ * (CLAUDE.md, the performance budget).
  */
 
 .contact-rail {
@@ -67,28 +67,4 @@
 .contact-rail-link:focus-visible .contact-rail-hint {
   opacity: 1;
   translate: 0 0;
-}
-
-/* A meridian grid in the card's lines, fading from the warm corner: a map, not a photo. */
-.about-card {
-  background-image:
-    radial-gradient(
-      90% 70% at 20% 10%,
-      color-mix(in srgb, var(--color-accent) 14%, transparent),
-      transparent 70%
-    ),
-    linear-gradient(color-mix(in srgb, var(--color-line) 60%, transparent) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-line) 60%, transparent) 1px,
-      transparent 1px
-    );
-  background-size:
-    100% 100%,
-    2rem 2rem,
-    2rem 2rem;
-  background-position:
-    0 0,
-    -1px -1px,
-    -1px -1px;
 }

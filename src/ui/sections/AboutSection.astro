@@ -1,67 +1,93 @@
 ---
+import type { Education, Experience } from '../../domain/profile/profile';
 import type { Dictionary } from '../i18n/dictionary';
+import { formatYears } from '../i18n/format';
 import Portrait from '../primitives/Portrait.astro';
+import { portraitPhoto } from '../primitives/portrait-photo';
 import Section from '../primitives/Section.astro';
 
 /**
- * The person behind the work. The portrait frame holds the photo once it exists; until then it
- * holds a profile card instead of a monogram: the live time in Barranquilla, where it is on the
- * map and the working facts a client asks first. Same 4:5 frame, so the photo drops in without
- * moving the layout.
+ * The person behind the work, told the way photo-less portfolios tell it (Brittany Chiang, Rauno
+ * Freiberg): a statement on the left and a hairline timeline on the right, in the same rows as
+ * the results and the certifications. No placeholder stands in for the face. Once
+ * src/assets/photos/portrait.* exists, the photo takes a column of its own.
  */
 interface Props {
   t: Dictionary;
+  experience: readonly Experience[];
+  education: readonly Education[];
 }
 
-const { t } = Astro.props;
+const { t, experience, education } = Astro.props;
 const [lead, ...rest] = t.about.paragraphs;
-const card = t.about.card;
+
+const groups = [
+  {
+    title: t.about.experience,
+    rows: experience.map((job) => ({
+      years: formatYears(job.period, t),
+      title: job.role,
+      place: job.organization,
+      note: job.summary,
+    })),
+  },
+  {
+    title: t.about.education,
+    rows: education.map((study) => ({
+      years: formatYears(study.period, t),
+      title: study.degree,
+      place: study.institution,
+      note: null,
+    })),
+  },
+].filter((group) => group.rows.length > 0);
 ---
 
 <Section id="about" title={t.about.title}>
-  <div class="grid gap-10 md:grid-cols-12 md:gap-10">
-    <div class="reveal max-w-sm md:col-span-5 lg:col-span-4 xl:col-span-3">
-      <Portrait alt={t.profile.portraitAlt} initials="JC">
-        <div slot="fallback" class="about-card flex size-full flex-col justify-between p-6 sm:p-7">
-          <div class="flex items-center justify-between font-mono text-eyebrow tracking-widest text-subtle uppercase">
-            <span>{card.label}</span>
-            <span aria-hidden="true">10.96° N · 74.80° W</span>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <p class="text-title font-medium text-ink">{t.profile.name}</p>
-            <p class="flex items-baseline gap-3">
-              <time
-                class="font-display text-heading leading-none font-medium text-ink tabular-nums"
-                data-clock-time
-              >
-                --:--
-              </time>
-            </p>
-            <p class="flex items-center gap-2 font-mono text-eyebrow text-muted">
-              <span class="relative flex size-2" aria-hidden="true">
-                <span class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60"></span>
-                <span class="relative inline-flex size-2 rounded-full bg-success"></span>
-              </span>
-              {t.about.localTime} · {card.timezone}
-            </p>
-          </div>
-
-          <dl class="flex flex-col border-t border-line">
-            {card.facts.map(([term, value]) => (
-              <div class="flex items-baseline justify-between gap-4 border-b border-line py-2.5 text-small">
-                <dt class="text-subtle">{term}</dt>
-                <dd class="text-right text-ink">{value}</dd>
-              </div>
-            ))}
-          </dl>
+  <div class="grid gap-12 lg:grid-cols-12 lg:gap-10">
+    <div class="reveal flex flex-col gap-6 lg:col-span-7">
+      {portraitPhoto && (
+        <div class="max-w-56">
+          <Portrait alt={t.profile.portraitAlt} initials="JC" />
         </div>
-      </Portrait>
-    </div>
-    <div class="reveal flex max-w-4xl flex-col gap-6 self-center md:col-span-7 lg:col-span-8 xl:col-span-8 xl:col-start-5">
-      {lead && <p class="font-display text-quote font-medium text-pretty">{lead}</p>}
+      )}
+      {lead && <p class="font-display text-quote font-medium text-balance text-ink">{lead}</p>}
       {rest.map((paragraph) => (
-        <p class="text-lead text-pretty text-muted">{paragraph}</p>
+        <p class="max-w-2xl text-lead text-pretty text-muted">{paragraph}</p>
+      ))}
+      <p class="flex items-center gap-2 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+        <span class="relative flex size-2" aria-hidden="true">
+          <span class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60"></span>
+          <span class="relative inline-flex size-2 rounded-full bg-success"></span>
+        </span>
+        {t.about.basedIn}
+        <time class="text-muted tabular-nums" data-clock-time>
+          --:--
+        </time>
+      </p>
+    </div>
+
+    <div class="reveal flex flex-col gap-10 lg:col-span-5">
+      {groups.map((group) => (
+        <section aria-label={group.title}>
+          <h3 class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+            {group.title}
+          </h3>
+          <ol class="mt-4 border-t border-line">
+            {group.rows.map((row) => (
+              <li class="grid gap-1 border-b border-line py-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-6">
+                <span class="font-mono text-small text-subtle tabular-nums">{row.years}</span>
+                <div class="flex flex-col gap-1">
+                  <p class="font-medium text-ink">
+                    {row.title}
+                    <span class="text-muted"> · {row.place}</span>
+                  </p>
+                  {row.note && <p class="text-small text-pretty text-muted">{row.note}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
       ))}
     </div>
   </div>
