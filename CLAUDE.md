@@ -58,9 +58,9 @@ and PR #39 needed six and four CI rounds (docs/runbooks/deploy-friction.md). To 
     in CSS from the start.
   - No animation that repaints many glyphs or elements per frame (TBT reached 1.3 s).
   - Large backgrounds take their size from the viewport (`svh`), not from content that reflows
-    when fonts arrive (CLS). Text in Hanken Grotesk falls back to `Hanken Fallback` (Arial with
+    when fonts arrive (CLS). Text in Overused Grotesk falls back to `Overused Fallback` (Arial with
     its metrics), so it does not move when the font arrives.
-  - The fonts of the largest paints preload with the HTML: Hanken Grotesk (headings, every page)
+  - The fonts of the largest paints preload with the HTML: Overused Grotesk (headings, every page)
     and Geist Mono (the hero's backdrop); other fonts are not preloaded, they compete with the
     render-blocking CSS.
   - Deferring styles changes the states a page goes through: no transition may run when they

@@ -1,6 +1,6 @@
 // Open Graph cards (1200 x 630) drawn as SVG. Pure functions so tests can check them; the
-// renderer in scripts/generate-og.mjs turns the SVG into PNG with resvg, Hanken Grotesk and Geist
-// Mono, the site's faces (ADR 0029). There is no text measurement in SVG, so lines are wrapped
+// renderer in scripts/generate-og.mjs turns the SVG into PNG with resvg, Overused Grotesk and Geist
+// Mono, the site's faces (ADR 0030). There is no text measurement in SVG, so lines are wrapped
 // with approximate glyph widths; the estimate errs wide, so real lines come out a little shorter
 // than the limit.
 
@@ -21,7 +21,7 @@ const COLORS = {
 const NARROW = new Set([..."iljtfrI.,:;!|'()[]"]);
 const WIDE = new Set([...'mwMW']);
 
-/** Approximate advance of one character in em for Hanken Grotesk (wide on purpose). @param {string} char */
+/** Approximate advance of one character in em for Overused Grotesk (wide on purpose). @param {string} char */
 const charWidth = (char) => {
   if (char === ' ') return 0.28;
   if (NARROW.has(char)) return 0.32;
@@ -132,7 +132,7 @@ export const cardSvg = ({
   const titleLines = heading.lines
     .map(
       (line, index) =>
-        `<text x="${PAD}" y="${titleTop + index * lineHeight}" font-family="Hanken Grotesk" font-weight="600" font-size="${heading.fontSize}" letter-spacing="-1.5" fill="${COLORS.ink}">${escapeXml(line)}</text>`,
+        `<text x="${PAD}" y="${titleTop + index * lineHeight}" font-family="Overused Grotesk SemiBold" font-size="${heading.fontSize}" letter-spacing="-1.5" fill="${COLORS.ink}">${escapeXml(line)}</text>`,
     )
     .join('');
   const afterTitle = titleTop + (heading.lines.length - 1) * lineHeight;
@@ -141,7 +141,7 @@ export const cardSvg = ({
     ? wrapText(subtitle, { fontSize: 30, maxWidth: CONTENT_WIDTH, maxLines: 2 })
         .map(
           (line, index) =>
-            `<text x="${PAD}" y="${afterTitle + 64 + index * 40}" font-family="Hanken Grotesk" font-size="30" fill="${COLORS.muted}">${escapeXml(line)}</text>`,
+            `<text x="${PAD}" y="${afterTitle + 64 + index * 40}" font-family="Overused Grotesk" font-size="30" fill="${COLORS.muted}">${escapeXml(line)}</text>`,
         )
         .join('')
     : '';
@@ -151,14 +151,14 @@ export const cardSvg = ({
     ? wrapText(body, { fontSize: 28, maxWidth: CONTENT_WIDTH - 80, maxLines: 3 })
         .map(
           (line, index) =>
-            `<text x="${PAD}" y="${bodyTop + index * 40}" font-family="Hanken Grotesk" font-size="28" fill="${COLORS.subtle}">${escapeXml(line)}</text>`,
+            `<text x="${PAD}" y="${bodyTop + index * 40}" font-family="Overused Grotesk" font-size="28" fill="${COLORS.subtle}">${escapeXml(line)}</text>`,
         )
         .join('')
     : '';
 
   const highlightSvg = highlight
     ? `<text x="${PAD}" y="528" font-family="Geist Mono" font-weight="500" font-size="44" fill="${COLORS.accent}">${escapeXml(highlight.value)}</text>` +
-      `<text x="${PAD + monoWidth(highlight.value, 44) + 24}" y="526" font-family="Hanken Grotesk" font-size="24" fill="${COLORS.muted}">${escapeXml(
+      `<text x="${PAD + monoWidth(highlight.value, 44) + 24}" y="526" font-family="Overused Grotesk" font-size="24" fill="${COLORS.muted}">${escapeXml(
         wrapText(highlight.label, {
           fontSize: 24,
           maxWidth: CONTENT_WIDTH - monoWidth(highlight.value, 44) - 24,
@@ -181,7 +181,7 @@ export const cardSvg = ({
     bodySvg,
     highlightSvg,
     `<line x1="${PAD}" y1="562" x2="${WIDTH - PAD}" y2="562" stroke="${COLORS.line}" stroke-width="2"/>`,
-    `<text x="${PAD}" y="${HEIGHT - 40}" font-family="Hanken Grotesk" font-size="22" fill="${COLORS.subtle}">${escapeXml(footer)}</text>`,
+    `<text x="${PAD}" y="${HEIGHT - 40}" font-family="Overused Grotesk" font-size="22" fill="${COLORS.subtle}">${escapeXml(footer)}</text>`,
     '</svg>',
   ].join('');
 };
