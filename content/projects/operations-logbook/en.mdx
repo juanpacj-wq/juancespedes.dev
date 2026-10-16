@@ -1,6 +1,6 @@
 ---
 kind: case-study
-title: Digital operations logbook for two thermal power plants
+title: Digital operations logbook for four power plants
 summary: I replaced the Excel shift logbooks with a real-time web application. Official reports are generated from the data, and the code has more than 1,400 automated tests.
 role: Full-stack engineer, sole developer (design, backend, frontend, database, deployment)
 period: { start: '2026-03', end: null }
@@ -41,7 +41,7 @@ story:
       after: 'When a shift closes, the application stores who was on it and that record no longer changes.'
     - before: 'The official daily report was assembled by copying cells.'
       after: "The report is generated from the data, in the official template's format."
-problem: Operations staff at two thermal power plants kept their shift logs in Excel workbooks. Information was scattered across files, closing a shift depended on each person's discipline, and the official daily reports were assembled by hand by copying cells.
+problem: Operations staff at four power plants kept their shift logs in Excel workbooks. Information was scattered across files, closing a shift depended on each person's discipline, and the official daily reports were assembled by hand by copying cells.
 responsibilities:
   - Gathered requirements with shift supervisors, operations engineers and chemists, and turned them into a domain model of shifts, logbooks and role-based permissions.
   - Designed and built the frontend, the backend, the database and the corporate sign-in integration.
@@ -114,7 +114,7 @@ architecture:
     - { from: api, to: excel-report, label: 'Builds the daily workbook' }
     - { from: dashboard, to: api, label: 'Queries events by period' }
 outcomes:
-  - Both plants log their shifts in the application, with each shift's history frozen when it closes.
+  - All four plants log their shifts in the application, with each shift's history frozen when it closes.
   - The official daily report is generated from the data in the template's format.
   - The generation dashboard consumes logbook events through a tested contract, without touching its tables.
 lessons:
