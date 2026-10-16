@@ -82,9 +82,14 @@ test.describe('layout', () => {
     });
   }
 
-  test('the portrait placeholder is announced with its alternative text', async ({ page }) => {
+  test('until there is a photo, the about frame holds the profile card', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('img', { name: 'Retrato de Juan Céspedes' })).toBeVisible();
+    const about = page.locator('#about');
+    await about.scrollIntoViewIfNeeded();
+    await expect(about.locator('.about-card')).toBeVisible();
+    await expect(about.locator('.about-card')).toContainText('Juan Céspedes');
+    // The live time in Barranquilla replaces the dashes once the script runs.
+    await expect(about.locator('[data-clock-time]')).toHaveText(/\d{1,2}:\d{2}/);
   });
 
   test('pages are served at clean URLs without a redirect', async ({ request }) => {

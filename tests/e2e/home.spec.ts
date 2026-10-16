@@ -91,6 +91,40 @@ test.describe('home sections', () => {
     await expect(page).toHaveURL(/\/proyectos\/corporate-portal$/);
   });
 
+  test('a header link lands its section right under the header', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'The section links live in the desktop header');
+    await page.goto('/');
+    await page
+      .getByRole('navigation', { name: 'Navegación principal' })
+      .getByRole('link', { name: 'Stack' })
+      .click();
+    await expect(page).toHaveURL(/#capabilities$/);
+    // The title sits below the 4rem header, not a quarter of the screen further down.
+    const top = () =>
+      page.evaluate(
+        () => document.getElementById('capabilities-title')?.getBoundingClientRect().top,
+      );
+    await expect.poll(top).toBeGreaterThan(64);
+    await expect.poll(top).toBeLessThan(160);
+  });
+
+  test('the contact rail offers LinkedIn, GitHub and email on wide screens', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'The rail shows from 80rem; phones use the contact section');
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    const rail = page.getByRole('navigation', { name: 'Contacto directo' });
+    await expect(rail).toBeVisible();
+    await expect(rail.getByRole('link')).toHaveCount(3);
+    await expect(rail.getByRole('link', { name: /LinkedIn/ })).toHaveAttribute('target', '_blank');
+    await expect(rail.getByRole('link', { name: 'Correo directo' })).toHaveAttribute(
+      'href',
+      /^mailto:/,
+    );
+  });
+
   test('header links jump to their sections', async ({ page, isMobile }) => {
     test.skip(isMobile, 'The section links live in the desktop header');
     await page.goto('/');

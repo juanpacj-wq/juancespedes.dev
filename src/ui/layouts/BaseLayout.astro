@@ -25,6 +25,7 @@ import {
 import { toJsonLd, type JsonLd } from '../seo/structured-data';
 import { absoluteUrl, SITE } from '../site';
 import ChatDrawer from '../chat/ChatDrawer.astro';
+import ContactRail from '../chrome/ContactRail.astro';
 import ErrorReporter from '../chrome/ErrorReporter.astro';
 import SiteFooter from '../chrome/SiteFooter.astro';
 import SiteHeader, { type NavItem } from '../chrome/SiteHeader.astro';
@@ -138,6 +139,12 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
     <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
       <slot />
     </main>
+    <ContactRail
+      t={t}
+      email={SITE.email}
+      githubUrl={SITE.githubUrl}
+      linkedinUrl={SITE.linkedinUrl}
+    />
     <SiteFooter
       t={t}
       repositoryUrl={SITE.repositoryUrl}

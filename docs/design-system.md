@@ -47,7 +47,7 @@ without breakpoints.
 | `Card`      | Bevelled surface; `interactive` brightens and scales slightly on hover             |
 | `Frame`     | Frame with a label row around a stage; `inverted` swaps ink and canvas             |
 | `Stat`      | Headline figure that always prints its source                                      |
-| `Portrait`  | 4:5 photo with AVIF/WebP, or a serif monogram placeholder until the photo exists   |
+| `Portrait`  | 4:5 photo with AVIF/WebP; until it exists, its `fallback` slot or a monogram       |
 
 Art (`src/ui/art`): `AsciiArt` renders the committed ASCII grid of Caravaggio's _Narcissus_
 (`pnpm ascii` regenerates it) with a lamp that follows the pointer and a switch that floods the
@@ -69,7 +69,8 @@ Impact (`src/ui/impact`): `AchievementCard` is a figure, one sentence and the pr
 under a hairline; the whole item opens the case study, where the story, chart and source live
 ([ADR 0025](adr/0025-business-impact-section.md), trimmed by [ADR 0029](adr/0029-wide-clean-layout.md)).
 
-Site chrome (`src/ui/chrome`): `SiteHeader`, `SiteFooter`, `ThemeToggle`. Page layout:
+Site chrome (`src/ui/chrome`): `SiteHeader`, `SiteFooter`, `ThemeToggle`, and `ContactRail`, the
+LinkedIn, GitHub and email buttons fixed to the right edge from 80rem, in the 4rem gutter. Page layout:
 `src/ui/layouts/BaseLayout.astro` (meta, theme bootstrap, skip link, header, footer).
 
 ## Rules

@@ -5,8 +5,8 @@ import type { ImageMetadata } from 'astro';
 /**
  * The owner's portrait at a fixed 4:5 ratio, so the layout never shifts when the photo loads.
  * Uses src/assets/photos/portrait.{jpg,jpeg,png,webp} when it exists (optimized to AVIF and
- * WebP at build time); until then, renders a monogram placeholder. Swapping the photo is
- * dropping the file in place: no code changes.
+ * WebP at build time); until then, renders the `fallback` slot when given, or a monogram.
+ * Swapping the photo is dropping the file in place: no code changes.
  */
 interface Props {
   alt: string;
@@ -41,6 +41,8 @@ const photo = Object.values(photos)[0]?.default;
       fetchpriority={priority ? 'high' : 'auto'}
       class="size-full object-cover"
     />
+  ) : Astro.slots.has('fallback') ? (
+    <slot name="fallback" />
   ) : (
     <div role="img" aria-label={alt} class="portrait-placeholder grid size-full place-items-center">
       <span class="font-display text-display font-medium text-ink/70" aria-hidden="true">

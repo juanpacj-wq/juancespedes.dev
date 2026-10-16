@@ -86,6 +86,16 @@ const es = {
       'Ingeniero de sistemas de la Universidad del Norte, con matrícula profesional COPNIA.',
     ],
     localTime: 'Hora local',
+    card: {
+      label: 'Ficha',
+      timezone: 'Barranquilla · UTC−5',
+      facts: [
+        ['Modalidad', 'Remoto, por entregables'],
+        ['Idiomas', 'Español · Inglés C2'],
+        ['Construyendo desde', '2020'],
+        ['Respuesta', 'Menos de 24 h hábiles'],
+      ],
+    },
   },
   projects: {
     empty: 'Todavía no hay proyectos publicados con esa capacidad.',
@@ -126,6 +136,7 @@ const es = {
     title: 'Hablemos',
     description: 'Respondo en menos de 24 horas hábiles.',
     emailLabel: 'Correo directo',
+    railLabel: 'Contacto directo',
     elsewhere: 'También en',
   },
   form: {
@@ -407,6 +418,16 @@ const en: Dictionary = {
       'Systems engineer from Universidad del Norte, with a professional license (COPNIA).',
     ],
     localTime: 'Local time',
+    card: {
+      label: 'Profile',
+      timezone: 'Barranquilla · UTC−5',
+      facts: [
+        ['Works', 'Remote, per deliverable'],
+        ['Languages', 'Spanish · English C2'],
+        ['Building since', '2020'],
+        ['Replies', 'Within one business day'],
+      ],
+    },
   },
   projects: {
     empty: 'No published projects with that capability yet.',
@@ -447,6 +468,7 @@ const en: Dictionary = {
     title: "Let's talk",
     description: 'I reply within one business day.',
     emailLabel: 'Direct email',
+    railLabel: 'Direct contact',
     elsewhere: 'Also on',
   },
   form: {

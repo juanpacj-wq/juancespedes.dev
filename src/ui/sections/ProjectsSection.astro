@@ -20,7 +20,11 @@ const featured = projects.filter((project) => project.featured);
 const others = projects.filter((project) => !project.featured);
 ---
 
-<section id="projects" aria-labelledby="projects-title" class="scroll-mt-24 py-20 sm:py-28">
+<section
+  id="projects"
+  aria-labelledby="projects-title"
+  class="scroll-mt-2 py-20 sm:-scroll-mt-6 sm:py-28"
+>
   {projects.length === 0 ? (
     <Container>
       <h2

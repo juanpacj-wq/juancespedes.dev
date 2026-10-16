@@ -21,10 +21,14 @@ const Heading = `h${String(level)}` as 'h2' | 'h3';
 const headingId = `${id}-title`;
 ---
 
+<!--
+  A jump to the section (the header links) lands its hairline 1.5rem under the sticky header:
+  the scroll margin is that spot minus the section's own top padding (5rem, 7rem from sm).
+-->
 <section
   id={id}
   aria-labelledby={headingId}
-  class:list={['scroll-mt-24 py-20 sm:py-28', className]}
+  class:list={['scroll-mt-2 py-20 sm:-scroll-mt-6 sm:py-28', className]}
 >
   <Container>
     <header class="reveal mb-10 grid gap-4 border-t border-line pt-6 sm:mb-14 lg:grid-cols-12 lg:gap-10">

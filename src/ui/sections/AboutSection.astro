@@ -1,12 +1,13 @@
 ---
 import type { Dictionary } from '../i18n/dictionary';
-import Icon from '../icons/Icon.astro';
 import Portrait from '../primitives/Portrait.astro';
 import Section from '../primitives/Section.astro';
 
 /**
- * The person behind the work: the portrait lives here, away from the hero (which carries the
- * art), with a caption and the live local time in Barranquilla.
+ * The person behind the work. The portrait frame holds the photo once it exists; until then it
+ * holds a profile card instead of a monogram: the live time in Barranquilla, where it is on the
+ * map and the working facts a client asks first. Same 4:5 frame, so the photo drops in without
+ * moving the layout.
  */
 interface Props {
   t: Dictionary;
@@ -14,24 +15,50 @@ interface Props {
 
 const { t } = Astro.props;
 const [lead, ...rest] = t.about.paragraphs;
+const card = t.about.card;
 ---
 
 <Section id="about" title={t.about.title}>
   <div class="grid gap-10 md:grid-cols-12 md:gap-10">
-    <figure class="reveal max-w-xs md:col-span-4 lg:col-span-3 xl:col-span-2">
-      <Portrait alt={t.profile.portraitAlt} initials="JC" />
-      <figcaption class="mt-4 flex flex-col gap-1 text-small text-subtle">
-        <span class="text-ink">{t.profile.name}</span>
-        <span class="flex items-center gap-2">
-          <Icon name="map-pin" size={14} />
-          {t.profile.location}
-        </span>
-        <span class="font-mono text-eyebrow" data-clock hidden>
-          {t.about.localTime} <time class="text-muted"></time>
-        </span>
-      </figcaption>
-    </figure>
-    <div class="reveal flex max-w-4xl flex-col gap-6 self-center md:col-span-8 lg:col-start-5 xl:col-start-4">
+    <div class="reveal max-w-sm md:col-span-5 lg:col-span-4 xl:col-span-3">
+      <Portrait alt={t.profile.portraitAlt} initials="JC">
+        <div slot="fallback" class="about-card flex size-full flex-col justify-between p-6 sm:p-7">
+          <div class="flex items-center justify-between font-mono text-eyebrow tracking-widest text-subtle uppercase">
+            <span>{card.label}</span>
+            <span aria-hidden="true">10.96° N · 74.80° W</span>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <p class="text-title font-medium text-ink">{t.profile.name}</p>
+            <p class="flex items-baseline gap-3">
+              <time
+                class="font-display text-heading leading-none font-medium text-ink tabular-nums"
+                data-clock-time
+              >
+                --:--
+              </time>
+            </p>
+            <p class="flex items-center gap-2 font-mono text-eyebrow text-muted">
+              <span class="relative flex size-2" aria-hidden="true">
+                <span class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60"></span>
+                <span class="relative inline-flex size-2 rounded-full bg-success"></span>
+              </span>
+              {t.about.localTime} · {card.timezone}
+            </p>
+          </div>
+
+          <dl class="flex flex-col border-t border-line">
+            {card.facts.map(([term, value]) => (
+              <div class="flex items-baseline justify-between gap-4 border-b border-line py-2.5 text-small">
+                <dt class="text-subtle">{term}</dt>
+                <dd class="text-right text-ink">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </Portrait>
+    </div>
+    <div class="reveal flex max-w-4xl flex-col gap-6 self-center md:col-span-7 lg:col-span-8 xl:col-span-8 xl:col-start-5">
       {lead && <p class="font-display text-quote font-medium text-pretty">{lead}</p>}
       {rest.map((paragraph) => (
         <p class="text-lead text-pretty text-muted">{paragraph}</p>
@@ -41,22 +68,19 @@ const [lead, ...rest] = t.about.paragraphs;
 </Section>
 
 <script>
-  // Local time in Barranquilla, refreshed every half minute. Without JavaScript it stays hidden.
+  // Local time in Barranquilla, refreshed every half minute. Without JavaScript it shows dashes.
   const format = new Intl.DateTimeFormat(document.documentElement.lang || 'es', {
     hour: 'numeric',
     minute: '2-digit',
     timeZone: 'America/Bogota',
   });
-  for (const clock of document.querySelectorAll<HTMLElement>('[data-clock]')) {
-    const time = clock.querySelector('time');
-    if (!time) continue;
+  for (const time of document.querySelectorAll<HTMLTimeElement>('[data-clock-time]')) {
     const tick = (): void => {
       const now = new Date();
       time.dateTime = now.toISOString();
       time.textContent = format.format(now);
     };
     tick();
-    clock.hidden = false;
     window.setInterval(tick, 30_000);
   }
 </script>
