@@ -34,6 +34,12 @@
 /* ---------- Wide screens with motion: the pinned stage ---------- */
 
 @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+  /* A jump to #projects lands on the pinned stage itself, whose own padding clears the header:
+     the margin cancels the section's top padding (7rem). */
+  #projects:has([data-stage-ready]) {
+    scroll-margin-top: -7rem;
+  }
+
   /* The section is as tall as one screen per project; the pin stays while it scrolls past. */
   .project-stage[data-stage-ready] {
     height: calc(var(--count) * 100svh);

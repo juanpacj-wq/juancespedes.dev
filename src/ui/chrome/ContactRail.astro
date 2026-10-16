@@ -1,0 +1,62 @@
+---
+import type { Dictionary } from '../i18n/dictionary';
+import Icon from '../icons/Icon.astro';
+import type { IconName } from '../icons/icons';
+
+/**
+ * The ways to reach the owner, always at hand: a column of round buttons fixed to the middle of
+ * the right edge on wide screens (the reference's social rail). Each one names itself on hover
+ * or focus; the email shows the address. It sits in the page gutter, which grows to 4rem from
+ * xl so the rail never covers content (Container), and below xl the contact section and footer
+ * carry the same links.
+ */
+interface Props {
+  t: Dictionary;
+  email: string;
+  githubUrl: string;
+  linkedinUrl: string;
+}
+
+const { t, email, githubUrl, linkedinUrl } = Astro.props;
+
+const links: readonly {
+  href: string;
+  label: string;
+  hint: string;
+  icon: IconName;
+  external: boolean;
+}[] = [
+  { href: linkedinUrl, label: 'LinkedIn', hint: 'LinkedIn', icon: 'linkedin', external: true },
+  { href: githubUrl, label: 'GitHub', hint: 'GitHub', icon: 'github', external: true },
+  {
+    href: `mailto:${email}`,
+    label: t.contact.emailLabel,
+    hint: email,
+    icon: 'mail',
+    external: false,
+  },
+];
+---
+
+<nav class="contact-rail" aria-label={t.contact.railLabel}>
+  <ul class="flex flex-col gap-3">
+    {links.map((link) => (
+      <li>
+        <a
+          href={link.href}
+          class="contact-rail-link group"
+          {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        >
+          <Icon name={link.icon} size={20} />
+          <span class="contact-rail-hint font-mono text-eyebrow" aria-hidden="true">
+            {link.hint}
+          </span>
+          <span class="sr-only">
+            {link.label}
+            {link.external && ` ${t.a11y.external}`}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

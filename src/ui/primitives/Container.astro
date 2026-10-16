@@ -1,8 +1,9 @@
 ---
 /**
- * Page-width wrapper: 16 px gutters on phones growing to 64 px, content up to 120 rem, so wide
- * screens are used edge to edge like the reference portfolios (ADR 0029). Long text keeps its own
- * measure inside (max-w-prose and friends); the frame is wide, the lines are not.
+ * Page-width wrapper: content up to 120 rem with gutters from 16 px on phones to 64 px from xl,
+ * so wide screens are used edge to edge like the reference portfolios (ADR 0029) and the contact
+ * rail has the right gutter to itself. Long text keeps its own measure inside (max-w-prose and
+ * friends); the frame is wide, the lines are not.
  */
 interface Props {
   as?: 'div' | 'section' | 'header' | 'footer' | 'main';
@@ -12,6 +13,6 @@ interface Props {
 const { as: Tag = 'div', class: className } = Astro.props;
 ---
 
-<Tag class:list={['mx-auto w-full max-w-page px-4 sm:px-6 lg:px-10 2xl:px-16', className]}>
+<Tag class:list={['mx-auto w-full max-w-page px-4 sm:px-6 lg:px-10 xl:px-16', className]}>
   <slot />
 </Tag>

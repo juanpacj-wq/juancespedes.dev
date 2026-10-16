@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './hero.css';
+@import './chrome.css';
 
 /*
  * Design tokens: the only place where raw color, type, radius, shadow and motion values live.
