@@ -113,8 +113,11 @@ export default defineConfig({
     cacheDir: process.argv.includes('dev') ? 'node_modules/.vite-dev' : 'node_modules/.vite',
     build: {
       // Fonts stay files: an inlined subset becomes a data: URL the policy refuses (font-src
-      // 'self'), and it would grow the stylesheet every page waits for.
-      assetsInlineLimit: (file) => (file.endsWith('.woff2') ? false : undefined),
+      // 'self'), and it would grow the stylesheet every page waits for. The header script stays a
+      // file too: inlined, its 3 kB would weigh on the HTML budget of every page instead of being
+      // cached once.
+      assetsInlineLimit: (file) =>
+        file.endsWith('.woff2') || file.includes('SiteHeader.astro') ? false : undefined,
     },
   },
 });

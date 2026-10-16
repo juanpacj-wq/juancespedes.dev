@@ -10,8 +10,9 @@ const BUDGET_KB = {
   // React runtime plus every island and page script. Islands hydrate on visibility and page
   // scripts are deferred modules, so none of this blocks the first paint; the budget keeps it
   // from growing unnoticed. Raised from 75 to 80 for the case study motion (about 3 kB, loaded
-  // on project pages only, ADR 0021).
-  total: 80,
+  // on project pages only, ADR 0021), and to 82 for the header script (1.6 kB: the theme switch,
+  // moved out of the inline HTML of every page, plus the menu motion).
+  total: 82,
   // Any single chunk other than the shared React runtime.
   chunk: 10,
 };

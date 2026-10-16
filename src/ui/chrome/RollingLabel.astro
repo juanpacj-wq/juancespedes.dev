@@ -1,0 +1,17 @@
+---
+/**
+ * A label whose letters roll up one after another on hover, each replaced by a copy rising from
+ * below (the agency-site hover of good-fella.com). The page ships the plain word; site-header.ts
+ * splits it into letters, so the motion costs no HTML on every page. Assistive technology reads
+ * the plain text either way. The motion lives in chrome.css and needs a parent `.nav-link`.
+ */
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<span class="roll" data-roll>
+  {text}
+</span>

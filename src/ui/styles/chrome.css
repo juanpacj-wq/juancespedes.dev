@@ -68,3 +68,153 @@
   opacity: 1;
   translate: 0 0;
 }
+
+/*
+ * Header motion (src/ui/chrome/SiteHeader.astro and site-header.ts). A pill glides under the
+ * pointer from one item to the next, the letters of the item roll up, and a line marks the
+ * section being read: it draws in from the left and leaves by the right. All of it stays still
+ * with reduced motion, where the pill and the line simply appear.
+ */
+.nav-list {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.nav-list .nav-link {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  padding-inline: 0.75rem;
+  border-radius: var(--radius-chip);
+}
+
+.nav-link {
+  transition:
+    color 200ms ease,
+    scale 300ms var(--ease-out);
+}
+
+.nav-link:hover,
+.nav-link:focus-visible,
+.nav-link[aria-current] {
+  color: var(--color-ink);
+}
+
+.nav-link:active {
+  scale: 0.96;
+}
+
+.nav-pill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: var(--pill-w, 0);
+  height: 2.25rem;
+  border-radius: var(--radius-chip);
+  background-color: color-mix(in srgb, var(--color-surface-raised) 85%, transparent);
+  box-shadow: var(--shadow-bevel);
+  opacity: 0;
+  translate: var(--pill-x, 0) -50%;
+  pointer-events: none;
+  transition:
+    opacity 200ms ease,
+    translate 450ms var(--ease-out),
+    width 450ms var(--ease-out);
+}
+
+.nav-list[data-pill-on] .nav-pill {
+  opacity: 1;
+}
+
+/* The first time it shows it appears where it is, instead of gliding in from the left edge. */
+.nav-list[data-pill-jump] .nav-pill {
+  transition: opacity 200ms ease;
+}
+
+.nav-list .nav-link::after {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.25rem;
+  left: 0.75rem;
+  height: 1px;
+  background-color: var(--color-accent-ink);
+  content: '';
+  scale: 0 1;
+  transform-origin: right;
+  transition: scale 500ms var(--ease-in-out);
+}
+
+.nav-list .nav-link[aria-current]::after {
+  scale: 1 1;
+  transform-origin: left;
+}
+
+.roll,
+.roll-track {
+  display: inline-flex;
+}
+
+.roll-track {
+  height: 1.5em;
+  overflow: clip;
+  line-height: 1.5;
+}
+
+.roll-char {
+  display: inline-block;
+  text-shadow: 0 1.5em currentColor;
+  transition: translate 450ms var(--ease-out) calc(var(--i) * 18ms);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .nav-link:hover .roll-char {
+    translate: 0 -1.5em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-pill,
+  .nav-list .nav-link::after,
+  .roll-char {
+    transition: none;
+  }
+}
+
+/* Theme switch: the sun turns, the moon rocks; the new theme then spreads from the button. */
+.theme-toggle svg {
+  transition: rotate 600ms var(--ease-out);
+}
+
+/* Search: the key cap goes down under the pointer, like a key being pressed. */
+[data-palette-open] kbd {
+  box-shadow: 0 2px 0 var(--color-line-strong);
+  transition:
+    translate 150ms ease,
+    box-shadow 150ms ease;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .theme-toggle:hover .theme-icon-sun {
+    rotate: 90deg;
+  }
+
+  .theme-toggle:hover .theme-icon-moon {
+    rotate: -24deg;
+  }
+
+  [data-palette-open]:hover kbd {
+    box-shadow: 0 0 0 var(--color-line-strong);
+    translate: 0 2px;
+  }
+}
+
+/* During the theme spread the page swaps in one piece: no cross-fade under the circle. */
+:root[data-theme-spread]::view-transition-old(root),
+:root[data-theme-spread]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

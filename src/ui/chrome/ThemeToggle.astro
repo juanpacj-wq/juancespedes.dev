@@ -2,9 +2,10 @@
 import Icon from '../icons/Icon.astro';
 
 /**
- * Light/dark switch. Plain DOM script on purpose: shipping a UI framework runtime for one
- * button would cost more than the whole page (see ADR 0009). The choice persists in
- * localStorage; the inline script in BaseLayout applies it before first paint.
+ * Light/dark switch. Its behaviour is `mountThemeToggle` in site-header.ts, the header's one
+ * script: plain DOM on purpose, since a UI framework runtime for one button would cost more than
+ * the whole page (see ADR 0009). The choice persists in localStorage; the inline script in
+ * BaseLayout applies it before first paint.
  */
 interface Props {
   toLightLabel: string;
@@ -31,29 +32,3 @@ const { toLightLabel, toDarkLabel } = Astro.props;
     display: none;
   }
 </style>
-
-<script>
-  const STORAGE_KEY = 'theme';
-
-  const current = (): 'light' | 'dark' =>
-    document.documentElement.dataset['theme'] === 'light' ? 'light' : 'dark';
-
-  const label = (button: HTMLButtonElement): void => {
-    const next = current() === 'dark' ? button.dataset['toLight'] : button.dataset['toDark'];
-    if (next) button.setAttribute('aria-label', next);
-  };
-
-  for (const button of document.querySelectorAll<HTMLButtonElement>('.theme-toggle')) {
-    label(button);
-    button.addEventListener('click', () => {
-      const next = current() === 'dark' ? 'light' : 'dark';
-      document.documentElement.dataset['theme'] = next;
-      try {
-        localStorage.setItem(STORAGE_KEY, next);
-      } catch {
-        // Storage can be unavailable (private mode); the theme still applies for this page.
-      }
-      label(button);
-    });
-  }
-</script>

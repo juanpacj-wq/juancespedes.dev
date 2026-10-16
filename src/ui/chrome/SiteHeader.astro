@@ -3,6 +3,7 @@ import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
 import Container from '../primitives/Container.astro';
 import CommandPalette from './CommandPalette.astro';
+import RollingLabel from './RollingLabel.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 export interface NavItem {
@@ -27,18 +28,22 @@ const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.
   <Container class="flex h-16 items-center justify-between gap-4">
     <a
       href={homeHref}
-      class="font-mono text-small font-medium tracking-tight text-ink transition-colors hover:text-accent-ink"
+      aria-label="juancespedes.dev"
+      class="font-mono text-small font-medium tracking-tight text-ink"
+      data-scramble
     >
-      juancespedes<span class="text-accent-ink">.dev</span>
+      <span data-scramble-text>juancespedes</span>
+      <span class="text-accent-ink">.dev</span>
     </a>
     <div class="flex items-center gap-1 sm:gap-4">
       {navItems.length > 0 && (
         <nav aria-label={t.a11y.mainNavigation} class="hidden md:block">
-          <ul class="flex items-center gap-6 text-small text-muted">
+          <ul class="nav-list text-small text-muted" data-nav>
+            <li class="nav-pill" aria-hidden="true" data-nav-pill></li>
             {navItems.map((item) => (
               <li>
-                <a href={item.href} class="transition-colors hover:text-ink">
-                  {item.label}
+                <a href={item.href} class="nav-link">
+                  <RollingLabel text={item.label} />
                 </a>
               </li>
             ))}
@@ -46,12 +51,12 @@ const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.
               <li>
                 <button
                   type="button"
-                  class="transition-colors hover:text-ink"
+                  class="nav-link"
                   aria-expanded="false"
                   aria-controls="chat-panel"
                   data-chat-open
                 >
-                  {chatLabel}
+                  <RollingLabel text={chatLabel} />
                 </button>
               </li>
             )}
@@ -64,9 +69,9 @@ const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.
           href={switchTo.href}
           hreflang={switchTo.locale}
           lang={switchTo.locale}
-          class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-control font-mono text-small text-muted transition-colors hover:text-ink"
+          class="nav-link inline-flex min-h-11 min-w-11 items-center justify-center rounded-control font-mono text-small text-muted"
         >
-          <span>{t.language.short}</span>
+          <RollingLabel text={t.language.short} />
           <span class="sr-only">: {t.language.switchTo}</span>
         </a>
       )}
@@ -74,6 +79,14 @@ const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.
     </div>
   </Container>
 </header>
+
+<script>
+  // One module file for the header, theme switch included, instead of inline script on every
+  // page (the HTML budget).
+  import { mountSiteHeader } from './site-header';
+
+  mountSiteHeader();
+</script>
 
 <style>
   /* Over the home backdrop the bar starts clear, so the painting reaches the top of the screen,
