@@ -70,7 +70,12 @@ under a hairline; the whole item opens the case study, where the story, chart an
 ([ADR 0025](adr/0025-business-impact-section.md), trimmed by [ADR 0029](adr/0029-wide-clean-layout.md)).
 
 Site chrome (`src/ui/chrome`): `SiteHeader`, `SiteFooter`, `ThemeToggle`, and `ContactRail`, the
-LinkedIn, GitHub and email buttons fixed to the right edge from 80rem, in the 4rem gutter. Page layout:
+LinkedIn, GitHub and email buttons fixed to the right edge from 80rem, in the 4rem gutter. The
+header moves (`site-header.ts`, styles in `chrome.css`): a pill glides under the pointer between
+menu items, each label's letters roll up (`RollingLabel`), a line drawn in `--ease-in-out` marks
+the home section being read (`aria-current="location"`), the logo's name scrambles through code
+glyphs, and a new theme spreads as a circle from its switch. Reduced motion keeps only the states.
+Page layout:
 `src/ui/layouts/BaseLayout.astro` (meta, theme bootstrap, skip link, header, footer).
 
 ## Rules

@@ -122,6 +122,8 @@
   --radius-stage: 1.25rem;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Slow at both ends: for a line that draws in one side and leaves by the other. */
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
 
   --breakpoint-xs: 25rem;
 

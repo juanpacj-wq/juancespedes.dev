@@ -108,6 +108,17 @@ test.describe('home sections', () => {
     await expect.poll(top).toBeLessThan(160);
   });
 
+  test('the header marks the section being read', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'The section links live in the desktop header');
+    await page.goto('/');
+    const nav = page.getByRole('navigation', { name: 'Navegación principal' });
+    await expect(nav.locator('[aria-current]')).toHaveCount(0);
+    await nav.getByRole('link', { name: 'Servicios' }).click();
+    await expect(nav.locator('[aria-current="location"]')).toHaveAttribute('href', '#services');
+    await nav.getByRole('link', { name: 'Contacto' }).click();
+    await expect(nav.locator('[aria-current="location"]')).toHaveAttribute('href', '#contact');
+  });
+
   test('the contact rail offers LinkedIn, GitHub and email on wide screens', async ({
     page,
     isMobile,
