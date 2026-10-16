@@ -22,8 +22,8 @@ const { t, locale, email, privacyHref, githubUrl, linkedinUrl } = Astro.props;
 
 <Section id="contact" title={t.contact.title}>
   <p slot="description">{t.contact.description}</p>
-  <div class="grid gap-8 lg:grid-cols-[1fr_18rem]">
-    <Card padding="lg">
+  <div class="grid gap-8 lg:grid-cols-12 lg:gap-10">
+    <Card padding="lg" class="lg:col-span-8">
       <ContactForm
         client:visible
         locale={locale}
@@ -33,7 +33,7 @@ const { t, locale, email, privacyHref, githubUrl, linkedinUrl } = Astro.props;
         text={t.form}
       />
     </Card>
-    <aside class="flex flex-col gap-2">
+    <aside class="flex flex-col gap-2 lg:col-span-4 lg:col-start-9">
       <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
         {t.contact.emailLabel}
       </p>

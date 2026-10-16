@@ -55,12 +55,7 @@ const two = (n: number) => String(n + 1).padStart(2, '0');
   {architecture.flows.length > 0 && (
     <div class="flex flex-col gap-6">
       <div class="flex flex-wrap items-end justify-between gap-4">
-        <div class="flex flex-col gap-2">
-          <h3 class="font-display text-title font-light text-ink">{t.project.flows}</h3>
-          <p class="text-small text-subtle" hidden data-arch-hint>
-            {t.project.diagramHint}
-          </p>
-        </div>
+        <h3 class="font-display text-title font-medium text-ink">{t.project.flows}</h3>
         <div class="flex items-center gap-2" hidden data-arch-steps>
           <button type="button" class="cs-step" data-step="-1" aria-label={t.project.previousStep}>
             <Icon name="arrow-right" size={16} class="rotate-180" />

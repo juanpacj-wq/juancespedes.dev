@@ -111,5 +111,10 @@ export default defineConfig({
     // the dev server pointing at files that no longer existed ("The file does not exist ... in the
     // optimize deps directory").
     cacheDir: process.argv.includes('dev') ? 'node_modules/.vite-dev' : 'node_modules/.vite',
+    build: {
+      // Fonts stay files: an inlined subset becomes a data: URL the policy refuses (font-src
+      // 'self'), and it would grow the stylesheet every page waits for.
+      assetsInlineLimit: (file) => (file.endsWith('.woff2') ? false : undefined),
+    },
   },
 });

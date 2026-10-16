@@ -17,8 +17,8 @@ const [lead, ...rest] = t.about.paragraphs;
 ---
 
 <Section id="about" title={t.about.title}>
-  <div class="grid gap-10 md:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] md:gap-16 lg:gap-24">
-    <figure class="reveal">
+  <div class="grid gap-10 md:grid-cols-12 md:gap-10">
+    <figure class="reveal max-w-xs md:col-span-4 lg:col-span-3 xl:col-span-2">
       <Portrait alt={t.profile.portraitAlt} initials="JC" />
       <figcaption class="mt-4 flex flex-col gap-1 text-small text-subtle">
         <span class="text-ink">{t.profile.name}</span>
@@ -31,8 +31,8 @@ const [lead, ...rest] = t.about.paragraphs;
         </span>
       </figcaption>
     </figure>
-    <div class="reveal flex max-w-2xl flex-col gap-6 self-center">
-      {lead && <p class="font-display text-quote font-light text-pretty">{lead}</p>}
+    <div class="reveal flex max-w-4xl flex-col gap-6 self-center md:col-span-8 lg:col-start-5 xl:col-start-4">
+      {lead && <p class="font-display text-quote font-medium text-pretty">{lead}</p>}
       {rest.map((paragraph) => (
         <p class="text-lead text-pretty text-muted">{paragraph}</p>
       ))}

@@ -137,7 +137,7 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
         {project.confidentiality === 'anonymized' && <> · {t.projects.anonymized}</>}
       </p>
 
-      <h1 class="cs-title max-w-6xl font-display text-display font-light text-balance text-ink">
+      <h1 class="cs-title max-w-6xl font-display text-display font-medium text-balance text-ink">
         {words(project.title).map((word, index) => (
           <>
             <span class="cs-word" style={`--i:${String(index)}`}>
@@ -206,7 +206,7 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
               class:list={['cs-badge', index === 0 ? 'cs-badge--one' : 'cs-badge--two']}
               aria-hidden="true"
             >
-              <span class="text-title font-light tracking-tight text-ink">{metric.value}</span>
+              <span class="text-title font-medium tracking-tight text-ink">{metric.value}</span>
               <span class="line-clamp-2 text-small text-muted">{metric.label}</span>
             </p>
           ))}
@@ -274,7 +274,7 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
           wide
           quiet
         >
-          <p class="cs-hook max-w-5xl font-display text-heading font-light text-balance">
+          <p class="cs-hook max-w-5xl font-display text-heading font-medium text-balance">
             {hookWords.map((word, index) => (
               <>
                 <span
@@ -381,7 +381,7 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
         )}
 
         <DetailSection id="role" title={titleOf('role')} number={numberOf('role')}>
-          <p class="font-display text-quote font-light text-pretty text-ink">{project.role}</p>
+          <p class="font-display text-quote font-medium text-pretty text-ink">{project.role}</p>
           {project.responsibilities.length > 0 && (
             <ol class="cs-rail mt-12 flex flex-col gap-10">
               {project.responsibilities.map((item, index) => (
@@ -424,12 +424,12 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
               <li class="cs-decision" style={`--i:${String(index)}`}>
                 <div class="flex flex-col gap-4 lg:col-span-5">
                   <span
-                    class="font-display text-display leading-none font-light text-accent-ink"
+                    class="font-display text-display leading-none font-medium text-accent-ink"
                     aria-hidden="true"
                   >
                     {two(index)}
                   </span>
-                  <h3 class="font-display text-title font-light text-balance text-ink sm:text-quote">
+                  <h3 class="font-display text-title font-medium text-balance text-ink sm:text-quote">
                     {decision.title}
                   </h3>
                 </div>
@@ -480,7 +480,7 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
           <ul class="flex flex-col gap-12">
             {project.lessons.map((item) => (
               <li class="cs-lesson reveal">
-                <p class="font-display text-quote font-light text-pretty text-ink">{item}</p>
+                <p class="font-display text-quote font-medium text-pretty text-ink">{item}</p>
               </li>
             ))}
           </ul>
@@ -596,7 +596,7 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
     <aside class="cs-cta" aria-labelledby="cs-cta-title">
       <h2
         id="cs-cta-title"
-        class="max-w-3xl font-display text-heading font-light text-balance text-ink"
+        class="max-w-3xl font-display text-heading font-medium text-balance text-ink"
       >
         {t.project.ctaTitle}
       </h2>
@@ -616,7 +616,7 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
               <span class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
                 {t.project.nextCase}
               </span>
-              <span class="font-display text-heading font-light text-balance text-ink">
+              <span class="font-display text-heading font-medium text-balance text-ink">
                 {next.title}
               </span>
               <span class="line-clamp-3 text-pretty text-muted">{next.summary}</span>

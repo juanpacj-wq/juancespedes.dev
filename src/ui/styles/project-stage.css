@@ -12,39 +12,21 @@
 
 /* ---------- On every screen: the parts that dress the list ---------- */
 
-.project-stage-shot {
-  --glow: var(--accent);
-  background: radial-gradient(
-    70% 85% at 55% 100%,
-    color-mix(in srgb, var(--glow) 18%, transparent),
-    transparent 75%
-  );
+.project-stage-screen img {
+  transition: scale 700ms var(--ease-out);
 }
 
-.project-stage-slide[data-tone='success'] .project-stage-shot {
-  --glow: var(--success);
+.project-stage-card:hover .project-stage-screen img {
+  scale: 1.02;
 }
 
-.project-stage-screen {
-  box-shadow: var(--shadow-lift);
-  border-radius: var(--radius-card) var(--radius-card) 0 0;
-}
-
-.project-stage-cta svg {
-  transition: translate 400ms var(--ease-out);
-}
-
-.project-stage-card:hover .project-stage-cta svg {
-  translate: 0.25rem 0;
-}
-
-/* One focus ring around the whole project; the stretched link carries the focus. It sits inside
-   the card because the stage clips anything outside it. */
+/* One focus ring around the screen; the stretched link carries the focus. It sits inside the
+   screen because the stage clips anything outside it. */
 .project-stage-link:focus-visible {
   outline: none;
 }
 
-.project-stage-card:has(.project-stage-link:focus-visible) {
+.project-stage-card:has(.project-stage-link:focus-visible) .project-stage-shot {
   outline: 2px solid var(--accent);
   outline-offset: -4px;
 }
@@ -57,52 +39,40 @@
     height: calc(var(--count) * 100svh);
   }
 
+  /* Title across the top; under it, the rail of thumbnails and the stage. */
   [data-stage-ready] .project-stage-pin {
     position: sticky;
     top: 0;
     display: grid;
-    grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
-    gap: clamp(2rem, 4vw, 4.5rem);
+    grid-template-columns: 8rem minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: clamp(1.5rem, 3vw, 3.5rem);
+    row-gap: 1.5rem;
     height: 100svh;
     /* Clears the sticky site header (4rem). */
-    padding-block: 6rem 1.5rem;
+    padding-block: 5.5rem 1.5rem;
   }
-
-  /* ----- Left: title, rail of thumbnails, way out ----- */
 
   [data-stage-ready] .project-stage-aside {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    min-height: 0;
-    margin: 0;
+    display: contents;
   }
+
+  [data-stage-ready] .project-stage-aside h2 {
+    grid-column: 1 / -1;
+  }
+
+  /* ----- Left: thumbnails and the way out ----- */
 
   [data-stage-ready] .project-stage-rail {
     display: block;
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 0;
   }
 
   .project-stage-rail-link {
-    display: grid;
-    grid-template-columns: 4.5rem 1.5rem minmax(0, 1fr);
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.25rem;
+    display: block;
     border-radius: var(--radius-control);
-    color: var(--muted);
-    transition: color 300ms ease;
-  }
-
-  .project-stage-rail-link:hover,
-  .project-stage-rail-link[aria-current] {
-    color: var(--ink);
-  }
-
-  .project-stage-rail-name {
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
   }
 
   .project-stage-thumb {
@@ -111,13 +81,8 @@
     overflow: hidden;
     border-radius: var(--radius-control);
     background: var(--surface-raised);
-    box-shadow: var(--shadow-bevel);
-    opacity: 0.55;
-    scale: 0.92;
-    transform-origin: 0 50%;
-    transition:
-      opacity 400ms ease,
-      scale 500ms var(--ease-out);
+    opacity: 0.45;
+    transition: opacity 400ms ease;
   }
 
   .project-stage-thumb img {
@@ -130,7 +95,6 @@
   .project-stage-rail-link:hover .project-stage-thumb,
   .project-stage-rail-link[aria-current] .project-stage-thumb {
     opacity: 1;
-    scale: 1;
   }
 
   .project-stage-rail-link[aria-current] .project-stage-thumb {
@@ -140,26 +104,28 @@
 
   [data-stage-ready] .project-stage-more {
     display: inline-flex;
-    align-self: flex-start;
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+    justify-self: start;
     align-items: center;
     gap: 0.5rem;
-    margin-top: auto;
-    padding: 0.625rem 1.125rem;
-    border-radius: var(--radius-chip);
-    background: var(--ink);
-    color: var(--canvas);
+    color: var(--ink);
     font-size: var(--text-small);
     font-weight: 500;
-    transition: scale 300ms var(--ease-out);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.3em;
+    transition: text-decoration-color 300ms ease;
   }
 
   [data-stage-ready] .project-stage-more:hover {
-    scale: 1.03;
+    text-decoration-color: var(--accent);
   }
 
-  /* Short screens keep the rail and drop the paragraph under the title. */
-  @media (max-height: 50rem) {
-    [data-stage-ready] .project-stage-aside header p {
+  /* Short screens keep the thumbnails; the link to every project waits below the stage. */
+  @media (max-height: 48rem) {
+    [data-stage-ready] .project-stage-more {
       display: none;
     }
   }
@@ -168,6 +134,8 @@
 
   [data-stage-ready] .project-stage-main {
     display: flex;
+    grid-column: 2;
+    grid-row: 2;
     flex-direction: column;
     gap: 1rem;
     min-height: 0;
@@ -180,7 +148,6 @@
     min-height: 0;
     /* clip, not hidden: focus must never scroll the stage itself. */
     overflow: clip;
-    border-radius: var(--radius-panel);
   }
 
   [data-stage-ready] .project-stage-slide {
@@ -192,6 +159,7 @@
     scale: calc(1 - var(--behind) * 0.06);
     transform-origin: 50% 0;
     will-change: translate, scale;
+    background: var(--canvas);
   }
 
   /* The project being covered dims as it settles back. */
@@ -212,9 +180,9 @@
     aspect-ratio: auto;
   }
 
-  /* The screen trails its card a little on the way in. */
+  /* The screen trails its frame a little on the way in. */
   [data-stage-ready] .project-stage-screen {
-    translate: 0 calc(min(1, var(--ahead)) * 18%);
+    translate: 0 calc(min(1, var(--ahead)) * 12%);
   }
 
   [data-stage-ready] .project-stage-hud {
@@ -223,11 +191,11 @@
     gap: 1.5rem;
   }
 
-  /* Below 90rem the page gutter is narrower than the floating chat button; keep the hint clear. */
-  @media (max-width: 90rem) {
-    [data-stage-ready] .project-stage-hud {
-      padding-inline-end: 5rem;
-    }
+  /* The floating chat button sits over the bottom right corner; the caption and the bars stop
+     short of it. */
+  [data-stage-ready] .project-stage-hud,
+  [data-stage-ready] .project-stage-caption {
+    padding-inline-end: 6rem;
   }
 
   .project-stage-bars {

@@ -58,10 +58,11 @@ and PR #39 needed six and four CI rounds (docs/runbooks/deploy-friction.md). To 
     in CSS from the start.
   - No animation that repaints many glyphs or elements per frame (TBT reached 1.3 s).
   - Large backgrounds take their size from the viewport (`svh`), not from content that reflows
-    when fonts arrive (CLS). Text in Geist falls back to `Geist Fallback` (Arial with Geist's
-    metrics), so it does not move when the font arrives.
-  - The largest paint drawn in a web font preloads that font with the HTML (the hero's backdrop in
-    Geist Mono); other fonts are not preloaded, they compete with the render-blocking CSS.
+    when fonts arrive (CLS). Text in Hanken Grotesk falls back to `Hanken Fallback` (Arial with
+    its metrics), so it does not move when the font arrives.
+  - The fonts of the largest paints preload with the HTML: Hanken Grotesk (headings, every page)
+    and Geist Mono (the hero's backdrop); other fonts are not preloaded, they compete with the
+    render-blocking CSS.
   - Deferring styles changes the states a page goes through: no transition may run when they
     arrive (`data-chapters-ready`), and run the axe tests for the affected pages before pushing.
 - If CI still fails, download every report (`gh run download <run> -p 'lighthouse-reports-*'`),
