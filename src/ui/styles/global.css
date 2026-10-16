@@ -31,7 +31,7 @@
   --accent-ink: light-dark(#9a4b0c, #e8a33a);
   --on-accent: light-dark(#14110d, #14110d);
   --success: light-dark(#0f766e, #5cc2a8);
-  --ascii: light-dark(#8a4a12, #e8a33a);
+  --ascii: light-dark(#4f2a0c, #e8a33a);
   --bevel: light-dark(#000000, #ffffff);
   --shadow-tint: light-dark(#6b6259, #000000);
   /* Specular light on glass (the chat button): white in both themes, never text. */

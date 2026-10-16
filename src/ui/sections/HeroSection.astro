@@ -42,7 +42,7 @@ const { roles } = t.hero;
   <!-- A pool of shadow behind the text, so it reads over the brightest paint. -->
   <div class="hero-veil pointer-events-none absolute inset-0" aria-hidden="true"></div>
   <Container class="hero-front relative flex min-h-svh flex-col items-center justify-center gap-6 pt-28 pb-24 text-center">
-    <Badge tone="success" status>
+    <Badge tone="success" status class="hero-badge">
       {t.availability.available}
     </Badge>
     <!--
@@ -100,7 +100,9 @@ const { roles } = t.hero;
   const closeGap = (index: number) => {
     if (!ticker || !prefix) return;
     const role = ticker.children[index] as HTMLElement | undefined;
-    const sameLine = Math.abs(prefix.offsetTop - ticker.offsetTop) < 4;
+    // Centres, not tops: the ticker's window is taller than the prefix's line (hero.css).
+    const centre = (element: HTMLElement) => element.offsetTop + element.offsetHeight / 2;
+    const sameLine = Math.abs(centre(prefix) - centre(ticker)) < 4;
     const gap = role && sameLine ? (ticker.offsetWidth - role.offsetWidth) / 2 : 0;
     prefix.style.setProperty('--gap', `${gap.toFixed(1)}px`);
   };
@@ -112,9 +114,20 @@ const { roles } = t.hero;
         prefix.dataset['measured'] = '';
       });
     });
-    new ResizeObserver(() => {
+    /*
+     * Measure again whenever a width that the gap depends on changes: the line, the ticker or any
+     * role. A role grows when its font arrives without the line changing size; watching only the
+     * line left a stale gap after a page change (from English to Spanish) until a reload.
+     */
+    const remeasure = new ResizeObserver(() => {
       closeGap(Number(ticker.style.getPropertyValue('--role') || '0'));
-    }).observe(ticker.parentElement ?? ticker);
+    });
+    for (const element of [ticker.parentElement ?? ticker, ticker, prefix, ...ticker.children]) {
+      remeasure.observe(element);
+    }
+    addEventListener('pageshow', () => {
+      closeGap(Number(ticker.style.getPropertyValue('--role') || '0'));
+    });
   }
 
   if (ticker && first && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
@@ -188,7 +201,7 @@ const { roles } = t.hero;
   /* Dark glyphs on a light ground carry less weight than light ones on dark: the light theme
      shows the painting at more strength, so it reads with the lamp off and with the light on. */
   :global(:root[data-theme='light']) .hero-art :global(.ascii-canvas) {
-    opacity: 0.8;
+    opacity: 0.85;
   }
 
   .hero-art :global(figcaption) {

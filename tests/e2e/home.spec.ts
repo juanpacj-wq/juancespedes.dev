@@ -134,6 +134,31 @@ test.describe('hero headline', () => {
     await expect(ticker).toHaveAttribute('style', /--role: ?1(;|$)/, { timeout: 6000 });
   });
 
+  test('keeps the role next to "ingeniero", also after coming from English', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'On a phone the role wraps onto its own line');
+    // The visible space between the prefix and the role on screen, in px.
+    const gap = () =>
+      page.evaluate(() => {
+        const prefix = document.querySelector('[data-role-prefix]');
+        const ticker = document.querySelector<HTMLElement>('[data-role-ticker]');
+        if (!prefix || !ticker) return Number.NaN;
+        const index = Number(ticker.style.getPropertyValue('--role') || '0');
+        const role = ticker.children[index];
+        if (!role) return Number.NaN;
+        return role.getBoundingClientRect().left - prefix.getBoundingClientRect().right;
+      });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await expect.poll(gap).toBeLessThan(40);
+    await page.goto('/en');
+    await page.getByRole('banner').getByRole('link', { name: /^ES/ }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect.poll(gap).toBeLessThan(40);
+  });
+
   test('stays on the first role when the visitor prefers less motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
