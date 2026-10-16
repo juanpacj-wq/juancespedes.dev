@@ -243,7 +243,9 @@ test.describe('project pages', () => {
     await page.mouse.up();
   });
 
-  test('a row on the home page opens its project', async ({ page }) => {
+  test('a project on the home page opens its page', async ({ page }) => {
+    // Reduced motion keeps the home page projects as a list (the stage has its own tests).
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/#projects');
     await page.locator('#project-invoice-etl-rescue').getByRole('link').click();
     await expect(page).toHaveURL(/\/proyectos\/invoice-etl-rescue$/);

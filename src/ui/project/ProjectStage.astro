@@ -1,0 +1,415 @@
+---
+import { getImage } from 'astro:assets';
+
+import type { Project } from '../../domain/project/project';
+import type { Dictionary } from '../i18n/dictionary';
+import { formatYears } from '../i18n/format';
+import { projectPath } from '../i18n/routes';
+import Icon from '../icons/Icon.astro';
+import Container from '../primitives/Container.astro';
+import Tag from '../primitives/Tag.astro';
+import { mediaFor } from './media';
+import ScreenPlaceholder from './ScreenPlaceholder.astro';
+import { SCREENSHOT_QUALITY } from './screenshots';
+
+/**
+ * The featured case studies as a stage: on wide screens the section pins to the viewport and
+ * scrolling no longer moves the page, it brings the next project in over the current one. A rail
+ * of thumbnails on the left marks where you are and jumps to a project; the stage on the right
+ * holds one project at a time, and clicking it opens the case study.
+ *
+ * Progressive: the markup is a plain list of projects, which is what phones, reduced motion and
+ * visits without JavaScript get. The script below loads src/ui/styles/project-stage.css after the
+ * page has loaded and only then turns the list into the pinned stage (`data-stage-ready`), so the
+ * stage never costs the first paint (CLAUDE.md, the performance budget). Screenshots keep their
+ * address in data attributes until the section comes near.
+ *
+ * Scrolling writes one number, `--p` (the position on the stage, 0 to n - 1), and CSS derives
+ * every slide's offset, scale and the progress bars from it: transforms only, one style write per
+ * frame. Each project holds still for part of its scroll before the next one slides in, so the
+ * stage reads as one screen per project rather than a strip.
+ */
+interface Props {
+  t: Dictionary;
+  projects: readonly Project[];
+  headingId: string;
+}
+
+const { t, projects, headingId } = Astro.props;
+const pad = (value: number) => String(value).padStart(2, '0');
+const total = pad(projects.length);
+
+const SHOT_SIZES = '(min-width: 1024px) 62vw, 92vw';
+
+const slides = await Promise.all(
+  projects.map(async (project, index) => {
+    const media = mediaFor(project.slug);
+    const wide = media.cover ?? media.card;
+    const [shot, thumb] = await Promise.all([
+      wide
+        ? getImage({
+            src: wide.src,
+            widths: [800, 1280, 1600, 2048],
+            sizes: SHOT_SIZES,
+            quality: SCREENSHOT_QUALITY.webp,
+          })
+        : null,
+      media.card
+        ? // The rail shows it 4.5rem wide: one 240 px file covers a 2x screen.
+          getImage({ src: media.card.src, width: 240, quality: 80 })
+        : null,
+    ]);
+    return {
+      project,
+      index,
+      number: pad(index + 1),
+      href: projectPath(project.locale, project.slug),
+      figures: project.metrics.slice(0, 2),
+      stack: project.stack.slice(0, 4),
+      tone: index % 2 === 0 ? 'accent' : 'success',
+      shot,
+      thumb,
+    };
+  }),
+);
+---
+
+<div
+  class="project-stage"
+  data-project-stage
+  data-stage-track
+  style={`--count: ${String(projects.length)}; --p: 0`}
+>
+  <Container class="project-stage-pin">
+    <div class="project-stage-aside mb-12">
+      <header class="max-w-3xl">
+        <h2 id={headingId} class="font-display text-heading font-light text-balance">
+          {t.projects.featuredTitle}
+        </h2>
+        <p class="mt-5 max-w-2xl text-lead text-pretty text-muted">{t.projects.description}</p>
+      </header>
+
+      <nav class="project-stage-rail hidden" aria-label={t.projects.stageRail}>
+        <ol class="flex flex-col gap-3">
+          {slides.map((slide) => (
+            <li>
+              <a
+                href={`#stage-${slide.project.slug}`}
+                class="project-stage-rail-link"
+                data-stage-goto={slide.index}
+                aria-current={slide.index === 0 ? 'true' : undefined}
+              >
+                <span class="project-stage-thumb" aria-hidden="true">
+                  {slide.thumb && (
+                    <img
+                      data-stage-shot
+                      data-src={slide.thumb.src}
+                      width={slide.thumb.attributes.width}
+                      height={slide.thumb.attributes.height}
+                      alt=""
+                      decoding="async"
+                    />
+                  )}
+                </span>
+                <span class="font-mono text-eyebrow text-subtle">{slide.number}</span>
+                <span class="project-stage-rail-name text-small">{slide.project.title}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <a href="#more-projects-title" class="project-stage-more hidden">
+        {t.projects.moreLink}
+        <Icon name="arrow-right" size={16} />
+      </a>
+    </div>
+
+    <div class="project-stage-main">
+      <ol class="project-stage-slides flex flex-col gap-8">
+        {slides.map((slide) => (
+          <li
+            id={`stage-${slide.project.slug}`}
+            class="project-stage-slide scroll-mt-24"
+            data-stage-slide
+            data-tone={slide.tone}
+            style={`--i: ${String(slide.index)}`}
+          >
+            <article
+              id={`project-${slide.project.slug}`}
+              class="project-stage-card relative isolate flex h-full flex-col overflow-hidden rounded-panel bg-surface shadow-bevel"
+            >
+              <div class="flex flex-col gap-6 p-6 sm:p-10 xl:flex-row xl:items-start xl:justify-between">
+                <div class="flex max-w-2xl flex-col gap-3">
+                  <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+                    <span class="text-accent-ink">
+                      {slide.number} / {total}
+                    </span>{' '}
+                    · {t.kindLabels[slide.project.kind]} · {formatYears(slide.project.period, t)}
+                    {slide.project.confidentiality === 'anonymized' && (
+                      <> · {t.projects.anonymized}</>
+                    )}
+                  </p>
+                  <h3 class="font-display text-quote font-light text-balance text-ink">
+                    <a
+                      href={slide.href}
+                      class="project-stage-link after:absolute after:inset-0 after:z-20"
+                    >
+                      {slide.project.title}
+                    </a>
+                  </h3>
+                  <p class="line-clamp-2 text-pretty text-muted">{slide.project.summary}</p>
+                  {slide.stack.length > 0 && (
+                    <ul class="flex flex-wrap gap-2 pt-1">
+                      {slide.stack.map((name) => (
+                        <li>
+                          <Tag>{name}</Tag>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div class="flex shrink-0 flex-col gap-5 xl:items-end">
+                  {slide.figures.length > 0 && (
+                    <dl class="flex gap-8 xl:text-right">
+                      {slide.figures.map((metric) => (
+                        <div class="flex max-w-40 flex-col gap-1">
+                          <dt class="sr-only">{metric.label}</dt>
+                          <dd class="text-price font-medium text-ink">{metric.value}</dd>
+                          <dd class="line-clamp-3 text-small text-muted" aria-hidden="true">
+                            {metric.label}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                  <span
+                    class="project-stage-cta inline-flex items-center gap-2 text-small font-medium text-accent-ink"
+                    aria-hidden="true"
+                  >
+                    {t.projects.viewCase}
+                    <Icon name="arrow-right" size={16} />
+                  </span>
+                </div>
+              </div>
+
+              <div
+                class="project-stage-shot relative aspect-video px-6 sm:px-10"
+                aria-hidden="true"
+              >
+                <div
+                  class="project-stage-screen size-full"
+                  style={`view-transition-name: project-screen-${slide.project.slug}`}
+                >
+                  {slide.shot ? (
+                    <img
+                      data-stage-shot
+                      data-src={slide.shot.src}
+                      data-srcset={slide.shot.srcSet.attribute}
+                      sizes={SHOT_SIZES}
+                      width={slide.shot.attributes.width}
+                      height={slide.shot.attributes.height}
+                      alt=""
+                      decoding="async"
+                      class="size-full rounded-t-card object-cover object-top-left"
+                    />
+                  ) : (
+                    <ScreenPlaceholder slug={slide.project.slug} />
+                  )}
+                </div>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ol>
+
+      <div class="project-stage-hud hidden" aria-hidden="true">
+        <span class="font-mono text-eyebrow tracking-widest text-ink" data-stage-counter>
+          01 / {total}
+        </span>
+        <span class="project-stage-bars">
+          {slides.map((slide) => (
+            <span class="project-stage-bar" style={`--i: ${String(slide.index)}`} />
+          ))}
+        </span>
+        <span class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+          {t.projects.stageHint}
+        </span>
+      </div>
+    </div>
+  </Container>
+</div>
+
+<script>
+  import stageStyles from '../styles/project-stage.css?url';
+
+  const root = document.querySelector<HTMLElement>('[data-project-stage]');
+  if (root) {
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-stage-slide]')];
+    const rail = [...root.querySelectorAll<HTMLAnchorElement>('[data-stage-goto]')];
+    const counter = root.querySelector('[data-stage-counter]');
+    const last = slides.length - 1;
+    const total = String(slides.length).padStart(2, '0');
+    // The stage only pins where there is room and motion is welcome; elsewhere it stays a list.
+    const stageable = matchMedia('(min-width: 64rem) and (prefers-reduced-motion: no-preference)');
+    const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+    /*
+     * The screenshots load when the section comes within a screen of the viewport. It sits below
+     * the first screen, so they never compete with the first paint; a visit that lands on it
+     * loads them at once.
+     */
+    const loadShots = () => {
+      for (const shot of root.querySelectorAll<HTMLImageElement>('img[data-stage-shot]')) {
+        shot.srcset = shot.dataset.srcset ?? '';
+        shot.src = shot.dataset.src ?? '';
+      }
+    };
+    if ('IntersectionObserver' in window) {
+      const near = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          near.disconnect();
+          loadShots();
+        },
+        { rootMargin: '100% 0px' },
+      );
+      near.observe(root);
+    } else {
+      loadShots();
+    }
+
+    /** Where the scroll is on the stage, from 0 (first project) to `last`. */
+    const scrollSpan = () => Math.max(1, root.offsetHeight - innerHeight);
+    const rawPosition = () => clamp(-root.getBoundingClientRect().top / scrollSpan(), 0, 1) * last;
+
+    /*
+     * Each project holds still for the first 30% of its scroll and the next one slides in over
+     * the remaining 70%, eased at both ends: one screen per project rather than a filmstrip.
+     */
+    const HOLD = 0.3;
+    const shape = (raw: number) => {
+      const step = Math.min(Math.floor(raw), last);
+      const t = clamp((raw - step - HOLD) / (1 - HOLD), 0, 1);
+      return step + t * t * (3 - 2 * t);
+    };
+
+    let target = 0;
+    let shown = 0;
+    let frame = 0;
+    let active = 0;
+
+    const mark = (index: number) => {
+      if (index === active) return;
+      active = index;
+      rail.forEach((link, i) => {
+        if (i === index) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      });
+      if (counter) counter.textContent = `${String(index + 1).padStart(2, '0')} / ${total}`;
+    };
+
+    /*
+     * The shown position follows the scroll with a short ease, so a wheel notch glides. The ease
+     * is measured in time, not frames: it settles alike at 60 Hz, 120 Hz or a throttled tab.
+     */
+    const EASE_MS = 90;
+    let lastTime = 0;
+    const paint = (time: number) => {
+      frame = 0;
+      const elapsed = lastTime ? Math.min(time - lastTime, 500) : 16;
+      lastTime = time;
+      shown += (target - shown) * (1 - Math.exp(-elapsed / EASE_MS));
+      if (Math.abs(target - shown) < 0.001) {
+        shown = target;
+        lastTime = 0;
+      } else {
+        frame = requestAnimationFrame(paint);
+      }
+      root.style.setProperty('--p', shown.toFixed(4));
+    };
+
+    // The rail and counter follow the scroll itself, so they never lag behind the reader.
+    const onScroll = () => {
+      target = shape(rawPosition());
+      mark(Math.round(target));
+      if (!frame) frame = requestAnimationFrame(paint);
+    };
+
+    /** The scroll offset where project `index` sits still on the stage. */
+    const offsetOf = (index: number) =>
+      root.getBoundingClientRect().top + scrollY + (scrollSpan() * index) / Math.max(1, last);
+
+    const go = (index: number, behavior: ScrollBehavior) => {
+      scrollTo({ top: offsetOf(index), behavior });
+    };
+
+    const onRail = (event: MouseEvent) => {
+      const link = (event.target as Element).closest<HTMLAnchorElement>('[data-stage-goto]');
+      if (!link) return;
+      event.preventDefault();
+      go(Number(link.dataset.stageGoto), 'smooth');
+    };
+
+    /*
+     * Tabbing to a project that is off the stage brings it on, so focus is never hidden. The stage
+     * jumps before the browser scrolls the focused link into view; otherwise it would scroll to
+     * where the link waited, below the stage.
+     */
+    const onFocus = (event: FocusEvent) => {
+      const slide = (event.target as Element).closest<HTMLElement>('[data-stage-slide]');
+      if (!slide) return;
+      const index = slides.indexOf(slide);
+      if (index === active) return;
+      cancelAnimationFrame(frame);
+      frame = 0;
+      target = shown = index;
+      root.style.setProperty('--p', String(index));
+      mark(index);
+      go(index, 'instant');
+    };
+
+    const enter = () => {
+      root.dataset.stageReady = '';
+      addEventListener('scroll', onScroll, { passive: true });
+      addEventListener('resize', onScroll, { passive: true });
+      root.addEventListener('click', onRail);
+      root.addEventListener('focusin', onFocus);
+      target = shown = shape(rawPosition());
+      root.style.setProperty('--p', shown.toFixed(4));
+      mark(Math.round(target));
+    };
+
+    const leave = () => {
+      delete root.dataset.stageReady;
+      removeEventListener('scroll', onScroll);
+      removeEventListener('resize', onScroll);
+      root.removeEventListener('click', onRail);
+      root.removeEventListener('focusin', onFocus);
+      cancelAnimationFrame(frame);
+      frame = 0;
+      root.style.setProperty('--p', '0');
+      mark(0);
+    };
+
+    const sync = () => {
+      if (stageable.matches && root.dataset.stageReady === undefined) enter();
+      else if (!stageable.matches && root.dataset.stageReady !== undefined) leave();
+    };
+
+    // The stage styles arrive after the page has loaded; the stage switches on when they apply.
+    const addStyles = () => {
+      const sheet = document.createElement('link');
+      sheet.rel = 'stylesheet';
+      sheet.href = stageStyles;
+      sheet.addEventListener('load', () => {
+        sync();
+        stageable.addEventListener('change', sync);
+      });
+      document.head.append(sheet);
+    };
+    if (document.readyState === 'complete') addStyles();
+    else addEventListener('load', addStyles, { once: true });
+  }
+</script>

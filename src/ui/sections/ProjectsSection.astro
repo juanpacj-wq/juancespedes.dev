@@ -1,13 +1,14 @@
 ---
 import type { Project } from '../../domain/project/project';
 import type { Dictionary } from '../i18n/dictionary';
+import Container from '../primitives/Container.astro';
 import ProjectCard from '../project/ProjectCard.astro';
-import Section from '../primitives/Section.astro';
+import ProjectStage from '../project/ProjectStage.astro';
 
 /**
- * Projects as cards that open their own page. Featured projects get the wide case-study card
- * with their figures; the rest share a grid of smaller cards. Both lists keep the display order
- * set in the content (`order`).
+ * Projects that open their own page. Featured projects play one at a time on the pinned stage
+ * (ProjectStage); the rest share a grid of smaller cards below it. Both lists keep the display
+ * order set in the content (`order`).
  */
 interface Props {
   t: Dictionary;
@@ -19,36 +20,42 @@ const featured = projects.filter((project) => project.featured);
 const others = projects.filter((project) => !project.featured);
 ---
 
-<Section id="projects" title={t.projects.featuredTitle}>
-  <p slot="description">{t.projects.description}</p>
-
+<section id="projects" aria-labelledby="projects-title" class="scroll-mt-24 py-20 sm:py-28">
   {projects.length === 0 ? (
-    <p class="rounded-card border border-dashed border-line-strong p-8 text-muted">
-      {t.projects.empty}
-    </p>
+    <Container>
+      <h2 id="projects-title" class="mb-12 font-display text-heading font-light text-balance">
+        {t.projects.featuredTitle}
+      </h2>
+      <p class="rounded-card border border-dashed border-line-strong p-8 text-muted">
+        {t.projects.empty}
+      </p>
+    </Container>
   ) : (
-    <div class="flex flex-col gap-8 lg:gap-12">
-      {featured.map((project, index) => (
-        <ProjectCard t={t} project={project} tone={index % 2 === 0 ? 'accent' : 'success'} />
-      ))}
+    <>
+      <ProjectStage t={t} projects={featured} headingId="projects-title" />
 
       {others.length > 0 && (
-        <section aria-labelledby="more-projects-title" class="flex flex-col gap-6 pt-8">
-          <h3 id="more-projects-title" class="font-display text-title font-light text-ink">
-            {t.projects.moreTitle}
-          </h3>
-          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {others.map((project, index) => (
-              <ProjectCard
-                t={t}
-                project={project}
-                variant="compact"
-                tone={index % 2 === 0 ? 'success' : 'accent'}
-              />
-            ))}
-          </div>
-        </section>
+        <Container class="pt-16 lg:pt-24">
+          <section aria-labelledby="more-projects-title" class="flex scroll-mt-24 flex-col gap-6">
+            <h3
+              id="more-projects-title"
+              class="scroll-mt-24 font-display text-title font-light text-ink"
+            >
+              {t.projects.moreTitle}
+            </h3>
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {others.map((project, index) => (
+                <ProjectCard
+                  t={t}
+                  project={project}
+                  variant="compact"
+                  tone={index % 2 === 0 ? 'success' : 'accent'}
+                />
+              ))}
+            </div>
+          </section>
+        </Container>
       )}
-    </div>
+    </>
   )}
-</Section>
+</section>

@@ -59,6 +59,10 @@ nodes and flows as text, and `case-study-motion.ts` adds the wires, highlights a
 walk on top. Motion on these pages is scroll-driven CSS plus that one deferred script, and no
 starting state lowers text contrast ([ADR 0021](adr/0021-case-study-redesign.md)).
 
+Home page projects: `ProjectStage` pins the featured case studies on wide screens and brings one
+in over the other as the visitor scrolls, from a single `--p` property; phones and reduced motion
+keep a list ([ADR 0028](adr/0028-pinned-project-stage.md)).
+
 Impact (`src/ui/impact`): `AchievementCard` is a bevelled card with a kind and place rule, a
 figure in the tone of the win (verdigris for security and reliability, ochre for speed and savings)
 and its source; `AchievementChart` draws a before and after, a breakdown or progress as bars that
