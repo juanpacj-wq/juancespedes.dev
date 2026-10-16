@@ -15,6 +15,7 @@ import { SUPPORTED_LOCALES, type Locale } from '../../domain/shared/locale';
 import { dictionaryFor } from '../i18n/dictionary';
 import {
   alternatesFor,
+  homePath,
   notesPath,
   nowPath,
   ogImagePath,
@@ -129,7 +130,7 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
     </a>
     <SiteHeader
       t={t}
-      homeHref={alternates ? alternates[locale] : '/'}
+      homeHref={homePath(locale)}
       navItems={navItems}
       switchTo={switchTo}
       chatLabel={PUBLIC_CHAT_ENABLED ? t.chat.open : null}
