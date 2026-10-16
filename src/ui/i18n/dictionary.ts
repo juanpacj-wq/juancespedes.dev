@@ -83,19 +83,11 @@ const es = {
     title: 'Sobre mí',
     paragraphs: [
       'Trabajo por entregables, a precio fijo y en remoto. Me gusta que el resultado se pueda medir: menos horas manuales, menos errores y datos a tiempo.',
-      'Ingeniero de sistemas de la Universidad del Norte, con matrícula profesional COPNIA.',
     ],
     localTime: 'Hora local',
-    card: {
-      label: 'Ficha',
-      timezone: 'Barranquilla · UTC−5',
-      facts: [
-        ['Modalidad', 'Remoto, por entregables'],
-        ['Idiomas', 'Español · Inglés C2'],
-        ['Construyendo desde', '2020'],
-        ['Respuesta', 'Menos de 24 h hábiles'],
-      ],
-    },
+    experience: 'Experiencia',
+    education: 'Formación',
+    basedIn: 'Barranquilla, Colombia · hora local',
   },
   projects: {
     empty: 'Todavía no hay proyectos publicados con esa capacidad.',
@@ -415,19 +407,11 @@ const en: Dictionary = {
     title: 'About',
     paragraphs: [
       'I work per deliverable, at a fixed price and remotely. I like results you can measure: fewer manual hours, fewer errors and data on time.',
-      'Systems engineer from Universidad del Norte, with a professional license (COPNIA).',
     ],
     localTime: 'Local time',
-    card: {
-      label: 'Profile',
-      timezone: 'Barranquilla · UTC−5',
-      facts: [
-        ['Works', 'Remote, per deliverable'],
-        ['Languages', 'Spanish · English C2'],
-        ['Building since', '2020'],
-        ['Replies', 'Within one business day'],
-      ],
-    },
+    experience: 'Experience',
+    education: 'Education',
+    basedIn: 'Barranquilla, Colombia · local time',
   },
   projects: {
     empty: 'No published projects with that capability yet.',

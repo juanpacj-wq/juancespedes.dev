@@ -58,7 +58,7 @@ const jsonLd = homeGraph({
 >
   <HeroSection t={t} locale={locale} />
   <ProjectsSection t={t} projects={projects} />
-  <AboutSection t={t} />
+  <AboutSection t={t} experience={profile.experience} education={profile.education} />
   <CapabilitiesSection t={t} matrix={matrix} />
   <ImpactSection t={t} locale={locale} achievements={achievements} />
   <ServicesSection
