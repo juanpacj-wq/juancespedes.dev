@@ -145,33 +145,88 @@ test.describe('hero headline', () => {
   });
 });
 
-test.describe('project cards', () => {
-  test('featured cases get the wide card and the rest share a grid', async ({ page }) => {
+test.describe('projects', () => {
+  test('featured cases play on the stage and the rest share a grid', async ({ page }) => {
     await page.goto('/#projects');
-    await expect(page.locator('#projects .project-card--feature')).toHaveCount(5);
+    await expect(page.locator('#projects [data-stage-slide]')).toHaveCount(5);
     await expect(page.locator('#projects .project-card--compact')).toHaveCount(3);
-    // One link per card, named by the project's title.
-    const card = page.locator('#project-operations-logbook');
-    await expect(card.getByRole('link')).toHaveCount(1);
-    await expect(card.getByRole('link')).toHaveAccessibleName(/Bitácora digital de operación/);
+    // One link per project, named by the project's title.
+    const slide = page.locator('#project-operations-logbook');
+    await expect(slide.getByRole('link')).toHaveCount(1);
+    await expect(slide.getByRole('link')).toHaveAccessibleName(/Bitácora digital de operación/);
   });
 
-  test('a click anywhere on a card opens its case study', async ({ page }) => {
-    // The click goes to coordinates: with smooth scrolling and the cards' reveal the box is read
-    // while the card still moves, and on WebKit the click landed beside it. Reduced motion keeps
-    // the link that covers the card.
+  test('a click anywhere on a project opens its case study', async ({ page }) => {
+    // Reduced motion keeps the projects as a list, so the click lands on a still box.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/#projects');
-    // On the screen drawing, away from the title: the link covers the whole card.
-    const stage = page.locator('#project-plant-telemetry .project-card-stage');
-    await stage.scrollIntoViewIfNeeded();
-    const box = await stage.boundingBox();
-    if (!box) throw new Error('card not laid out');
+    // On the screenshot, away from the title: the link covers the whole project.
+    const shot = page.locator('#project-plant-telemetry .project-stage-shot');
+    await shot.scrollIntoViewIfNeeded();
+    const box = await shot.boundingBox();
+    if (!box) throw new Error('project not laid out');
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     await expect(page).toHaveURL(/\/proyectos\/plant-telemetry$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Telemetría de generación eléctrica en tiempo real',
     );
+  });
+
+  test.describe('the pinned stage', () => {
+    test.skip(({ isMobile }) => isMobile, 'Phones keep the projects as a list');
+
+    const stage = (page: Page) => page.locator('[data-project-stage]');
+    const current = (page: Page) =>
+      page.getByRole('navigation', { name: 'Ir a un caso de estudio' }).locator('[aria-current]');
+    /** Whether a project's title sits inside the stage's visible frame (it clips the others). */
+    const onStage = (page: Page, slug: string) =>
+      page.evaluate((id) => {
+        const frame = document.querySelector('.project-stage-slides')?.getBoundingClientRect();
+        const title = document.querySelector(`#project-${id} h3`)?.getBoundingClientRect();
+        if (!frame || !title) return false;
+        return (
+          title.top >= frame.top &&
+          title.bottom <= frame.bottom &&
+          frame.top >= 0 &&
+          frame.bottom <= innerHeight
+        );
+      }, slug);
+
+    test.beforeEach(async ({ page }) => {
+      await page.goto('/');
+      await expect(stage(page)).toHaveAttribute('data-stage-ready', '');
+    });
+
+    test('scrolling past it brings the next project on instead of moving the page', async ({
+      page,
+    }) => {
+      await stage(page).evaluate((root: HTMLElement) => {
+        // Halfway through the section: the third of five projects, holding still.
+        const span = root.offsetHeight - innerHeight;
+        scrollTo({
+          top: root.getBoundingClientRect().top + scrollY + span * 0.5,
+          behavior: 'instant',
+        });
+      });
+      await expect(current(page)).toHaveAccessibleName(/Portal corporativo bilingüe/);
+      await expect(page.locator('[data-stage-counter]')).toHaveText('03 / 05');
+      // The section is pinned: its title stays in view while the projects change.
+      await expect(page.locator('#projects-title')).toBeInViewport();
+    });
+
+    test('the rail jumps to a project and the stage shows it', async ({ page }) => {
+      const rail = page.getByRole('navigation', { name: 'Ir a un caso de estudio' });
+      await rail.scrollIntoViewIfNeeded();
+      await rail.getByRole('link', { name: /Rescate de un ETL/ }).click();
+      await expect(current(page)).toHaveAccessibleName(/Rescate de un ETL/);
+      await expect.poll(() => onStage(page, 'invoice-etl-rescue')).toBe(true);
+    });
+
+    test('focus on a project that waits off the stage brings it on', async ({ page }) => {
+      await page.locator('#project-juancespedes-dev').getByRole('link').focus();
+      await expect(current(page)).toHaveAccessibleName(/Este portafolio/);
+      await expect.poll(() => onStage(page, 'juancespedes-dev')).toBe(true);
+    });
   });
 });
 

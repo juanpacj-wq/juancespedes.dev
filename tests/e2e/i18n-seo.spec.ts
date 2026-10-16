@@ -88,6 +88,8 @@ test.describe('bilingual site and SEO', () => {
   });
 
   test('the English home page is complete and links within English', async ({ page }) => {
+    // Reduced motion keeps the projects as a list, so a project link is clicked where it stands.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/en');
     await expect(page.locator('main h2')).toHaveText([
       'Featured case studies',
@@ -98,10 +100,10 @@ test.describe('bilingual site and SEO', () => {
       'Education and certifications',
       'Tell me what you need',
     ]);
-    const esCards = await page.request
+    const esProjects = await page.request
       .get('/')
-      .then(async (r) => (await r.text()).match(/<article[^>]*data-tilt/g)?.length);
-    await expect(page.locator('#projects article[data-tilt]')).toHaveCount(esCards ?? 0);
+      .then(async (r) => (await r.text()).match(/<article[^>]*id="project-/g)?.length);
+    await expect(page.locator('#projects article[id^="project-"]')).toHaveCount(esProjects ?? 0);
 
     await page.locator('#project-plant-telemetry').getByRole('link').click();
     await expect(page).toHaveURL(/\/en\/projects\/plant-telemetry$/);

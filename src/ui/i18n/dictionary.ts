@@ -99,6 +99,9 @@ const es = {
     moreTitle: 'Más proyectos',
     viewCase: 'Ver caso de estudio',
     viewProject: 'Ver proyecto',
+    stageHint: 'Desplázate para recorrerlos · haz clic en uno para abrirlo',
+    stageRail: 'Ir a un caso de estudio',
+    moreLink: 'Ver más proyectos',
   },
   capabilities: {
     eyebrow: 'Capacidades',
@@ -443,6 +446,9 @@ const en: Dictionary = {
     moreTitle: 'More projects',
     viewCase: 'View case study',
     viewProject: 'View project',
+    stageHint: 'Scroll to browse · click one to open it',
+    stageRail: 'Go to a case study',
+    moreLink: 'See more projects',
   },
   capabilities: {
     eyebrow: 'Capabilities',

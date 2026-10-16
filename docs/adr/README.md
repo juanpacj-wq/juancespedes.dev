@@ -32,5 +32,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0025](0025-business-impact-section.md)                   | Business impact instead of a CV-style history                            | Accepted |
 | [0026](0026-stack-by-area.md)                             | The capabilities section as a stack of logos by area                     | Accepted |
 | [0027](0027-sharp-screenshots-and-responsive-captures.md) | Sharp screenshots, and phone and tablet captures beside them             | Accepted |
+| [0028](0028-pinned-project-stage.md)                      | Featured projects on a pinned stage                                      | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.
