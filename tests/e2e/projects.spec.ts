@@ -268,6 +268,15 @@ test.describe('project pages', () => {
     await expect(page).toHaveURL(/\/proyectos\/operations-logbook$/);
   });
 
+  test('the logo leads home from any page, in its language', async ({ page }) => {
+    await page.goto('/proyectos/plant-telemetry');
+    await page.getByRole('banner').getByRole('link', { name: 'juancespedes.dev' }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await page.goto('/en/projects/plant-telemetry');
+    await page.getByRole('banner').getByRole('link', { name: 'juancespedes.dev' }).click();
+    await expect(page).toHaveURL(/\/en$/);
+  });
+
   test('the back link returns to the project list', async ({ page }) => {
     await page.goto('/proyectos/linkedin-pilot');
     await page.getByRole('link', { name: 'Todos los proyectos' }).click();

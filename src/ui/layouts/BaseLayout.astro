@@ -1,8 +1,7 @@
 ---
 import '@fontsource-variable/geist-mono';
-import '@fontsource-variable/hanken-grotesk';
 
-import textFont from '@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2?url';
+import textFont from '../../assets/fonts/overused-grotesk-latin.woff2?url';
 import '../styles/global.css';
 
 import {
@@ -16,6 +15,7 @@ import { SUPPORTED_LOCALES, type Locale } from '../../domain/shared/locale';
 import { dictionaryFor } from '../i18n/dictionary';
 import {
   alternatesFor,
+  homePath,
   notesPath,
   nowPath,
   ogImagePath,
@@ -130,7 +130,7 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
     </a>
     <SiteHeader
       t={t}
-      homeHref={alternates ? alternates[locale] : '/'}
+      homeHref={homePath(locale)}
       navItems={navItems}
       switchTo={switchTo}
       chatLabel={PUBLIC_CHAT_ENABLED ? t.chat.open : null}

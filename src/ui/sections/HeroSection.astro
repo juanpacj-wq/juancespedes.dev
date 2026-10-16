@@ -185,6 +185,12 @@ const { roles } = t.hero;
     mask-image: linear-gradient(to bottom, black 62%, transparent 100%);
   }
 
+  /* Dark glyphs on a light ground carry less weight than light ones on dark: the light theme
+     shows the painting at more strength, so it reads with the lamp off and with the light on. */
+  :global(:root[data-theme='light']) .hero-art :global(.ascii-canvas) {
+    opacity: 0.8;
+  }
+
   .hero-art :global(figcaption) {
     position: absolute;
     inset-inline: max(1rem, (100% - 80rem) / 2 + 2rem);

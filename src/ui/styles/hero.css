@@ -4,18 +4,19 @@
  */
 
 @layer components {
-  /* A little more room between lines than the display default, so accents and descenders of
-     the rotating role stay inside its one-line window. */
+  /* A little more room between lines than the display default. */
   .hero-title {
     /* A step under the display size, so "ingeniero de automatización" holds one line on laptops. */
     font-size: clamp(2.75rem, 1.6rem + 4vw, 5.5rem);
     line-height: 1.1;
   }
 
-  /* Prefix and ticker share a centred line and wrap onto two on narrow screens. */
+  /* Prefix and ticker share a centred line and wrap onto two on narrow screens. Centring them
+     vertically keeps their baselines together although the ticker's window is taller. */
   .role-line {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
     column-gap: 0.25em;
   }
@@ -29,11 +30,14 @@
   }
 
   /* One line tall; the column of roles slides through it. Its width is the widest role, so the
-     change of role never moves anything else on the page. */
+     change of role never moves anything else on the page. The window's line is taller than the
+     title's: the grotesk's descenders ("engineer", "ingeniero") reach further than the title's
+     line box, and a shorter window would cut them and show the role above at its top edge. */
   .role-ticker {
     display: inline-block;
     height: 1lh;
     overflow: clip;
+    line-height: 1.5;
   }
 
   .role-ticker-item {

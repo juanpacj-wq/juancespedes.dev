@@ -31,7 +31,7 @@
   --accent-ink: light-dark(#9a4b0c, #e8a33a);
   --on-accent: light-dark(#14110d, #14110d);
   --success: light-dark(#0f766e, #5cc2a8);
-  --ascii: light-dark(#a8540f, #e8a33a);
+  --ascii: light-dark(#8a4a12, #e8a33a);
   --bevel: light-dark(#000000, #ffffff);
   --shadow-tint: light-dark(#6b6259, #000000);
   /* Specular light on glass (the chat button): white in both themes, never text. */
@@ -82,10 +82,9 @@
 }
 
 @theme {
-  /* One grotesk for headings and text (ADR 0029); Geist Mono for data, labels and the hero art. */
-  --font-display:
-    'Hanken Grotesk Variable', 'Hanken Fallback', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Hanken Grotesk Variable', 'Hanken Fallback', ui-sans-serif, system-ui, sans-serif;
+  /* One grotesk for headings and text (ADR 0030); Geist Mono for data, labels and the hero art. */
+  --font-display: 'Overused Grotesk', 'Overused Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Overused Grotesk', 'Overused Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
 
   /* Fluid type scale: grows with the viewport between 360 px and 1280 px. */
@@ -108,10 +107,10 @@
   /* Display and heading are set tight and medium weight, the way a grotesk carries a headline. */
   --text-heading: clamp(2.25rem, 1.5rem + 3vw, 4.5rem);
   --text-heading--line-height: 1;
-  --text-heading--letter-spacing: -0.04em;
+  --text-heading--letter-spacing: -0.035em;
   --text-display: clamp(2.75rem, 1.6rem + 5vw, 6.5rem);
   --text-display--line-height: 0.98;
-  --text-display--letter-spacing: -0.045em;
+  --text-display--letter-spacing: -0.04em;
 
   --radius-chip: 999px;
   --radius-control: 0.625rem;
@@ -129,17 +128,33 @@
   --container-page: 120rem;
 }
 
+/* ---------- Text face ---------- */
+
 /*
- * Arial resized to Hanken Grotesk's metrics (size and line box, measured with @capsizecss/unpack),
- * so text keeps its lines when the font arrives and nothing below it moves: no layout shift
- * without making every page wait for the font. Liberation Sans and Arimo share Arial's metrics.
+ * Overused Grotesk (OFL, src/assets/fonts/OVERUSED-GROTESK-OFL.txt), the open-source answer to
+ * PP Neue Montreal (ADR 0030). Cut down to what the site sets: upright only, weights 300 to 900,
+ * Latin and the punctuation the copy uses. 34 kB.
  */
 @font-face {
-  font-family: 'Hanken Fallback';
+  font-family: 'Overused Grotesk';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 900;
+  src: url('../../assets/fonts/overused-grotesk-latin.woff2') format('woff2');
+}
+
+/*
+ * Arial resized to Overused Grotesk's metrics (size and line box, measured with
+ * @capsizecss/unpack), so text keeps its lines when the font arrives and nothing below it moves:
+ * no layout shift without making every page wait for the font. Liberation Sans and Arimo share
+ * Arial's metrics.
+ */
+@font-face {
+  font-family: 'Overused Fallback';
   src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('Arimo');
-  size-adjust: 100.94%;
-  ascent-override: 99.07%;
-  descent-override: 30.02%;
+  size-adjust: 91.3%;
+  ascent-override: 109.53%;
+  descent-override: 38.34%;
   line-gap-override: 0%;
 }
 

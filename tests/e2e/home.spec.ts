@@ -217,9 +217,9 @@ test.describe('projects', () => {
     test('the rail jumps to a project and the stage shows it', async ({ page }) => {
       const rail = page.getByRole('navigation', { name: 'Ir a un caso de estudio' });
       await rail.scrollIntoViewIfNeeded();
-      await rail.getByRole('link', { name: /Rescate de un ETL/ }).click();
-      await expect(current(page)).toHaveAccessibleName(/Rescate de un ETL/);
-      await expect.poll(() => onStage(page, 'invoice-etl-rescue')).toBe(true);
+      await rail.getByRole('link', { name: /Plataforma de un foro/ }).click();
+      await expect(current(page)).toHaveAccessibleName(/Plataforma de un foro/);
+      await expect.poll(() => onStage(page, 'event-platform')).toBe(true);
     });
 
     test('focus on a project that waits off the stage brings it on', async ({ page }) => {

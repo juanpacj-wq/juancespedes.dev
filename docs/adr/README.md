@@ -34,5 +34,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0027](0027-sharp-screenshots-and-responsive-captures.md) | Sharp screenshots, and phone and tablet captures beside them             | Accepted |
 | [0028](0028-pinned-project-stage.md)                      | Featured projects on a pinned stage                                      | Accepted |
 | [0029](0029-wide-clean-layout.md)                         | A wide, quieter layout with one grotesk                                  | Accepted |
+| [0030](0030-overused-grotesk.md)                          | Overused Grotesk, chosen from what 2026 sites use                        | Accepted |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.
