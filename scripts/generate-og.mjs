@@ -17,12 +17,15 @@ const PROJECTS = join(ROOT, 'content', 'projects');
 const NOTES = join(ROOT, 'content', 'notes');
 const LOCALES = /** @type {const} */ (['es', 'en']);
 
-const FONT_DIR = join(ROOT, 'node_modules', 'geist', 'dist', 'fonts');
+// Hanken Grotesk ships as static TTFs in scripts/assets/fonts (OFL): resvg reads TrueType, and the
+// npm packages only carry web fonts. Geist Mono still comes from the geist package.
+const MONO_DIR = join(ROOT, 'node_modules', 'geist', 'dist', 'fonts', 'geist-mono');
+const TEXT_DIR = join(ROOT, 'scripts', 'assets', 'fonts');
 const fontFiles = [
-  join(FONT_DIR, 'geist-sans', 'Geist-Regular.ttf'),
-  join(FONT_DIR, 'geist-sans', 'Geist-SemiBold.ttf'),
-  join(FONT_DIR, 'geist-mono', 'GeistMono-Regular.ttf'),
-  join(FONT_DIR, 'geist-mono', 'GeistMono-Medium.ttf'),
+  join(TEXT_DIR, 'HankenGrotesk-Regular.ttf'),
+  join(TEXT_DIR, 'HankenGrotesk-SemiBold.ttf'),
+  join(MONO_DIR, 'GeistMono-Regular.ttf'),
+  join(MONO_DIR, 'GeistMono-Medium.ttf'),
 ];
 
 /** @param {string} path */
@@ -35,7 +38,7 @@ const frontmatter = (path) => {
 /** @param {string} relativePath @param {Parameters<typeof cardSvg>[0]} card */
 const write = (relativePath, card) => {
   const png = new Resvg(cardSvg(card), {
-    font: { fontFiles, loadSystemFonts: false, defaultFontFamily: 'Geist' },
+    font: { fontFiles, loadSystemFonts: false, defaultFontFamily: 'Hanken Grotesk' },
   })
     .render()
     .asPng();
