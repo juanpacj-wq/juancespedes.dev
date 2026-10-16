@@ -154,11 +154,11 @@
   project: operations-logbook
   value: { es: '97 %', en: '97%' }
   title:
-    es: Hallazgos de seguridad cerrados en la bitácora de dos plantas
-    en: Security findings closed in a two-plant logbook
+    es: Hallazgos de seguridad cerrados en la bitácora de cuatro plantas
+    en: Security findings closed in a four-plant logbook
   summary:
-    es: La bitácora digital que reemplazó los libros de Excel de dos plantas térmicas pasó por una auditoría de seguridad, y cerré 38 de sus 39 hallazgos.
-    en: The digital logbook that replaced the Excel books of two thermal plants went through a security audit, and I closed 38 of its 39 findings.
+    es: La bitácora digital que reemplazó los libros de Excel de cuatro plantas de generación pasó por una auditoría de seguridad, y cerré 38 de sus 39 hallazgos.
+    en: The digital logbook that replaced the Excel books of four power plants went through a security audit, and I closed 38 of its 39 findings.
   context: { es: Bitácora de operación, en: Operations logbook }
   source:
     es: Informe interno de auditoría de seguridad, 2026

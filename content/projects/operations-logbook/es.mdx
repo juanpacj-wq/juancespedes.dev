@@ -1,6 +1,6 @@
 ---
 kind: case-study
-title: Bitácora digital de operación para dos plantas térmicas
+title: Bitácora digital de operación para cuatro plantas de generación
 summary: Reemplacé los libros de Excel de los turnos de operación por una aplicación web en tiempo real. Los reportes oficiales se generan desde los datos y el código tiene más de 1.400 pruebas automatizadas.
 role: Ingeniero full-stack, único desarrollador (diseño, backend, frontend, base de datos, despliegue)
 period: { start: '2026-03', end: null }
@@ -41,7 +41,7 @@ story:
       after: 'Al cerrar el turno, la aplicación guarda quiénes lo conformaban y ese registro ya no cambia.'
     - before: 'El reporte oficial del día se armaba copiando celdas.'
       after: 'El reporte se genera desde los datos, con el formato de la plantilla oficial.'
-problem: El personal de operación de dos plantas térmicas llevaba sus bitácoras de turno en libros de Excel. La información quedaba repartida entre archivos, el cierre de turno dependía de la disciplina de cada persona y los reportes oficiales del día se armaban a mano copiando celdas.
+problem: El personal de operación de cuatro plantas de generación llevaba sus bitácoras de turno en libros de Excel. La información quedaba repartida entre archivos, el cierre de turno dependía de la disciplina de cada persona y los reportes oficiales del día se armaban a mano copiando celdas.
 responsibilities:
   - Levanté los requisitos con jefes de turno, ingenieros de operación y químicos, y los convertí en un modelo de dominio con turnos, bitácoras y permisos por cargo.
   - Diseñé y construí el frontend, el backend, la base de datos y la integración con el inicio de sesión corporativo.
@@ -126,7 +126,7 @@ architecture:
     - { from: api, to: excel-report, label: 'Arma el libro del día' }
     - { from: dashboard, to: api, label: 'Consulta eventos por periodo' }
 outcomes:
-  - Las dos plantas registran sus turnos en la aplicación, con el historial de cada turno congelado al cerrarlo.
+  - Las cuatro plantas registran sus turnos en la aplicación, con el historial de cada turno congelado al cerrarlo.
   - El reporte oficial del día se genera desde los datos con el formato de la plantilla.
   - El tablero de generación consume los eventos de la bitácora por un contrato con pruebas, sin acceder a sus tablas.
 lessons:

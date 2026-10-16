@@ -7,7 +7,7 @@ experience:
     highlights:
       - Put 6 web systems of my own into production, used by operations, procurement, communications and finance.
       - Rebuilt the bilingual corporate website (134 pages) to WCAG 2.2 AA, with automatic-rollback deployments.
-      - Built the digital operations logbook for two thermal power plants and real-time generation telemetry.
+      - Built the digital operations logbook for four power plants and real-time generation telemetry.
       - Rescued a legacy e-invoicing ETL pipeline without stopping operations.
       - My work passed an external penetration test with only 3 low-severity findings.
 
