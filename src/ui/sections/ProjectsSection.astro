@@ -23,7 +23,10 @@ const others = projects.filter((project) => !project.featured);
 <section id="projects" aria-labelledby="projects-title" class="scroll-mt-24 py-20 sm:py-28">
   {projects.length === 0 ? (
     <Container>
-      <h2 id="projects-title" class="mb-12 font-display text-heading font-light text-balance">
+      <h2
+        id="projects-title"
+        class="mb-12 border-t border-line pt-6 font-display text-heading font-medium text-balance"
+      >
         {t.projects.featuredTitle}
       </h2>
       <p class="rounded-card border border-dashed border-line-strong p-8 text-muted">
@@ -36,21 +39,16 @@ const others = projects.filter((project) => !project.featured);
 
       {others.length > 0 && (
         <Container class="pt-16 lg:pt-24">
-          <section aria-labelledby="more-projects-title" class="flex scroll-mt-24 flex-col gap-6">
+          <section aria-labelledby="more-projects-title" class="flex flex-col gap-8">
             <h3
               id="more-projects-title"
-              class="scroll-mt-24 font-display text-title font-light text-ink"
+              class="scroll-mt-24 border-t border-line pt-6 text-title font-medium text-ink"
             >
               {t.projects.moreTitle}
             </h3>
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {others.map((project, index) => (
-                <ProjectCard
-                  t={t}
-                  project={project}
-                  variant="compact"
-                  tone={index % 2 === 0 ? 'success' : 'accent'}
-                />
+            <div class="grid gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+              {others.map((project) => (
+                <ProjectCard t={t} project={project} />
               ))}
             </div>
           </section>

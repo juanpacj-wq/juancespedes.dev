@@ -27,8 +27,6 @@ const { t, locale, services, process, currency, pricing } = Astro.props;
 ---
 
 <Section id="services" title={t.services.title}>
-  <p slot="description">{t.services.description}</p>
-
   <ul class="grid gap-4 lg:grid-cols-3">
     {services.map((service, index) => (
       <li class="reveal flex">
@@ -119,7 +117,7 @@ const { t, locale, services, process, currency, pricing } = Astro.props;
     {pricing} {t.services.currencyNote}
   </p>
 
-  <h3 class="mt-20 mb-8 font-display text-title font-light sm:text-heading">
+  <h3 class="mt-24 mb-8 border-t border-line pt-6 text-title font-medium">
     {t.services.processTitle}
   </h3>
   <ol class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

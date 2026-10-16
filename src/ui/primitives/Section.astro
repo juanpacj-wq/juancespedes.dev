@@ -2,10 +2,11 @@
 import Container from './Container.astro';
 
 /**
- * A titled page section with a serif heading. The heading level is configurable so the page
- * outline stays correct wherever the section is used. The optional eyebrow is reserved for
- * reference pages whose sections really are a sequence (the design system); the home page does
- * not label every section (ADR 0018).
+ * A titled page section. The header is one line across the page: a hairline on top, a short
+ * title on the left and, when the section needs one, a brief note on the right (ADR 0029). The
+ * heading level is configurable so the page outline stays correct wherever the section is used.
+ * The optional eyebrow is reserved for reference pages whose sections really are a sequence (the
+ * design system); the home page does not label every section (ADR 0018).
  */
 interface Props {
   id: string;
@@ -26,17 +27,17 @@ const headingId = `${id}-title`;
   class:list={['scroll-mt-24 py-20 sm:py-28', className]}
 >
   <Container>
-    <header class="reveal mb-12 max-w-3xl">
-      {eyebrow && (
-        <p class="mb-3 font-mono text-eyebrow tracking-widest text-accent-ink uppercase">
-          {eyebrow}
-        </p>
-      )}
-      <Heading id={headingId} class="font-display text-heading font-light text-balance">
-        {title}
-      </Heading>
+    <header class="reveal mb-10 grid gap-4 border-t border-line pt-6 sm:mb-14 lg:grid-cols-12 lg:gap-10">
+      <div class="flex flex-col gap-3 lg:col-span-8">
+        {eyebrow && (
+          <p class="font-mono text-eyebrow tracking-widest text-accent-ink uppercase">{eyebrow}</p>
+        )}
+        <Heading id={headingId} class="font-display text-heading font-medium text-balance">
+          {title}
+        </Heading>
+      </div>
       {Astro.slots.has('description') && (
-        <div class="mt-5 max-w-2xl text-lead text-pretty text-muted">
+        <div class="max-w-md text-body text-pretty text-muted lg:col-span-4 lg:justify-self-end lg:pt-2">
           <slot name="description" />
         </div>
       )}

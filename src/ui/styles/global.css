@@ -82,8 +82,10 @@
 }
 
 @theme {
-  --font-display: 'Literata Display', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --font-sans: 'Geist Variable', 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
+  /* One grotesk for headings and text (ADR 0029); Geist Mono for data, labels and the hero art. */
+  --font-display:
+    'Hanken Grotesk Variable', 'Hanken Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Hanken Grotesk Variable', 'Hanken Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
 
   /* Fluid type scale: grows with the viewport between 360 px and 1280 px. */
@@ -98,17 +100,18 @@
   --text-title: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
   --text-title--line-height: 1.3;
   --text-quote: clamp(1.375rem, 1.1rem + 1.1vw, 2rem);
-  --text-quote--line-height: 1.3;
+  --text-quote--line-height: 1.25;
+  --text-quote--letter-spacing: -0.02em;
   --text-price: 2.25rem;
   --text-price--line-height: 1;
   --text-price--letter-spacing: -0.025em;
-  /* Display and heading are set in the serif (font-display), light weight. */
-  --text-heading: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);
-  --text-heading--line-height: 1.04;
-  --text-heading--letter-spacing: -0.015em;
-  --text-display: clamp(2.75rem, 1.7rem + 4.2vw, 5.25rem);
-  --text-display--line-height: 1.02;
-  --text-display--letter-spacing: -0.02em;
+  /* Display and heading are set tight and medium weight, the way a grotesk carries a headline. */
+  --text-heading: clamp(2.25rem, 1.5rem + 3vw, 4.5rem);
+  --text-heading--line-height: 1;
+  --text-heading--letter-spacing: -0.04em;
+  --text-display: clamp(2.75rem, 1.6rem + 5vw, 6.5rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.045em;
 
   --radius-chip: 999px;
   --radius-control: 0.625rem;
@@ -121,33 +124,22 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   --breakpoint-xs: 25rem;
-}
 
-/* ---------- Display face ---------- */
-
-/*
- * Literata (OFL, src/assets/fonts/LITERATA-OFL.txt), cut down to what headings need: the
- * display optical size, weights 300 to 500 and Latin. 43 kB instead of 110 kB (ADR 0018).
- */
-@font-face {
-  font-family: 'Literata Display';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 300 500;
-  src: url('../../assets/fonts/literata-display.woff2') format('woff2');
+  /* Page width: content reaches the edges on wide screens, as the references do (ADR 0029). */
+  --container-page: 120rem;
 }
 
 /*
- * Arial resized to Geist's metrics (size and line box, measured with @capsizecss/unpack), so text
- * keeps its lines when Geist arrives and nothing below it moves: no layout shift without making
- * every page wait for the font. Liberation Sans and Arimo share Arial's metrics.
+ * Arial resized to Hanken Grotesk's metrics (size and line box, measured with @capsizecss/unpack),
+ * so text keeps its lines when the font arrives and nothing below it moves: no layout shift
+ * without making every page wait for the font. Liberation Sans and Arimo share Arial's metrics.
  */
 @font-face {
-  font-family: 'Geist Fallback';
+  font-family: 'Hanken Fallback';
   src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('Arimo');
-  size-adjust: 104.76%;
-  ascent-override: 95.94%;
-  descent-override: 28.16%;
+  size-adjust: 100.94%;
+  ascent-override: 99.07%;
+  descent-override: 30.02%;
   line-gap-override: 0%;
 }
 
@@ -158,7 +150,6 @@
     background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-feature-settings: 'ss01', 'cv11';
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;

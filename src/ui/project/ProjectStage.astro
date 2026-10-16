@@ -7,7 +7,6 @@ import { formatYears } from '../i18n/format';
 import { projectPath } from '../i18n/routes';
 import Icon from '../icons/Icon.astro';
 import Container from '../primitives/Container.astro';
-import Tag from '../primitives/Tag.astro';
 import { mediaFor } from './media';
 import ScreenPlaceholder from './ScreenPlaceholder.astro';
 import { SCREENSHOT_QUALITY } from './screenshots';
@@ -17,6 +16,9 @@ import { SCREENSHOT_QUALITY } from './screenshots';
  * scrolling no longer moves the page, it brings the next project in over the current one. A rail
  * of thumbnails on the left marks where you are and jumps to a project; the stage on the right
  * holds one project at a time, and clicking it opens the case study.
+ *
+ * Each project shows its screen, its name and its kind and years, nothing else: the summary,
+ * figures and stack are the case study's job, one click away (ADR 0029).
  *
  * Progressive: the markup is a plain list of projects, which is what phones, reduced motion and
  * visits without JavaScript get. The script below loads src/ui/styles/project-stage.css after the
@@ -39,7 +41,7 @@ const { t, projects, headingId } = Astro.props;
 const pad = (value: number) => String(value).padStart(2, '0');
 const total = pad(projects.length);
 
-const SHOT_SIZES = '(min-width: 1024px) 62vw, 92vw';
+const SHOT_SIZES = '(min-width: 1024px) 75vw, 92vw';
 
 const slides = await Promise.all(
   projects.map(async (project, index) => {
@@ -64,9 +66,6 @@ const slides = await Promise.all(
       index,
       number: pad(index + 1),
       href: projectPath(project.locale, project.slug),
-      figures: project.metrics.slice(0, 2),
-      stack: project.stack.slice(0, 4),
-      tone: index % 2 === 0 ? 'accent' : 'success',
       shot,
       thumb,
     };
@@ -81,16 +80,16 @@ const slides = await Promise.all(
   style={`--count: ${String(projects.length)}; --p: 0`}
 >
   <Container class="project-stage-pin">
-    <div class="project-stage-aside mb-12">
-      <header class="max-w-3xl">
-        <h2 id={headingId} class="font-display text-heading font-light text-balance">
-          {t.projects.featuredTitle}
-        </h2>
-        <p class="mt-5 max-w-2xl text-lead text-pretty text-muted">{t.projects.description}</p>
-      </header>
+    <div class="project-stage-aside mb-10 sm:mb-14">
+      <h2
+        id={headingId}
+        class="border-t border-line pt-6 font-display text-heading font-medium text-balance"
+      >
+        {t.projects.featuredTitle}
+      </h2>
 
       <nav class="project-stage-rail hidden" aria-label={t.projects.stageRail}>
-        <ol class="flex flex-col gap-3">
+        <ol class="flex flex-col gap-2">
           {slides.map((slide) => (
             <li>
               <a
@@ -111,8 +110,7 @@ const slides = await Promise.all(
                     />
                   )}
                 </span>
-                <span class="font-mono text-eyebrow text-subtle">{slide.number}</span>
-                <span class="project-stage-rail-name text-small">{slide.project.title}</span>
+                <span class="sr-only">{slide.project.title}</span>
               </a>
             </li>
           ))}
@@ -126,76 +124,20 @@ const slides = await Promise.all(
     </div>
 
     <div class="project-stage-main">
-      <ol class="project-stage-slides flex flex-col gap-8">
+      <ol class="project-stage-slides flex flex-col gap-12">
         {slides.map((slide) => (
           <li
             id={`stage-${slide.project.slug}`}
             class="project-stage-slide scroll-mt-24"
             data-stage-slide
-            data-tone={slide.tone}
             style={`--i: ${String(slide.index)}`}
           >
             <article
               id={`project-${slide.project.slug}`}
-              class="project-stage-card relative isolate flex h-full flex-col overflow-hidden rounded-panel bg-surface shadow-bevel"
+              class="project-stage-card relative isolate flex h-full flex-col gap-4"
             >
-              <div class="flex flex-col gap-6 p-6 sm:p-10 xl:flex-row xl:items-start xl:justify-between">
-                <div class="flex max-w-2xl flex-col gap-3">
-                  <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
-                    <span class="text-accent-ink">
-                      {slide.number} / {total}
-                    </span>{' '}
-                    · {t.kindLabels[slide.project.kind]} · {formatYears(slide.project.period, t)}
-                    {slide.project.confidentiality === 'anonymized' && (
-                      <> · {t.projects.anonymized}</>
-                    )}
-                  </p>
-                  <h3 class="font-display text-quote font-light text-balance text-ink">
-                    <a
-                      href={slide.href}
-                      class="project-stage-link after:absolute after:inset-0 after:z-20"
-                    >
-                      {slide.project.title}
-                    </a>
-                  </h3>
-                  <p class="line-clamp-2 text-pretty text-muted">{slide.project.summary}</p>
-                  {slide.stack.length > 0 && (
-                    <ul class="flex flex-wrap gap-2 pt-1">
-                      {slide.stack.map((name) => (
-                        <li>
-                          <Tag>{name}</Tag>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                <div class="flex shrink-0 flex-col gap-5 xl:items-end">
-                  {slide.figures.length > 0 && (
-                    <dl class="flex gap-8 xl:text-right">
-                      {slide.figures.map((metric) => (
-                        <div class="flex max-w-40 flex-col gap-1">
-                          <dt class="sr-only">{metric.label}</dt>
-                          <dd class="text-price font-medium text-ink">{metric.value}</dd>
-                          <dd class="line-clamp-3 text-small text-muted" aria-hidden="true">
-                            {metric.label}
-                          </dd>
-                        </div>
-                      ))}
-                    </dl>
-                  )}
-                  <span
-                    class="project-stage-cta inline-flex items-center gap-2 text-small font-medium text-accent-ink"
-                    aria-hidden="true"
-                  >
-                    {t.projects.viewCase}
-                    <Icon name="arrow-right" size={16} />
-                  </span>
-                </div>
-              </div>
-
               <div
-                class="project-stage-shot relative aspect-video px-6 sm:px-10"
+                class="project-stage-shot relative aspect-video overflow-hidden rounded-panel bg-surface shadow-bevel"
                 aria-hidden="true"
               >
                 <div
@@ -212,12 +154,26 @@ const slides = await Promise.all(
                       height={slide.shot.attributes.height}
                       alt=""
                       decoding="async"
-                      class="size-full rounded-t-card object-cover object-top-left"
+                      class="size-full object-cover object-top-left"
                     />
                   ) : (
                     <ScreenPlaceholder slug={slide.project.slug} />
                   )}
                 </div>
+              </div>
+
+              <div class="project-stage-caption flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+                <h3 class="text-title font-medium text-balance text-ink">
+                  <a
+                    href={slide.href}
+                    class="project-stage-link after:absolute after:inset-0 after:z-20"
+                  >
+                    {slide.project.title}
+                  </a>
+                </h3>
+                <p class="shrink-0 font-mono text-eyebrow tracking-widest text-subtle uppercase">
+                  {t.kindLabels[slide.project.kind]} · {formatYears(slide.project.period, t)}
+                </p>
               </div>
             </article>
           </li>
@@ -232,9 +188,6 @@ const slides = await Promise.all(
           {slides.map((slide) => (
             <span class="project-stage-bar" style={`--i: ${String(slide.index)}`} />
           ))}
-        </span>
-        <span class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
-          {t.projects.stageHint}
         </span>
       </div>
     </div>

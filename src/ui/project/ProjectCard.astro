@@ -5,40 +5,28 @@ import type { Project } from '../../domain/project/project';
 import type { Dictionary } from '../i18n/dictionary';
 import { formatYears } from '../i18n/format';
 import { projectPath } from '../i18n/routes';
-import Icon from '../icons/Icon.astro';
 import { mediaFor } from './media';
 import ScreenPlaceholder from './ScreenPlaceholder.astro';
 import { SCREENSHOT_QUALITY } from './screenshots';
 
 /**
- * A project as a card that opens its page (the reference's case-study card). `feature` is the
- * wide card with the figures and a screen leaning out of the right edge; `compact` stacks the
- * screen on top for the smaller grid. The title link stretches over the whole card, so there is
- * one link per project and its name is the title.
+ * A project in the grid under the stage: its screen, its name, its kind and years. The summary
+ * and the figures live on the project page, one click away (ADR 0029). The title link stretches
+ * over the whole card, so there is one link per project and its name is the title.
  *
- * Effects live in src/ui/styles/cards.css: a tilt and a light that follow a fine pointer (the
- * script below), the screen lifting and the button filling on hover, and a reveal on scroll.
- *
- * The screenshot is decoration (the stage is hidden from assistive technology) and waits with the
- * effects: its address sits in data attributes until the cards come near, because a lazy image
- * within the browser's look-ahead distance still downloads with the page (CLAUDE.md, the
- * performance budget). Without JavaScript the card keeps its stage and glow, without the picture.
+ * The screenshot is decoration (hidden from assistive technology) and keeps its address in data
+ * attributes until the grid comes near: a lazy image within the browser's look-ahead distance
+ * still downloads with the page (CLAUDE.md, the performance budget).
  */
 interface Props {
   t: Dictionary;
   project: Project;
-  variant?: 'feature' | 'compact';
-  /** Alternates the colour of the glow behind the screen. */
-  tone?: 'accent' | 'success';
 }
 
-const { t, project, variant = 'feature', tone = 'accent' } = Astro.props;
+const { t, project } = Astro.props;
 const href = projectPath(project.locale, project.slug);
 const media = mediaFor(project.slug);
-const figures = project.metrics.slice(0, variant === 'feature' ? 3 : 1);
-const cta = variant === 'feature' ? t.projects.viewCase : t.projects.viewProject;
-const sizes =
-  variant === 'feature' ? '(min-width: 1024px) 40vw, 90vw' : '(min-width: 768px) 30vw, 90vw';
+const sizes = '(min-width: 1024px) 31vw, (min-width: 768px) 46vw, 92vw';
 const shot = media.card
   ? await getImage({
       src: media.card.src,
@@ -49,135 +37,41 @@ const shot = media.card
   : null;
 ---
 
-<article
-  id={`project-${project.slug}`}
-  class:list={['project-card reveal relative scroll-mt-24', `project-card--${variant}`]}
-  data-tilt
-  data-tone={tone}
->
+<article id={`project-${project.slug}`} class="project-card group relative flex flex-col gap-4">
   <div
-    class:list={[
-      'project-card-surface relative isolate flex overflow-hidden rounded-panel bg-surface-raised shadow-bevel',
-      variant === 'feature' ? 'flex-col lg:flex-row' : 'h-full flex-col',
-    ]}
+    class="project-card-shot aspect-16/10 overflow-hidden rounded-panel bg-surface shadow-bevel"
+    aria-hidden="true"
   >
-    {variant === 'compact' && (
-      <div class="project-card-stage relative h-56 overflow-hidden" aria-hidden="true">
-        <div class="project-card-rise absolute inset-x-6 top-8 -bottom-6">
-          <div
-            class="project-card-screen size-full"
-            style={`view-transition-name: project-screen-${project.slug}`}
-          >
-            {shot ? (
-              <img
-                data-card-shot
-                data-src={shot.src}
-                data-srcset={shot.srcSet.attribute}
-                sizes={sizes}
-                width={shot.attributes.width}
-                height={shot.attributes.height}
-                alt=""
-                decoding="async"
-                class="size-full rounded-card object-cover object-top-left"
-              />
-            ) : (
-              <ScreenPlaceholder slug={project.slug} compact />
-            )}
-          </div>
-        </div>
-      </div>
-    )}
-
     <div
-      class:list={[
-        'flex flex-col',
-        variant === 'feature' ? 'gap-5 p-6 sm:p-10 lg:w-[56%] lg:p-12' : 'flex-1 gap-3 p-6 sm:p-8',
-      ]}
+      class="size-full transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.02]"
+      style={`view-transition-name: project-screen-${project.slug}`}
     >
-      <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
-        {t.kindLabels[project.kind]} · {formatYears(project.period, t)}
-        {project.confidentiality === 'anonymized' && <> · {t.projects.anonymized}</>}
-      </p>
-      <h3
-        class:list={[
-          'font-display font-light text-balance text-ink',
-          variant === 'feature' ? 'text-heading' : 'text-title',
-        ]}
-      >
-        <a href={href} class="project-card-link after:absolute after:inset-0 after:z-20">
-          {project.title}
-        </a>
-      </h3>
-      <p
-        class:list={[
-          'text-pretty text-muted',
-          variant === 'feature' ? 'line-clamp-3 text-lead' : 'line-clamp-3',
-        ]}
-      >
-        {project.summary}
-      </p>
-
-      <span
-        class:list={['project-card-cta', variant === 'compact' && 'project-card-cta--quiet']}
-        aria-hidden="true"
-      >
-        <span class="project-card-cta-clip">
-          <span class="project-card-cta-text" data-text={cta}>
-            {cta}
-          </span>
-        </span>
-        <Icon name="arrow-right" size={16} />
-      </span>
-
-      {figures.length > 0 && (
-        <dl
-          class:list={[
-            'grid gap-x-8 gap-y-4 pt-4',
-            variant === 'feature' ? 'mt-auto sm:grid-cols-3 lg:pt-10' : 'mt-auto',
-          ]}
-        >
-          {figures.map((metric) => (
-            <div class="flex flex-col gap-1">
-              <dt class="sr-only">{metric.label}</dt>
-              <dd class="text-price font-medium text-ink">{metric.value}</dd>
-              <dd class="line-clamp-2 text-small text-muted" aria-hidden="true">
-                {metric.label}
-              </dd>
-            </div>
-          ))}
-        </dl>
+      {shot ? (
+        <img
+          data-card-shot
+          data-src={shot.src}
+          data-srcset={shot.srcSet.attribute}
+          sizes={sizes}
+          width={shot.attributes.width}
+          height={shot.attributes.height}
+          alt=""
+          decoding="async"
+          class="size-full object-cover object-top-left"
+        />
+      ) : (
+        <ScreenPlaceholder slug={project.slug} compact />
       )}
     </div>
-
-    {variant === 'feature' && (
-      <div
-        class="project-card-stage relative h-72 overflow-hidden sm:h-96 lg:h-auto lg:flex-1"
-        aria-hidden="true"
-      >
-        <div class="project-card-rise absolute top-10 -right-24 -bottom-16 left-6 sm:left-12 lg:top-20 lg:left-4">
-          <div
-            class="project-card-screen size-full"
-            style={`view-transition-name: project-screen-${project.slug}`}
-          >
-            {shot ? (
-              <img
-                data-card-shot
-                data-src={shot.src}
-                data-srcset={shot.srcSet.attribute}
-                sizes={sizes}
-                width={shot.attributes.width}
-                height={shot.attributes.height}
-                alt=""
-                decoding="async"
-                class="size-full rounded-card object-cover object-top-left"
-              />
-            ) : (
-              <ScreenPlaceholder slug={project.slug} />
-            )}
-          </div>
-        </div>
-      </div>
-    )}
+  </div>
+  <div class="flex flex-col gap-1">
+    <h3 class="text-lead font-medium text-balance text-ink">
+      <a href={href} class="project-card-link after:absolute after:inset-0 after:z-20">
+        {project.title}
+      </a>
+    </h3>
+    <p class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+      {t.kindLabels[project.kind]} · {formatYears(project.period, t)}
+    </p>
   </div>
 </article>
 
@@ -185,11 +79,11 @@ const shot = media.card
   import cardStyles from '../styles/cards.css?url';
 
   /*
-   * The effects and the screenshots load when the cards come within a screen of the viewport.
-   * They sit below the first screen, so on arrival they never compete with the first paint
-   * (CLAUDE.md, the performance budget); a visit that lands on them loads them at once.
+   * The screenshots, and the styles of the placeholder drawn when one is missing, load when the
+   * grid comes within a screen of the viewport. It sits below the first screen, so they never
+   * compete with the first paint; a visit that lands on it loads them at once.
    */
-  const addStyles = () => {
+  const load = () => {
     const sheet = document.createElement('link');
     sheet.rel = 'stylesheet';
     sheet.href = cardStyles;
@@ -199,59 +93,18 @@ const shot = media.card
       shot.src = shot.dataset.src ?? '';
     }
   };
-  const firstCard = document.querySelector('[data-tilt]');
+  const firstCard = document.querySelector('.project-card');
   if (firstCard && 'IntersectionObserver' in window) {
     const watch = new IntersectionObserver(
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return;
         watch.disconnect();
-        addStyles();
+        load();
       },
       { rootMargin: '100% 0px' },
     );
     watch.observe(firstCard);
   } else {
-    addStyles();
-  }
-
-  /*
-   * Tilt and light follow a fine pointer (the reference's holographic card). One update per
-   * frame, transforms and a gradient position only; touch screens and reduced motion skip it.
-   */
-  const fine = matchMedia('(hover: hover) and (pointer: fine)');
-  const calm = matchMedia('(prefers-reduced-motion: reduce)');
-
-  for (const card of document.querySelectorAll<HTMLElement>('[data-tilt]')) {
-    let frame = 0;
-    let last: PointerEvent | null = null;
-    const rest = () => {
-      cancelAnimationFrame(frame);
-      frame = 0;
-      for (const [name, value] of [
-        ['--mx', '0.5'],
-        ['--my', '0.5'],
-        ['--rx', '0deg'],
-        ['--ry', '0deg'],
-      ] as const) {
-        card.style.setProperty(name, value);
-      }
-    };
-    card.addEventListener('pointermove', (event) => {
-      if (!fine.matches || calm.matches) return;
-      last = event;
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        if (!last) return;
-        const box = card.getBoundingClientRect();
-        const x = (last.clientX - box.left) / box.width;
-        const y = (last.clientY - box.top) / box.height;
-        card.style.setProperty('--mx', x.toFixed(3));
-        card.style.setProperty('--my', y.toFixed(3));
-        card.style.setProperty('--ry', `${((x - 0.5) * 5).toFixed(2)}deg`);
-        card.style.setProperty('--rx', `${((y - 0.5) * -3.5).toFixed(2)}deg`);
-      });
-    });
-    card.addEventListener('pointerleave', rest);
+    load();
   }
 </script>

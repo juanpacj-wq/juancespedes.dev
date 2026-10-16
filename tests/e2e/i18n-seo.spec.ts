@@ -92,13 +92,13 @@ test.describe('bilingual site and SEO', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/en');
     await expect(page.locator('main h2')).toHaveText([
-      'Featured case studies',
-      "Who's behind the work",
-      'The tools I build with',
-      'Business impact',
-      'Services and prices',
-      'Education and certifications',
-      'Tell me what you need',
+      'Work',
+      'About',
+      'Stack',
+      'Results',
+      'Services',
+      'Certifications',
+      "Let's talk",
     ]);
     const esProjects = await page.request
       .get('/')

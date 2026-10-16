@@ -266,7 +266,6 @@ const diagram = (figure: HTMLElement) => {
   // Step through the flows with the buttons, or by pointing at one.
   const steps = figure.querySelector<HTMLElement>('[data-arch-steps]');
   const count = figure.querySelector<HTMLElement>('[data-step-count]');
-  const hint = figure.querySelector<HTMLElement>('[data-arch-hint]');
   const total = String(flows.length).padStart(2, '0');
   let step = -1;
   const goTo = (index: number) => {
@@ -276,7 +275,6 @@ const diagram = (figure: HTMLElement) => {
   };
   if (flows.length > 0) {
     if (steps) steps.hidden = false;
-    if (hint) hint.hidden = false;
     for (const button of steps?.querySelectorAll<HTMLButtonElement>('[data-step]') ?? []) {
       button.addEventListener('click', () => {
         goTo(step + Number(button.dataset.step));

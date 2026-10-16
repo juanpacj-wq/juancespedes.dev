@@ -65,17 +65,17 @@ test.describe('home sections', () => {
     await page.goto('/');
     const headings = page.locator('main h2');
     await expect(headings).toHaveText([
-      'Casos de estudio destacados',
-      'Quién está detrás',
-      'Las herramientas con las que construyo',
-      'Impacto en el negocio',
-      'Servicios y precios',
-      'Formación y certificaciones',
-      'Cuéntame qué necesitas',
+      'Proyectos',
+      'Sobre mí',
+      'Stack',
+      'Resultados',
+      'Servicios',
+      'Certificaciones',
+      'Hablemos',
     ]);
   });
 
-  test('impact cards tell a figure with its source and open the case behind it', async ({
+  test('results show a figure and where it came from, and open the case behind it', async ({
     page,
   }) => {
     await page.goto('/#impact');
@@ -85,8 +85,8 @@ test.describe('home sections', () => {
     await expect(featured.getByRole('heading', { level: 3 })).toHaveText(
       'Cero vulnerabilidades graves en una auditoría externa',
     );
-    await expect(featured.getByText(/^Fuente: /)).toBeVisible();
-    await expect(page.locator('#impact')).toContainText('Universidad del Norte');
+    // The source and the story live on the project page; the home page names the project.
+    await expect(featured).toContainText('Portal corporativo');
     await featured.getByRole('link').click();
     await expect(page).toHaveURL(/\/proyectos\/corporate-portal$/);
   });
@@ -99,7 +99,7 @@ test.describe('home sections', () => {
       .getByRole('link', { name: 'Servicios' })
       .click();
     await expect(page).toHaveURL(/#services$/);
-    await expect(page.getByRole('heading', { name: 'Servicios y precios' })).toBeInViewport();
+    await expect(page.getByRole('heading', { name: 'Servicios', exact: true })).toBeInViewport();
   });
 
   test('the stack lists each area with its technologies and loads its logos on approach', async ({
@@ -149,7 +149,7 @@ test.describe('projects', () => {
   test('featured cases play on the stage and the rest share a grid', async ({ page }) => {
     await page.goto('/#projects');
     await expect(page.locator('#projects [data-stage-slide]')).toHaveCount(5);
-    await expect(page.locator('#projects .project-card--compact')).toHaveCount(3);
+    await expect(page.locator('#projects .project-card')).toHaveCount(3);
     // One link per project, named by the project's title.
     const slide = page.locator('#project-operations-logbook');
     await expect(slide.getByRole('link')).toHaveCount(1);

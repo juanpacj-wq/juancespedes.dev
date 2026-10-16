@@ -7,6 +7,8 @@
   /* A little more room between lines than the display default, so accents and descenders of
      the rotating role stay inside its one-line window. */
   .hero-title {
+    /* A step under the display size, so "ingeniero de automatización" holds one line on laptops. */
+    font-size: clamp(2.75rem, 1.6rem + 4vw, 5.5rem);
     line-height: 1.1;
   }
 
