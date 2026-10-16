@@ -159,9 +159,10 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
     --lamp: 11rem;
   }
 
-  /* On the light ground the paint needs depth, not light: brightened, it fades into the page. */
+  /* On the light ground the paint needs depth, not light: brightened, it fades into the page.
+     Darkened, its colours read as dark as the unlit ink does. */
   :global(:root[data-theme='light']) .ascii-paint {
-    filter: brightness(0.85) contrast(1.25) saturate(1.4);
+    filter: brightness(0.6) contrast(1.35) saturate(1.3);
   }
 
   @media (prefers-reduced-motion: reduce) {
