@@ -1,7 +1,7 @@
 ---
 kind: report
 title: Financial control of a publicly funded solar energy program
-summary: 'A Power BI report for the managers of a program that brings solar systems to rural areas: budget execution by contract, overdue invoices and daily balances of the trust subaccounts, with HTML visuals built in DAX.'
+summary: 'A Power BI report for a program that brings solar power to rural areas: trust balances and their flow, budget execution by contract, overdue invoices and the fee structure, with HTML visuals built in DAX.'
 role: Author of the semantic model, the DAX and HTML measures and the report design
 period: { start: '2026-01', end: '2026-06' }
 capabilities: [data-bi]
@@ -12,14 +12,14 @@ stack:
   - PostgreSQL
   - Excel
 metrics:
-  - value: '43'
-    label: DAX measures; 19 of them return HTML and SVG for cards, waterfalls and curves
+  - value: '56'
+    label: DAX measures; 29 of them return HTML and SVG for cards, waterfalls, donuts and tables
     source: Semantic model of the original report, reviewed in October 2026
   - value: '4'
     label: trust subaccounts tracked day by day, split between implementation and fees
     source: Semantic model of the original report, reviewed in October 2026
   - value: '2'
-    label: pages, one for contracts and invoices and one for funds and balances
+    label: pages, one for trust management and one for budget execution and fees
     source: The original report and its public replica, reviewed in October 2026
 featured: false
 order: 12
@@ -30,14 +30,15 @@ businessQuestions:
   - How much of each contract is committed, invoiced and paid?
   - Which invoices are overdue, by how many days, and at which approval step?
   - How much money is in each subaccount today, and how did it move over the last month?
-  - Do the program's fees leave the margin that was planned?
+  - How are the program fees split between administrative costs, contractual costs and margin?
 dataSources:
   - PostgreSQL views with budget, invoices, contracts and bank transactions
-  - An Excel workbook with the program's investment plan by year
+  - An Excel workbook with the program plan and the fee breakdown by year
   - 'Public replica: synthetic contracts, invoices and transactions from December 2025 to September 2026'
 highlightedMeasures:
+  - Bank balance waterfall, grouped by month when there are many transactions
   - Budget execution chain, drawn in HTML
-  - Balance waterfall with inflows and outflows
+  - Fee structure by item
   - Contract matrix with financial progress
   - Days overdue per invoice
 liveReport: https://app.powerbi.com/view?r=eyJrIjoiZTllYTdjMGEtODg2ZC00ZWIxLWIxYzItM2M3MzAyODYzMmRmIiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9

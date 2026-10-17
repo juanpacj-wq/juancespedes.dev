@@ -1,10 +1,10 @@
 {
   "cover": {
-    "es": "Réplica pública con datos sintéticos: saldos de las subcuentas, facturas por contrato, cadena de ejecución presupuestal y facturas en mora.",
-    "en": "Public replica with synthetic data: subaccount balances, invoices by contract, the budget execution chain and overdue invoices."
+    "es": "Réplica pública con datos sintéticos: gestión de la fiducia con saldo inicial, ingresos, egresos y saldo disponible, el flujo de saldos bancarios en cascada, las facturas pendientes de pago y los movimientos de cada subcuenta.",
+    "en": "Public replica with synthetic data: trust management with opening balance, inflows, outflows and available balance, the bank balance waterfall, unpaid invoices and the transactions of each subaccount."
   },
   "gallery-1": {
-    "es": "Fondos y saldos: flujo diario de las subcuentas, plan frente a real de la remuneración y matriz de contratos con su avance financiero.",
-    "en": "Funds and balances: daily flow of the subaccounts, planned against actual fees and the contract matrix with financial progress."
+    "es": "Ejecución y remuneración: recursos girados, comprometidos y pagados, la cadena de ejecución presupuestal, la estructura de la remuneración por concepto y la matriz de contratos con su avance financiero.",
+    "en": "Execution and fees: funds transferred, committed and paid, the budget execution chain, the fee structure by item and the contract matrix with financial progress."
   }
 }

@@ -15,7 +15,7 @@ metrics:
   - value: '6'
     label: páginas, del resumen de indicadores al seguimiento de requisiciones pendientes
     source: Informe original y su réplica pública, revisados en octubre de 2026
-  - value: '41'
+  - value: '42'
     label: medidas DAX sobre gastos, ingresos, disponibilidad inicial y requisiciones
     source: Modelo semántico del informe original, revisado en octubre de 2026
   - value: '5'
@@ -32,7 +32,7 @@ businessQuestions:
   - ¿Cómo va el recaudo de ingresos frente al aforo, mes a mes?
   - ¿Qué requisiciones de compra siguen sin asignar, y desde cuándo?
 dataSources:
-  - Vistas de PostgreSQL en Azure con los movimientos del sistema financiero
+  - Vistas de PostgreSQL en Azure con los movimientos del sistema financiero y el maestro de proveedores
   - Vistas del sistema de compras con las requisiciones aprobadas
   - 'Réplica pública: datos sintéticos que simulan siete vigencias del ciclo presupuestal'
 highlightedMeasures:
@@ -40,6 +40,7 @@ highlightedMeasures:
   - Pagado acumulado del año frente a la meta de ejecución
   - Recaudo más disponibilidad inicial
   - Variación frente al mes anterior
+  - Registros con saldo provisional por liberar
 liveReport: https://app.powerbi.com/view?r=eyJrIjoiMGM1ZmViYjQtZTc1Zi00NjM3LTg1YjgtNjlkMDgwNjExNjBhIiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9
 ---
 

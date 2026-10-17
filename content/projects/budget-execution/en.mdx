@@ -15,7 +15,7 @@ metrics:
   - value: '6'
     label: pages, from the indicator summary to the pending purchase requisitions
     source: The original report and its public replica, reviewed in October 2026
-  - value: '41'
+  - value: '42'
     label: DAX measures over spending, revenue, opening balances and requisitions
     source: Semantic model of the original report, reviewed in October 2026
   - value: '5'
@@ -32,7 +32,7 @@ businessQuestions:
   - How is revenue collection tracking against the forecast, month by month?
   - Which purchase requisitions are still unassigned, and since when?
 dataSources:
-  - PostgreSQL views on Azure with the financial system's transactions
+  - PostgreSQL views on Azure with the financial system's transactions and the supplier master
   - Views of the purchasing system with the approved requisitions
   - 'Public replica: synthetic data that simulates seven fiscal years of the budget cycle'
 highlightedMeasures:
@@ -40,6 +40,7 @@ highlightedMeasures:
   - Year-to-date payments against the execution target
   - Revenue collected plus opening balance
   - Change from the previous month
+  - Commitments with provisional balance still to release
 liveReport: https://app.powerbi.com/view?r=eyJrIjoiMGM1ZmViYjQtZTc1Zi00NjM3LTg1YjgtNjlkMDgwNjExNjBhIiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9
 ---
 

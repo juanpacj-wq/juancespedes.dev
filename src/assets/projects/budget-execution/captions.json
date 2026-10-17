@@ -4,8 +4,8 @@
     "en": "Public replica with synthetic data: headline indicators for the revenue and spending budget, filtered by company, fiscal year and month."
   },
   "gallery-1": {
-    "es": "Seguimiento de la ejecución: pagos del mes y acumulados frente a la meta, con los diez contratos de mayor valor.",
-    "en": "Execution tracking: monthly and year-to-date payments against the target, with the ten largest contracts."
+    "es": "Seguimiento de la ejecución: pagos del mes y acumulados frente a la meta, los diez contratos de mayor valor por proveedor y los registros con saldo provisional por liberar.",
+    "en": "Execution tracking: monthly and year-to-date payments against the target, the ten largest contracts by supplier and the commitments with provisional balance still to release."
   },
   "gallery-2": {
     "es": "Ejecución de gastos por cuenta, nivel y registro presupuestal, con el análisis mensual de cada etapa.",
