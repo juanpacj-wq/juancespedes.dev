@@ -33,10 +33,6 @@ const es = {
     switchTo: 'Read this page in English',
     short: 'EN',
   },
-  theme: {
-    toLight: 'Cambiar a tema claro',
-    toDark: 'Cambiar a tema oscuro',
-  },
   availability: {
     available: 'Disponible para proyectos',
   },
@@ -272,7 +268,6 @@ const es = {
       notes: 'Notas',
       actions: 'Acciones',
     },
-    toggleTheme: 'Cambiar entre tema claro y oscuro',
     switchLanguage: 'Ver esta página en inglés',
     copyEmail: 'Copiar mi correo',
     copied: 'Correo copiado',
@@ -352,10 +347,6 @@ const en: Dictionary = {
   language: {
     switchTo: 'Leer esta página en español',
     short: 'ES',
-  },
-  theme: {
-    toLight: 'Switch to light theme',
-    toDark: 'Switch to dark theme',
   },
   availability: {
     available: 'Available for projects',
@@ -595,7 +586,6 @@ const en: Dictionary = {
       notes: 'Notes',
       actions: 'Actions',
     },
-    toggleTheme: 'Switch between light and dark theme',
     switchLanguage: 'View this page in Spanish',
     copyEmail: 'Copy my email address',
     copied: 'Email address copied',

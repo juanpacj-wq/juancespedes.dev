@@ -776,9 +776,8 @@
       filter 400ms ease;
   }
 
-  /* The brand colour where it keeps 3:1 against the theme's canvas, the ink colour otherwise. */
-  :root:not([data-theme='light']) .cs-band-logo[data-on-dark],
-  :root[data-theme='light'] .cs-band-logo[data-on-light] {
+  /* The brand colour where it keeps 3:1 against the canvas, the ink colour otherwise. */
+  .cs-band-logo[data-on-dark] {
     color: var(--brand);
   }
 

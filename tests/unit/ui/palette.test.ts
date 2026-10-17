@@ -67,7 +67,6 @@ describe('palette index', () => {
       keywords: ['Modbus TCP', 'Data and BI'],
     });
     expect(index.filter((i) => i.group === 'actions').map((i) => i.id)).toEqual([
-      'toggle-theme',
       'switch-language',
       'copy-email',
       'github',

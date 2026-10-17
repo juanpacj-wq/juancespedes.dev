@@ -12,12 +12,10 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   integrations: [react(), mdx()],
-  // Code in notes: both Shiki themes as CSS variables, so the site theme picks the colors. The
-  // light theme is the high-contrast one: github-light's orange and red fail AA on our surface.
-  // (global.css) instead of a fixed dark block in the light theme.
+  // Code in notes: the Shiki theme as CSS variables, so its colours read from global.css.
   markdown: {
     shikiConfig: {
-      themes: { light: 'github-light-high-contrast', dark: 'github-dark' },
+      themes: { dark: 'github-dark' },
       defaultColor: false,
     },
   },

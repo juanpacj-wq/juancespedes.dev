@@ -5,19 +5,18 @@ import { describe, expect, it } from 'vitest';
 
 /*
  * Reads the color tokens straight from the stylesheet, so this test breaks the moment a token
- * change drops a text/background pair below WCAG 2.2 AA in either theme.
+ * change drops a text/background pair below WCAG 2.2 AA. The site has one theme (ADR 0032).
  */
 
 const css = readFileSync(join(process.cwd(), 'src/ui/styles/global.css'), 'utf8');
 
-type Theme = 'light' | 'dark';
+// The theme values: the first :root block of the stylesheet.
+const theme = /:root \{([^}]*)\}/.exec(css)?.[1] ?? '';
 
 const tokens = (() => {
-  const result = new Map<string, Record<Theme, string>>();
-  for (const [, name, light, dark] of css.matchAll(
-    /--([\w-]+):\s*light-dark\((#[0-9a-f]{6}),\s*(#[0-9a-f]{6})\)/gi,
-  )) {
-    if (name && light && dark) result.set(name, { light, dark });
+  const result = new Map<string, string>();
+  for (const [, name, value] of theme.matchAll(/--([\w-]+):\s*(#[0-9a-f]{6});/gi)) {
+    if (name && value) result.set(name, value);
   }
   return result;
 })();
@@ -37,10 +36,10 @@ const contrast = (a: string, b: string): number => {
   return ((high ?? 0) + 0.05) / ((low ?? 0) + 0.05);
 };
 
-const color = (name: string, theme: Theme): string => {
+const color = (name: string): string => {
   const token = tokens.get(name);
   if (!token) throw new Error(`token --${name} not found in global.css`);
-  return token[theme];
+  return token;
 };
 
 /** [foreground, background, minimum ratio]. 4.5 for text, 3 for non-text UI (WCAG 1.4.11). */
@@ -67,17 +66,16 @@ const PAIRS: readonly (readonly [string, string, number])[] = [
 ];
 
 describe('color tokens', () => {
-  it('declares every token with a light and a dark value', () => {
+  it('declares every token with one value', () => {
     expect(tokens.size).toBeGreaterThanOrEqual(12);
+    expect(css).not.toContain('light-dark(');
   });
 
-  describe.each(['light', 'dark'] as const)('%s theme', (theme) => {
-    it.each(PAIRS)('%s on %s meets %d:1', (foreground, background, minimum) => {
-      const ratio = contrast(color(foreground, theme), color(background, theme));
-      expect(ratio, `${foreground} on ${background}: ${ratio.toFixed(2)}`).toBeGreaterThanOrEqual(
-        minimum,
-      );
-    });
+  it.each(PAIRS)('%s on %s meets %d:1', (foreground, background, minimum) => {
+    const ratio = contrast(color(foreground), color(background));
+    expect(ratio, `${foreground} on ${background}: ${ratio.toFixed(2)}`).toBeGreaterThanOrEqual(
+      minimum,
+    );
   });
 
   it('computes the reference ratios correctly', () => {

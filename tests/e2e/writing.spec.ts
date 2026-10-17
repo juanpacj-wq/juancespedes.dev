@@ -42,18 +42,14 @@ test.describe('technical notes', () => {
     }
   }
 
-  test('code follows the site theme', async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('theme', 'light');
-    });
+  test("code sits on the site surface, not on Shiki's own background", async ({ page }) => {
     await page.goto('/notas/strict-csp-astro-cloudflare');
     const background = await page
       .locator('.prose pre')
       .first()
       .evaluate((pre) => getComputedStyle(pre).backgroundColor);
-    // The light theme uses a light surface, never Shiki's fixed dark background.
-    const channels = (background.match(/\d+/g) ?? []).slice(0, 3).map(Number);
-    expect(channels.every((channel) => channel > 200)).toBe(true);
+    // --surface-raised (global.css).
+    expect(background).toBe('rgb(30, 28, 25)');
   });
 });
 

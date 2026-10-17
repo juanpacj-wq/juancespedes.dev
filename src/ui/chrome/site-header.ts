@@ -124,72 +124,7 @@ const splitLabel = (label: HTMLElement): void => {
   label.replaceChildren(hidden, track);
 };
 
-/**
- * The new theme spreads as a circle from its switch over the old one. Without view transitions,
- * or with reduced motion, it simply applies.
- */
-const spreadTheme = (button: HTMLElement, apply: () => void): void => {
-  if (typeof document.startViewTransition !== 'function' || reducedMotion()) {
-    apply();
-    return;
-  }
-  const box = button.getBoundingClientRect();
-  const x = box.left + box.width / 2;
-  const y = box.top + box.height / 2;
-  const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-  const root = document.documentElement;
-  root.dataset.themeSpread = '';
-  const transition = document.startViewTransition(apply);
-  void transition.ready.then(() =>
-    root.animate(
-      {
-        clipPath: [
-          `circle(0px at ${String(x)}px ${String(y)}px)`,
-          `circle(${String(radius)}px at ${String(x)}px ${String(y)}px)`,
-        ],
-      },
-      {
-        duration: 650,
-        easing: getComputedStyle(root).getPropertyValue('--ease-out').trim() || 'ease-out',
-        pseudoElement: '::view-transition-new(root)',
-      },
-    ),
-  );
-  void transition.finished.finally(() => delete root.dataset.themeSpread);
-};
-
-const STORAGE_KEY = 'theme';
-
-const currentTheme = (): 'light' | 'dark' =>
-  document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
-
-const labelToggle = (button: HTMLButtonElement): void => {
-  const next = currentTheme() === 'dark' ? button.dataset.toLight : button.dataset.toDark;
-  if (next) button.setAttribute('aria-label', next);
-};
-
-/** Light/dark switch: flips data-theme, remembers the choice and relabels the button. */
-const mountThemeToggle = (): void => {
-  for (const button of document.querySelectorAll<HTMLButtonElement>('.theme-toggle')) {
-    labelToggle(button);
-    button.addEventListener('click', () => {
-      const next = currentTheme() === 'dark' ? 'light' : 'dark';
-      const apply = (): void => {
-        document.documentElement.dataset.theme = next;
-        try {
-          localStorage.setItem(STORAGE_KEY, next);
-        } catch {
-          // Storage can be unavailable (private mode); the theme still applies for this page.
-        }
-        labelToggle(button);
-      };
-      spreadTheme(button, apply);
-    });
-  }
-};
-
 export const mountSiteHeader = (): void => {
-  mountThemeToggle();
   for (const roll of document.querySelectorAll<HTMLElement>('[data-roll]')) splitLabel(roll);
   for (const list of document.querySelectorAll<HTMLElement>('[data-nav]')) {
     mountPill(list);

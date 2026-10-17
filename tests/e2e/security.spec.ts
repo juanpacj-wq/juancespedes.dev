@@ -71,8 +71,6 @@ test.describe('security headers', () => {
     await expect(page.locator('#contact input[name="cf-turnstile-response"]')).not.toHaveValue('', {
       timeout: 15_000,
     });
-    await page.getByRole('button', { name: 'Cambiar a tema claro' }).click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     expect(await violations(page)).toEqual([]);
   });
 });

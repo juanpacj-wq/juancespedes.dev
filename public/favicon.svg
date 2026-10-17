@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#0d0d0f"/>
-  <text x="32" y="42" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="26" font-weight="700" fill="#f5a524">JC</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 13">
+  <!-- JP in a 4 x 5 pixel face, one cell per unit, drawn as one path so no seams show between cells. -->
+  <rect width="13" height="13" rx="2.75" fill="#0b0b0b"/>
+  <path fill="#ffffff" d="M3 4h3v1H3zM5 5h1v3H5zM2 7h1v1H2zM3 8h2v1H3zM7 4h3v1H7zM7 5h1v4H7zM10 5h1v1h-1zM8 6h2v1H8z"/>
 </svg>

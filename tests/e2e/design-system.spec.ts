@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 const PAGES = [
   '/',
@@ -19,40 +19,27 @@ const PAGES = [
 ] as const;
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
-const useTheme = async (page: Page, theme: 'light' | 'dark') => {
-  await page.addInitScript((value) => {
-    localStorage.setItem('theme', value);
-  }, theme);
-};
-
-test.describe('accessibility in both themes', () => {
-  for (const theme of ['dark', 'light'] as const) {
-    for (const path of PAGES) {
-      test(`${path} has no WCAG 2.2 AA violations in the ${theme} theme`, async ({ page }) => {
-        await useTheme(page, theme);
-        await page.goto(path);
-        await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
-
-        const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-        expect(results.violations).toEqual([]);
-      });
-    }
+test.describe('accessibility', () => {
+  for (const path of PAGES) {
+    test(`${path} has no WCAG 2.2 AA violations`, async ({ page }) => {
+      await page.goto(path);
+      const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+      expect(results.violations).toEqual([]);
+    });
   }
 });
 
-test.describe('theme switch', () => {
-  test('defaults to dark and remembers the visitor choice', async ({ page }) => {
+test.describe('one theme', () => {
+  test('stays dark, even for a visitor who chose the light theme before it was removed', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('theme', 'light');
+    });
     await page.goto('/');
-    const html = page.locator('html');
-    const toggle = page.getByRole('button', { name: 'Cambiar a tema claro' });
-
-    await expect(html).not.toHaveAttribute('data-theme', 'light');
-    await toggle.click();
-    await expect(html).toHaveAttribute('data-theme', 'light');
-    await expect(page.getByRole('button', { name: 'Cambiar a tema oscuro' })).toBeVisible();
-
-    await page.reload();
-    await expect(html).toHaveAttribute('data-theme', 'light');
+    await expect(page.getByRole('button', { name: /tema/ })).toHaveCount(0);
+    const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(canvas).toBe('rgb(14, 13, 11)');
   });
 });
 

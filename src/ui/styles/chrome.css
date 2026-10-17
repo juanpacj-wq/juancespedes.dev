@@ -184,11 +184,6 @@
   }
 }
 
-/* Theme switch: the sun turns, the moon rocks; the new theme then spreads from the button. */
-.theme-toggle svg {
-  transition: rotate 600ms var(--ease-out);
-}
-
 /* Search: the key cap goes down under the pointer, like a key being pressed. */
 [data-palette-open] kbd {
   box-shadow: 0 2px 0 var(--color-line-strong);
@@ -198,23 +193,8 @@
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .theme-toggle:hover .theme-icon-sun {
-    rotate: 90deg;
-  }
-
-  .theme-toggle:hover .theme-icon-moon {
-    rotate: -24deg;
-  }
-
   [data-palette-open]:hover kbd {
     box-shadow: 0 0 0 var(--color-line-strong);
     translate: 0 2px;
   }
-}
-
-/* During the theme spread the page swaps in one piece: no cross-fade under the circle. */
-:root[data-theme-spread]::view-transition-old(root),
-:root[data-theme-spread]::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
 }

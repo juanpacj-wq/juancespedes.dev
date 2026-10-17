@@ -76,9 +76,8 @@ export interface TechLogo {
   readonly path: string;
   /** Brand colour as six hex digits, without the hash. */
   readonly hex: string;
-  /** Whether the brand colour keeps 3:1 against the dark and the light canvas. */
+  /** Whether the brand colour keeps 3:1 against the canvas. */
   readonly onDark: boolean;
-  readonly onLight: boolean;
 }
 
 /** WCAG relative luminance of a six-digit hex colour. Exported for tests. */
@@ -91,18 +90,16 @@ export const luminance = (hex: string): number => {
 };
 
 /*
- * Both canvases are near the ends of the scale (luminance about 0.004 dark and 0.95 light), so
- * 3:1 for a graphic means a luminance of at least 0.1 on dark and at most 0.28 on light. A brand
- * colour outside its range is drawn in the ink colour for that theme.
+ * The canvas is near the dark end of the scale (luminance about 0.004), so 3:1 for a graphic
+ * means a luminance of at least 0.1. A darker brand colour is drawn in the ink colour.
  */
 const DARK_MIN = 0.1;
-const LIGHT_MAX = 0.28;
 
 export const logoFor = (name: string): TechLogo | null => {
   const icon = LOGOS[name];
   if (!icon) return null;
   const value = luminance(icon.hex);
-  return { path: icon.path, hex: icon.hex, onDark: value >= DARK_MIN, onLight: value <= LIGHT_MAX };
+  return { path: icon.path, hex: icon.hex, onDark: value >= DARK_MIN };
 };
 
 /** A technology's id in a sprite or a page: "Node.js" is "node-js", "WCAG 2.2" is "wcag-2-2". */

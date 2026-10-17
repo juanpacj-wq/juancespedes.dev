@@ -12,39 +12,30 @@
 /* ---------- Theme values ---------- */
 
 /*
- * Each token holds its light and dark value once, with light-dark(); color-scheme picks the
- * pair. Dark is the brand default; a visitor's choice is stored and applied as data-theme
- * before first paint by the inline script in BaseLayout (see ADR 0009).
+ * The site has one theme, dark (ADR 0032). Each token holds one value; form controls and
+ * scrollbars follow color-scheme.
  */
 :root {
   color-scheme: dark;
   /* Chiaroscuro: a warm near-black ground, cream ink and one candle-ochre light (ADR 0018). */
-  --canvas: light-dark(#fafaf9, #0e0d0b);
-  --surface: light-dark(#ffffff, #161513);
-  --surface-raised: light-dark(#f3f2ef, #1e1c19);
-  --frame: light-dark(#efede9, #1a1816);
-  --line: light-dark(#e6e3de, #2a2723);
-  --line-strong: light-dark(#cfcac2, #3d3934);
-  --ink: light-dark(#1a1714, #f2ede4);
-  --muted: light-dark(#57514a, #b7b0a5);
-  --subtle: light-dark(#6a635b, #948d82);
-  --accent: light-dark(#e8a33a, #e8a33a);
-  --accent-ink: light-dark(#9a4b0c, #e8a33a);
-  --on-accent: light-dark(#14110d, #14110d);
-  --success: light-dark(#0f766e, #5cc2a8);
-  --ascii: light-dark(#4f2a0c, #e8a33a);
-  --bevel: light-dark(#000000, #ffffff);
-  --shadow-tint: light-dark(#6b6259, #000000);
-  /* Specular light on glass (the chat button): white in both themes, never text. */
-  --glint: light-dark(#ffffff, #ffffff);
-}
-
-:root[data-theme='light'] {
-  color-scheme: light;
-}
-
-:root[data-theme='dark'] {
-  color-scheme: dark;
+  --canvas: #0e0d0b;
+  --surface: #161513;
+  --surface-raised: #1e1c19;
+  --frame: #1a1816;
+  --line: #2a2723;
+  --line-strong: #3d3934;
+  --ink: #f2ede4;
+  --muted: #b7b0a5;
+  --subtle: #948d82;
+  --accent: #e8a33a;
+  --accent-ink: #e8a33a;
+  --on-accent: #14110d;
+  --success: #5cc2a8;
+  --ascii: #e8a33a;
+  --bevel: #ffffff;
+  --shadow-tint: #000000;
+  /* Specular light on glass (the chat button): white, never text. */
+  --glint: #ffffff;
 }
 
 /* ---------- Tokens exposed to Tailwind ---------- */
@@ -342,11 +333,11 @@
   }
 }
 
-/* Shiki emits both themes as variables (astro.config.mjs); light-dark() follows the site theme. */
+/* Shiki emits its theme as variables (astro.config.mjs). */
 @layer components {
   .prose pre.astro-code,
   .prose pre.astro-code span {
-    color: light-dark(var(--shiki-light), var(--shiki-dark));
+    color: var(--shiki-dark);
   }
 
   .prose pre.astro-code {
@@ -364,8 +355,7 @@
     --tone: var(--color-accent);
   }
 
-  :root:not([data-theme='light']) .stack-item[data-on-dark],
-  :root[data-theme='light'] .stack-item[data-on-light] {
+  .stack-item[data-on-dark] {
     --tone: var(--brand);
   }
 
@@ -373,8 +363,7 @@
     color: var(--color-ink);
   }
 
-  :root:not([data-theme='light']) .stack-item[data-on-dark] .stack-logo,
-  :root[data-theme='light'] .stack-item[data-on-light] .stack-logo {
+  .stack-item[data-on-dark] .stack-logo {
     color: var(--brand);
   }
 

@@ -22,7 +22,7 @@ import { SITE } from '../site';
 export type PaletteGroup = 'pages' | 'projects' | 'notes' | 'actions';
 
 /** Actions run in the browser; everything else is a link. */
-export type PaletteAction = 'toggle-theme' | 'switch-language' | 'copy-email';
+export type PaletteAction = 'switch-language' | 'copy-email';
 
 export interface PaletteItem {
   readonly id: string;
@@ -89,7 +89,6 @@ export const buildPaletteIndex = ({
   ...notes.map((note) =>
     link(`note:${note.slug}`, 'notes', note.title, notePath(locale, note.slug), null, note.tags),
   ),
-  action('toggle-theme', t.palette.toggleTheme),
   action('switch-language', t.palette.switchLanguage),
   action('copy-email', t.palette.copyEmail, SITE.email),
   link('github', 'actions', 'GitHub', SITE.githubUrl, 'github.com/juanpacj-wq'),

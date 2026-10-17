@@ -18,9 +18,7 @@ decisions and quality checks are meant to be read.
 > Live design reference: [/design-system](https://juancespedes.dev/design-system)
 > ([docs](docs/design-system.md)).
 
-| Home (Spanish, dark theme)                                     | Home (English, light theme)                                      |
-| -------------------------------------------------------------- | ---------------------------------------------------------------- |
-| ![Home page in the dark theme](docs/screenshots/home-dark.png) | ![Home page in the light theme](docs/screenshots/home-light.png) |
+![Home page](docs/screenshots/home-dark.png)
 
 | Case study: architecture drawn from data                                 | Phone                                                |
 | ------------------------------------------------------------------------ | ---------------------------------------------------- |
@@ -79,7 +77,7 @@ Imports may only point inward. Two independent tools check it on every pull requ
 | [0006](docs/adr/0006-tailwind-on-design-tokens.md)          | Tailwind CSS v4 on design tokens                                          |
 | [0007](docs/adr/0007-testing-strategy.md)                   | Testing strategy and quality gates                                        |
 | [0008](docs/adr/0008-content-validation-layers.md)          | Content validated in three layers: schema, domain rules, cross-file tests |
-| [0009](docs/adr/0009-theming-and-design-tokens.md)          | Theming with light-dark() tokens; raw colors rejected in CI               |
+| [0009](docs/adr/0009-theming-and-design-tokens.md)          | Design tokens; raw colors rejected in CI (one theme since 0032)           |
 | [0010](docs/adr/0010-contact-form-delivery.md)              | Contact form on Email Routing and Turnstile; fails closed; stores nothing |
 | [0011](docs/adr/0011-case-study-pages.md)                   | Case study pages: fixed template, diagrams as data, private denylist      |
 | [0012](docs/adr/0012-bilingual-routes-and-seo.md)           | Spanish at the root, English under /en; hreflang, sitemap, JSON-LD, OG    |
@@ -103,7 +101,7 @@ Every pull request must pass all of them ([ADR 0007](docs/adr/0007-testing-strat
 | Architecture  | eslint-plugin-boundaries, dependency-cruiser                                       | 0 violations                                             |
 | Unit tests    | Vitest                                                                             | ≥ 90 % coverage of domain and application                |
 | Content       | Vitest over the real content files                                                 | ES/EN parity, sourced metrics, no internal data          |
-| Design tokens | Token check script, contrast test over the stylesheet                              | No raw colors; every text pair AA in both themes         |
+| Design tokens | Token check script, contrast test over the stylesheet                              | No raw colors; every text pair AA                        |
 | End-to-end    | Playwright on Chromium, WebKit and mobile, against the production build on workerd | All pass                                                 |
 | Accessibility | axe-core                                                                           | 0 WCAG 2.2 AA violations                                 |
 | Performance   | Lighthouse CI                                                                      | ≥ 95 performance, best practices, SEO; 100 accessibility |

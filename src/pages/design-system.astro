@@ -1,8 +1,8 @@
 ---
 /*
  * Living reference of the design system: every token and primitive, rendered with the real
- * components in the current theme. Not indexed by search engines; linked from the README.
- * The e2e suite runs axe on this page in both themes.
+ * components in the site's one theme. Not indexed by search engines; linked from the README.
+ * The e2e suite runs axe on this page.
  */
 import Icon from '../ui/icons/Icon.astro';
 import { ICONS, type IconName } from '../ui/icons/icons';
@@ -53,15 +53,15 @@ const iconNames = Object.keys(ICONS) as IconName[];
 
 <BaseLayout
   title="Design system | juancespedes.dev"
-  description="Tokens and components of juancespedes.dev, rendered live in the current theme."
+  description="Tokens and components of juancespedes.dev, rendered live."
   locale="en"
   noindex
 >
   <Section id="intro" eyebrow="Reference" title="Design system">
     <p slot="description">
       Tokens live in <code class="font-mono text-ink">src/ui/styles/global.css</code>; components in{' '}
-      <code class="font-mono text-ink">src/ui/primitives</code>. Switch the theme in the header to
-      see both. Contrast pairs are verified by an automated test.
+      <code class="font-mono text-ink">src/ui/primitives</code>. Contrast pairs are verified by an
+      automated test.
     </p>
   </Section>
 
@@ -170,7 +170,7 @@ const iconNames = Object.keys(ICONS) as IconName[];
         </p>
       </Frame>
       <Frame label="Inverted stage" inverted>
-        <p>Inverted swaps ink and canvas to give one item emphasis in both themes.</p>
+        <p>Inverted swaps ink and canvas to give one item emphasis.</p>
       </Frame>
     </div>
   </Section>
