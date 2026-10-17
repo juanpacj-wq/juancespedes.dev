@@ -249,14 +249,11 @@ export const mountNotFoundField = async (canvas: HTMLCanvasElement): Promise<voi
   };
 
   resize();
-  // Resizes and theme changes redraw at once; in motion the next frame would anyway.
+  // Resizes redraw at once; in motion the next frame would anyway.
   new ResizeObserver(() => {
     resize();
     frame(0);
   }).observe(canvas);
-  new MutationObserver(() => {
-    frame(0);
-  }).observe(document.documentElement, { attributeFilter: ['data-theme'] });
   canvas.dataset.ready = '';
   if (still) return;
 

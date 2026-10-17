@@ -84,7 +84,7 @@ export default function ContactForm({
         widgetId.current = turnstile.render(widgetRef.current, {
           sitekey: siteKey,
           language: locale,
-          theme: 'auto',
+          theme: 'dark',
           callback: (value: string) => {
             setToken(value);
           },

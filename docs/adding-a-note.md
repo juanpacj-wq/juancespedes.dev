@@ -19,7 +19,7 @@ status: draft # publish with: published
 ```
 
 3. Write the article below the frontmatter in MDX. `##` headings become the outline at the top of
-   the page. Code blocks are highlighted in both themes.
+   the page. Code blocks are highlighted with the site's dark theme.
 4. Drafts show up in `pnpm dev` only. `pnpm test` checks both languages; the build adds the pages,
    the Open Graph cards and the sitemap entries.
 

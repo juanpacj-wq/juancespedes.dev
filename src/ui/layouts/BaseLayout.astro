@@ -99,12 +99,14 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
     <meta name="author" content={t.profile.name} />
     {jsonLd && <script type="application/ld+json" set:html={toJsonLd(jsonLd)} />}
 
-    <meta name="color-scheme" content="dark light" />
+    <meta name="color-scheme" content="dark" />
     <!-- tokens-allow: meta tags need a literal color; keep in sync with the dark --canvas token -->
     <meta name="theme-color" content="#0b0b0d" />
     <meta name="generator" content={Astro.generator} />
     <link rel="preload" href={textFont} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- iOS home screen: it reads no SVG and rounds the corners itself. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap.xml" />
     {PUBLIC_WEB_ANALYTICS_TOKEN && (
       // Cloudflare Web Analytics: cookieless page views, production builds only (ADR 0013).
@@ -115,14 +117,6 @@ const switchTo = alternates ? { href: alternates[otherLocale], locale: otherLoca
         data-cf-beacon={JSON.stringify({ token: PUBLIC_WEB_ANALYTICS_TOKEN })}
       />
     )}
-    <!-- Applies a stored theme before first paint, so there is no flash of the wrong theme. -->
-    <script is:inline>
-      try {
-        const stored = localStorage.getItem('theme');
-        if (stored === 'light' || stored === 'dark')
-          document.documentElement.dataset.theme = stored;
-      } catch {}
-    </script>
   </head>
   <body class="flex min-h-dvh flex-col bg-canvas text-ink">
     <a

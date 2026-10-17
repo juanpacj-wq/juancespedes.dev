@@ -47,7 +47,6 @@ const items = stack.map((name) => ({ name, id: id(name), logo: logoFor(name) }))
                 class="cs-band-logo"
                 style={`--brand:#${logo.hex}`}
                 data-on-dark={logo.onDark ? '' : undefined}
-                data-on-light={logo.onLight ? '' : undefined}
               >
                 <title>{name}</title>
                 <use href={`#${id}`} />

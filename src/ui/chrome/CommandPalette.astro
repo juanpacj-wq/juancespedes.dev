@@ -171,10 +171,6 @@ const { t } = Astro.props;
         return;
       }
       switch (item.action) {
-        case 'toggle-theme':
-          document.querySelector<HTMLButtonElement>('.theme-toggle')?.click();
-          close();
-          break;
         case 'switch-language':
           close();
           switchLink()?.click();

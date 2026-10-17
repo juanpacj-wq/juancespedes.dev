@@ -97,11 +97,11 @@ describe('tech logos', () => {
     expect(luminance('FFFFFF')).toBeCloseTo(1);
   });
 
-  it('keeps the brand colour only where it holds 3:1 against each canvas', () => {
-    // React's cyan is bright: fine on dark, too faint on light.
-    expect(logoFor('React')).toMatchObject({ onDark: true, onLight: false });
-    // Express is near black: the ink colour on dark, the brand colour on light.
-    expect(logoFor('Express')).toMatchObject({ onDark: false, onLight: true });
+  it('keeps the brand colour only where it holds 3:1 against the canvas', () => {
+    // React's cyan is bright: fine on the dark canvas.
+    expect(logoFor('React')).toMatchObject({ onDark: true });
+    // Express is near black: drawn in the ink colour instead.
+    expect(logoFor('Express')).toMatchObject({ onDark: false });
   });
 
   it('has no logo for technologies without a free, faithful mark', () => {

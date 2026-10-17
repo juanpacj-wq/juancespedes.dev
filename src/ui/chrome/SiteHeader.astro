@@ -4,7 +4,6 @@ import type { Dictionary } from '../i18n/dictionary';
 import Container from '../primitives/Container.astro';
 import CommandPalette from './CommandPalette.astro';
 import RollingLabel from './RollingLabel.astro';
-import ThemeToggle from './ThemeToggle.astro';
 
 export interface NavItem {
   readonly href: string;
@@ -75,13 +74,12 @@ const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.
           <span class="sr-only">: {t.language.switchTo}</span>
         </a>
       )}
-      <ThemeToggle toLightLabel={t.theme.toLight} toDarkLabel={t.theme.toDark} />
     </div>
   </Container>
 </header>
 
 <script>
-  // One module file for the header, theme switch included, instead of inline script on every
+  // One module file for the header instead of inline script on every
   // page (the HTML budget).
   import { mountSiteHeader } from './site-header';
 

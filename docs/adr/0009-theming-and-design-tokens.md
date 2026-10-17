@@ -1,6 +1,7 @@
 # 0009. Theming with light-dark() tokens, enforced in CI
 
-- Status: accepted
+- Status: superseded in part by [0032](0032-dark-only.md): the light theme and its switch are
+  gone; the token rules stay
 - Date: 2026-10-12
 
 ## Context

@@ -57,15 +57,9 @@ test.describe('command palette', () => {
     await expect(trigger).toBeFocused();
   });
 
-  test('runs actions: theme and language', async ({ page }) => {
+  test('runs actions: language', async ({ page }) => {
     await page.goto('/proyectos/plant-telemetry');
-    let dialog = await openWithShortcut(page);
-    await dialog.getByRole('combobox').fill('tema');
-    await dialog.getByRole('combobox').press('Enter');
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-    await expect(dialog).toBeHidden();
-
-    dialog = await openWithShortcut(page);
+    const dialog = await openWithShortcut(page);
     await dialog.getByRole('combobox').fill('ingles');
     await dialog.getByRole('combobox').press('Enter');
     await expect(page).toHaveURL(/\/en\/projects\/plant-telemetry$/);
@@ -92,15 +86,10 @@ test.describe('command palette', () => {
     await expect(dialog.getByRole('status')).toHaveText('Nada coincide con esa búsqueda.');
   });
 
-  test('is accessible while open, in both themes', async ({ page }) => {
-    for (const theme of ['dark', 'light']) {
-      await page.addInitScript((value) => {
-        localStorage.setItem('theme', value);
-      }, theme);
-      await page.goto('/');
-      await openWithShortcut(page);
-      const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-      expect(results.violations, theme).toEqual([]);
-    }
+  test('is accessible while open', async ({ page }) => {
+    await page.goto('/');
+    await openWithShortcut(page);
+    const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+    expect(results.violations).toEqual([]);
   });
 });

@@ -226,7 +226,7 @@ export const initChatDrawer = (root: HTMLElement): void => {
         widgetId = turnstile.render(widget, {
           sitekey: siteKey,
           language: locale,
-          theme: 'auto',
+          theme: 'dark',
           appearance: 'interaction-only',
           callback: (value: string) => {
             token = value;
