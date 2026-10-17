@@ -1,5 +1,5 @@
 // Open Graph cards (1200 x 630) drawn as SVG. Pure functions so tests can check them; the
-// renderer in scripts/generate-og.mjs turns the SVG into PNG with resvg, Overused Grotesk and Geist
+// renderer in scripts/generate-og.mjs turns the SVG into PNG with resvg, Overused Grotesk and Fragment
 // Mono, the site's faces (ADR 0030). There is no text measurement in SVG, so lines are wrapped
 // with approximate glyph widths; the estimate errs wide, so real lines come out a little shorter
 // than the limit.
@@ -39,11 +39,11 @@ export const textWidth = (text, fontSize) =>
   [...text].reduce((total, char) => total + charWidth(char), 0) * fontSize;
 
 /**
- * Exact width in px of `text` in Geist Mono, where every character advances 0.6 em.
+ * Exact width in px of `text` in Fragment Mono, where every character advances 0.618 em.
  * @param {string} text
  * @param {number} fontSize
  */
-export const monoWidth = (text, fontSize) => [...text].length * 0.6 * fontSize;
+export const monoWidth = (text, fontSize) => [...text].length * 0.618 * fontSize;
 
 /**
  * Greedy word wrap. Returns at most `maxLines` lines; if the text does not fit, the last line ends
@@ -157,7 +157,7 @@ export const cardSvg = ({
     : '';
 
   const highlightSvg = highlight
-    ? `<text x="${PAD}" y="528" font-family="Geist Mono" font-weight="500" font-size="44" fill="${COLORS.accent}">${escapeXml(highlight.value)}</text>` +
+    ? `<text x="${PAD}" y="528" font-family="Fragment Mono" font-size="44" fill="${COLORS.accent}">${escapeXml(highlight.value)}</text>` +
       `<text x="${PAD + monoWidth(highlight.value, 44) + 24}" y="526" font-family="Overused Grotesk" font-size="24" fill="${COLORS.muted}">${escapeXml(
         wrapText(highlight.label, {
           fontSize: 24,
@@ -173,9 +173,9 @@ export const cardSvg = ({
     `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">`,
     `<rect width="${WIDTH}" height="${HEIGHT}" fill="${COLORS.canvas}"/>`,
     `<rect x="24" y="24" width="${WIDTH - 48}" height="${HEIGHT - 48}" rx="28" fill="${COLORS.surface}" stroke="${COLORS.line}" stroke-width="2"/>`,
-    `<text x="${PAD}" y="112" font-family="Geist Mono" font-weight="500" font-size="28" fill="${COLORS.ink}">juancespedes<tspan fill="${COLORS.accent}">.dev</tspan></text>`,
+    `<text x="${PAD}" y="112" font-family="Fragment Mono" font-size="28" fill="${COLORS.ink}">juancespedes<tspan fill="${COLORS.accent}">.dev</tspan></text>`,
     `<rect x="${WIDTH - PAD - badgeWidth}" y="80" width="${badgeWidth}" height="44" rx="22" fill="none" stroke="${COLORS.accent}" stroke-opacity="0.5" stroke-width="2"/>`,
-    `<text x="${WIDTH - PAD - badgeWidth / 2}" y="109" text-anchor="middle" font-family="Geist Mono" font-size="20" letter-spacing="1.5" fill="${COLORS.accent}">${escapeXml(eyebrow.toUpperCase())}</text>`,
+    `<text x="${WIDTH - PAD - badgeWidth / 2}" y="109" text-anchor="middle" font-family="Fragment Mono" font-size="20" letter-spacing="1.5" fill="${COLORS.accent}">${escapeXml(eyebrow.toUpperCase())}</text>`,
     titleLines,
     subtitleSvg,
     bodySvg,

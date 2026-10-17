@@ -29,8 +29,8 @@ const text = art.replace(/\n+$/, '');
 const count = text.replace(/\s/g, '').length;
 const lines = text.split('\n');
 const columns = lines[0]?.length ?? 120;
-// Width over height of the drawing: cells are 0.6 wide for each 1 of height.
-const ratio = (columns * 0.6) / lines.length;
+// Width over height of the drawing: cells are 0.618 wide for each 1 of height (Fragment Mono).
+const ratio = (columns * 0.618) / lines.length;
 // The colour layer only needs one pixel per character, so a tiny copy of the painting is enough.
 // It is fetched on first use (see the script), never with the page.
 const colour = await getImage({ src: painting, width: columns, format: 'webp' });
@@ -98,11 +98,12 @@ const countLabel = characters.replace('{count}', formatNumber(locale, count));
 
   .ascii-layer {
     margin: 0;
-    /* Geist Mono advances 0.6em per character: this fits every column in the figure's width. */
+    /* Fragment Mono advances 0.618em per character: this fits every column in the figure's
+       width. */
     font-family: var(--font-mono);
     /* The glyph ramp was measured at this weight (scripts/generate-ascii.mjs). */
-    font-weight: 600;
-    font-size: calc(100cqi / (var(--columns) * 0.6));
+    font-weight: 400;
+    font-size: calc(100cqi / (var(--columns) * 0.618));
     line-height: 1;
     letter-spacing: 0;
     white-space: pre;

@@ -1,5 +1,5 @@
 ---
-import monoFont from '@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url';
+import monoFont from '@fontsource/fragment-mono/files/fragment-mono-latin-400-normal.woff2?url';
 
 import type { Locale } from '../../domain/shared/locale';
 import AsciiArt from '../art/AsciiArt.astro';
@@ -23,7 +23,7 @@ const { roles } = t.hero;
   (data-ascii-stage).
 -->
 <!--
-  The backdrop text is the largest paint of the page and is drawn in Geist Mono, which the
+  The backdrop text is the largest paint of the page and is drawn in Fragment Mono, which the
   browser would only find after the stylesheet: fetch it with the HTML.
 -->
 <link rel="preload" href={monoFont} as="font" type="font/woff2" crossorigin />
