@@ -18,7 +18,7 @@ export interface Cloud {
 }
 
 /** Light to dense, picked from the coverage ramp measured for the painting (generate-ascii). */
-export const RAMP = '.:;!+*xoa#@8W';
+export const RAMP = '.:;!+x*oa#8W@';
 
 /** @param level 0 (lightest glyph) to 1 (densest); values outside are clamped. */
 export const glyphIndex = (level: number): number =>
@@ -84,7 +84,7 @@ export const mountNotFoundField = async (canvas: HTMLCanvasElement): Promise<voi
   const mono = getComputedStyle(canvas).fontFamily;
   const display = `500 240px ${getComputedStyle(document.documentElement).getPropertyValue('--font-display')}`;
   await document.fonts.load(display, '404').catch(() => undefined);
-  await document.fonts.load(`600 16px ${mono}`, RAMP).catch(() => undefined);
+  await document.fonts.load(`400 16px ${mono}`, RAMP).catch(() => undefined);
 
   // The display font's "404", rasterised once and cropped to its ink.
   mask.font = display;
@@ -207,7 +207,7 @@ export const mountNotFoundField = async (canvas: HTMLCanvasElement): Promise<voi
     context.clearRect(0, 0, canvas.width, canvas.height);
     // Read on every frame, so the ink follows the theme toggle.
     context.fillStyle = getComputedStyle(canvas).color;
-    context.font = `600 ${String(cell * ratio)}px ${mono}`;
+    context.font = `400 ${String(cell * ratio)}px ${mono}`;
     context.textBaseline = 'top';
     for (let at = 0; at < cells.length; at += 1) {
       const level = (cells[at] ?? 0) / full;

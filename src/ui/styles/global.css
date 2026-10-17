@@ -83,10 +83,11 @@
 }
 
 @theme {
-  /* One grotesk for headings and text (ADR 0030); Geist Mono for data, labels and the hero art. */
+  /* One grotesk for headings and text (ADR 0030); Fragment Mono for data, labels and the hero art
+     (ADR 0031). */
   --font-display: 'Overused Grotesk', 'Overused Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Overused Grotesk', 'Overused Fallback', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
+  --font-mono: 'Fragment Mono', 'Fragment Mono Fallback', ui-monospace, monospace;
 
   /* Fluid type scale: grows with the viewport between 360 px and 1280 px. */
   --text-eyebrow: 0.75rem;
@@ -161,6 +162,17 @@
   line-gap-override: 0%;
 }
 
+/* Courier New with Fragment Mono's advance (0.618 em) and vertical metrics, so a line of the mono
+   keeps its width while the font arrives. Fragment Mono has one weight: no faux bold over it. */
+@font-face {
+  font-family: 'Fragment Mono Fallback';
+  src: local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono'), local('Cousine');
+  size-adjust: 103%;
+  ascent-override: 92.23%;
+  descent-override: 24.27%;
+  line-gap-override: 0%;
+}
+
 /* ---------- Base ---------- */
 
 @layer base {
@@ -170,6 +182,8 @@
     font-family: var(--font-sans);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    /* Fragment Mono has one weight; a synthesized bold would smear it. */
+    font-synthesis-weight: none;
     scroll-behavior: smooth;
   }
 

@@ -36,6 +36,7 @@ default (Space Grotesk, DM Sans, Manrope, Instrument, Bricolage, Hanken) were le
 
 ## Consequences
 
-- `@fontsource-variable/hanken-grotesk` is removed; Geist Mono still comes from Fontsource.
+- `@fontsource-variable/hanken-grotesk` is removed; Geist Mono still came from Fontsource
+  until [ADR 0031](0031-fragment-mono.md) replaced it with Fragment Mono.
 - Updating the face means re-running the instancer and subsetter (commands in the PR that added
   it) on a new release from the RandomMaerks repository.

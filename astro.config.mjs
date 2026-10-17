@@ -117,7 +117,7 @@ export default defineConfig({
       // file too: inlined, its 3 kB would weigh on the HTML budget of every page instead of being
       // cached once.
       assetsInlineLimit: (file) =>
-        file.endsWith('.woff2') || file.includes('SiteHeader.astro') ? false : undefined,
+        /\.woff2?$/.test(file) || file.includes('SiteHeader.astro') ? false : undefined,
     },
   },
 });

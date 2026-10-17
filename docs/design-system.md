@@ -8,7 +8,7 @@ Decisions: [ADR 0006](adr/0006-tailwind-on-design-tokens.md) and
 
 Chiaroscuro ([ADR 0018](adr/0018-chiaroscuro-redesign.md)): a warm near-black ground, cream ink
 and one candle-ochre light, with a complete light theme. Since [ADR 0029](adr/0029-wide-clean-layout.md)
-one grotesk, Overused Grotesk ([ADR 0030](adr/0030-overused-grotesk.md)), sets headings (medium, tight tracking) and text; Geist Mono sets data,
+one grotesk, Overused Grotesk ([ADR 0030](adr/0030-overused-grotesk.md)), sets headings (medium, tight tracking) and text; Fragment Mono ([ADR 0031](adr/0031-fragment-mono.md)) sets data,
 labels and the ASCII painting. The page frame is 120rem wide with 16 to 64 px gutters, so wide
 screens are used edge to edge. Section headers are one line: a hairline, a short title and, only
 when needed, a brief note on the right. Each fact appears once per page; the project page holds the

@@ -258,7 +258,6 @@
     color: var(--color-ink);
     font-family: var(--font-mono);
     font-size: var(--text-eyebrow);
-    font-weight: 600;
   }
 
   .chat-icon-button {

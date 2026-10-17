@@ -13,62 +13,62 @@ const OUT = join(ROOT, 'src', 'assets', 'art', 'narcissus.txt');
 
 /** Enough columns for the arms, the face and the reflection to keep their outline. */
 const COLUMNS = 240;
-/** A monospace cell is about 0.6 wide for each 1 of height (line-height 1). */
-const CELL_ASPECT = 0.6;
+/** A Fragment Mono cell is 0.618 wide for each 1 of height (line-height 1). */
+const CELL_ASPECT = 0.618;
 /**
- * Glyphs and the share of their cell that Geist Mono inks at weight 600 (the weight the hero
- * draws the art with), measured by rendering each one to a canvas. A tone maps to the glyph whose
+ * Glyphs and the share of their cell that Fragment Mono inks at weight 400 (its only weight, the
+ * one the hero draws the art with), measured by rendering each one to a canvas. A tone maps to the glyph whose
  * coverage is nearest, so the drawing keeps the painting's values: a ramp ordered by eye puts
  * light glyphs in dark places (the tilde inks less than the semicolon) and the silhouette blurs.
  */
 /** @type {ReadonlyArray<readonly [string, number]>} */
 const GLYPHS = [
   [' ', 0],
-  ['.', 0.034],
-  ['-', 0.065],
-  [':', 0.068],
-  ['~', 0.087],
-  [';', 0.088],
-  ['^', 0.111],
-  ['!', 0.123],
-  ['=', 0.148],
-  ['+', 0.151],
-  ['*', 0.16],
-  ['<', 0.163],
-  ['(', 0.18],
-  ['v', 0.205],
-  ['r', 0.208],
-  ['x', 0.21],
-  ['t', 0.213],
-  ['c', 0.224],
-  ['n', 0.235],
-  ['s', 0.247],
-  ['o', 0.254],
-  ['a', 0.268],
-  ['e', 0.272],
-  ['k', 0.275],
-  ['w', 0.291],
-  ['X', 0.294],
-  ['Z', 0.302],
-  ['p', 0.312],
-  ['%', 0.314],
-  ['#', 0.318],
-  ['m', 0.321],
-  ['S', 0.338],
-  ['D', 0.344],
-  ['G', 0.351],
-  ['R', 0.357],
-  ['@', 0.366],
-  ['N', 0.37],
-  ['8', 0.371],
-  ['Q', 0.378],
-  ['B', 0.383],
-  ['&', 0.385],
-  ['$', 0.391],
-  ['W', 0.405],
-  ['M', 0.417],
+  ['.', 0.03],
+  ['-', 0.043],
+  [':', 0.059],
+  ['~', 0.06],
+  [';', 0.077],
+  ['!', 0.085],
+  ['+', 0.101],
+  ['^', 0.104],
+  ['=', 0.105],
+  ['<', 0.115],
+  ['(', 0.116],
+  ['r', 0.123],
+  ['v', 0.137],
+  ['x', 0.148],
+  ['t', 0.152],
+  ['*', 0.155],
+  ['c', 0.161],
+  ['n', 0.168],
+  ['s', 0.18],
+  ['o', 0.189],
+  ['k', 0.192],
+  ['e', 0.208],
+  ['a', 0.21],
+  ['Z', 0.211],
+  ['X', 0.221],
+  ['%', 0.225],
+  ['w', 0.228],
+  ['p', 0.229],
+  ['m', 0.235],
+  ['#', 0.25],
+  ['8', 0.257],
+  ['S', 0.257],
+  ['$', 0.261],
+  ['G', 0.261],
+  ['&', 0.263],
+  ['D', 0.264],
+  ['R', 0.264],
+  ['N', 0.272],
+  ['M', 0.281],
+  ['B', 0.293],
+  ['Q', 0.294],
+  ['W', 0.316],
+  ['@', 0.322],
 ];
-const DENSEST = 0.417;
+const DENSEST = 0.322;
 /** @param {number} level 0 (empty) to 1 (densest) */
 const glyphFor = (level) => {
   const target = level * DENSEST;
