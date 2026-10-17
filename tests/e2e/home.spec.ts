@@ -219,7 +219,7 @@ test.describe('projects', () => {
   test('featured cases play on the stage and the rest share a grid', async ({ page }) => {
     await page.goto('/#projects');
     await expect(page.locator('#projects [data-stage-slide]')).toHaveCount(5);
-    await expect(page.locator('#projects .project-card')).toHaveCount(3);
+    await expect(page.locator('#projects .project-card')).toHaveCount(7);
     // One link per project, named by the project's title.
     const slide = page.locator('#project-operations-logbook');
     await expect(slide.getByRole('link')).toHaveCount(1);

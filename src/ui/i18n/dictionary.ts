@@ -213,6 +213,11 @@ const es = {
     ctaTitle: '¿Trabajas en algo parecido?',
     ctaBody: 'Escríbeme y cuéntame qué necesitas.',
     ctaContact: 'Escríbeme',
+    liveReport: 'Pruébalo en vivo',
+    liveReportOpen: 'Cargar el informe interactivo',
+    liveReportNote:
+      'Réplica con datos de prueba publicada en Power BI. Se carga desde los servidores de Microsoft solo cuando haces clic.',
+    liveReportNewTab: 'Abrir en una pestaña nueva',
   },
   chat: {
     title: 'Pregúntale a mi portafolio',
@@ -532,6 +537,11 @@ const en: Dictionary = {
     ctaTitle: 'Working on something similar?',
     ctaBody: 'Write to me and tell me what you need.',
     ctaContact: 'Get in touch',
+    liveReport: 'Try it live',
+    liveReportOpen: 'Load the interactive report',
+    liveReportNote:
+      "A replica with test data, published on Power BI. It loads from Microsoft's servers only when you click.",
+    liveReportNewTab: 'Open in a new tab',
   },
   chat: {
     title: 'Ask my portfolio',

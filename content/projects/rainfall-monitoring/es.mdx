@@ -1,0 +1,44 @@
+---
+kind: report
+title: Monitoreo de precipitaciones para una operación minera
+summary: Informe en Power BI que consolida las lecturas diarias de ocho pluviómetros en tres sedes, con resumen de la semana y del mes, eventos de lluvia hora a hora y comparación con el histórico.
+role: Autor del modelo, las medidas DAX y el informe
+period: { start: '2024-08', end: '2024-10' }
+capabilities: [data-bi]
+stack:
+  - Power BI
+  - DAX
+  - Power Query
+  - SharePoint
+  - Excel
+metrics:
+  - value: '8'
+    label: pluviómetros en tres sedes, con una lectura diaria cada uno
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+  - value: '15'
+    label: medidas DAX para acumulados por semana, mes, sede y año
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+  - value: '1'
+    label: relación que faltaba en el modelo y se agregó en la réplica, porque las donas por sede repetían el total
+    source: Revisión del modelo original al construir la réplica, octubre de 2026
+featured: false
+order: 10
+status: published
+confidentiality: anonymized
+tool: Power BI Desktop y servicio de Power BI
+businessQuestions:
+  - ¿Cuánto llovió esta semana y este mes en cada sede y en cada punto de medición?
+  - ¿Qué días concentraron la lluvia, y a qué hora empezó y terminó cada evento?
+  - ¿Cómo se compara este año con el histórico de lluvias de la zona?
+dataSources:
+  - Listas de SharePoint donde el personal de campo registra las lecturas diarias
+  - Libro de Excel con el histórico de lecturas anteriores
+  - 'Réplica pública: datos sintéticos con el régimen bimodal de lluvias del Caribe colombiano'
+highlightedMeasures:
+  - Lluvia acumulada por semana, mes y sede
+  - Duración y lámina de cada evento de lluvia
+  - Comparación con el mismo periodo del histórico
+liveReport: https://app.powerbi.com/view?r=eyJrIjoiOWY1NmIyZTYtZjRlOC00YjU3LWJjOTUtNzc0OWUwNmE3N2RmIiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

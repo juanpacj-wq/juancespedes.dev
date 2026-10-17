@@ -1,0 +1,73 @@
+---
+import type { Dictionary } from '../i18n/dictionary';
+import Icon from '../icons/Icon.astro';
+import TextLink from '../primitives/TextLink.astro';
+
+/**
+ * The report itself, live: a replica with test data published to the web from Power BI. The
+ * frame weighs several megabytes and comes from Microsoft, so the page only draws a facade (the
+ * performance budget and the privacy notice, CLAUDE.md): the iframe is created when the visitor
+ * clicks. Without JavaScript the facade is a plain link that opens the report in a new tab.
+ */
+interface Props {
+  t: Dictionary;
+  url: string;
+  /** The report's name, for the frame's accessible title. */
+  title: string;
+}
+
+const { t, url, title } = Astro.props;
+---
+
+<div class="flex flex-col gap-4">
+  <div class="overflow-hidden rounded-card bg-surface shadow-bevel">
+    <div
+      class="flex h-9 items-center gap-1.5 border-b border-line bg-frame px-4"
+      aria-hidden="true"
+    >
+      <i class="size-2.5 rounded-chip bg-line-strong"></i>
+      <i class="size-2.5 rounded-chip bg-line-strong"></i>
+      <i class="size-2.5 rounded-chip bg-line-strong"></i>
+      <span class="ml-2 overflow-hidden rounded-chip bg-surface-raised px-3 py-0.5 font-mono text-eyebrow text-ellipsis whitespace-nowrap text-subtle">
+        app.powerbi.com
+      </span>
+    </div>
+    <div class="relative aspect-[16/10]" data-live-report-stage>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-live-report={title}
+        class="group absolute inset-0 flex flex-col items-center justify-center gap-5 p-6 text-center"
+      >
+        <span class="inline-flex min-h-12 items-center gap-2 rounded-chip bg-accent px-6 font-medium text-on-accent shadow-bevel transition-[scale,filter] duration-500 ease-out group-hover:brightness-110 motion-safe:group-hover:scale-103">
+          <Icon name="zap" size={18} />
+          {t.project.liveReportOpen}
+        </span>
+        <span class="max-w-md text-small text-pretty text-muted">{t.project.liveReportNote}</span>
+      </a>
+    </div>
+  </div>
+  <p class="text-small">
+    <TextLink href={url} external externalLabel={t.a11y.external}>
+      {t.project.liveReportNewTab}
+    </TextLink>
+  </p>
+</div>
+
+<script>
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-live-report]')) {
+    link.addEventListener('click', (event) => {
+      // Let modified clicks (new tab, new window) do what the visitor asked for.
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
+      event.preventDefault();
+      const frame = document.createElement('iframe');
+      frame.src = link.href;
+      frame.title = link.dataset.liveReport ?? '';
+      frame.allowFullscreen = true;
+      frame.className = 'absolute inset-0 size-full border-0';
+      link.replaceWith(frame);
+      frame.focus();
+    });
+  }
+</script>

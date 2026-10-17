@@ -1,0 +1,10 @@
+{
+  "cover": {
+    "es": "Réplica pública con datos sintéticos: saldos de las subcuentas, facturas por contrato, cadena de ejecución presupuestal y facturas en mora.",
+    "en": "Public replica with synthetic data: subaccount balances, invoices by contract, the budget execution chain and overdue invoices."
+  },
+  "gallery-1": {
+    "es": "Fondos y saldos: flujo diario de las subcuentas, plan frente a real de la remuneración y matriz de contratos con su avance financiero.",
+    "en": "Funds and balances: daily flow of the subaccounts, planned against actual fees and the contract matrix with financial progress."
+  }
+}

@@ -1,0 +1,47 @@
+---
+kind: report
+title: Thermal generation scorecard in Power BI
+summary: Six pages that bring together generation, availability, fuel use and IEEE indicators for four thermal units, so management sees on one screen how each plant is doing against the market.
+role: Author of the semantic model, the DAX measures and the report design
+period: { start: '2024-09', end: '2025-09' }
+capabilities: [data-bi]
+stack:
+  - Power BI
+  - DAX
+  - Power Query
+  - PostgreSQL
+  - SharePoint
+  - Excel
+metrics:
+  - value: '6'
+    label: pages, from the month's net generation to the IEEE reliability indicators
+    source: The original report and its public replica, reviewed in October 2026
+  - value: '33'
+    label: DAX measures, among them EFOF, FOR, SOF and starting reliability
+    source: Semantic model of the original report, reviewed in October 2026
+  - value: '4'
+    label: thermal units compared month by month with national generation
+    source: Semantic model of the original report, reviewed in October 2026
+featured: false
+order: 9
+status: published
+confidentiality: anonymized
+tool: Power BI Desktop and the Power BI service
+businessQuestions:
+  - How much net energy did each unit deliver this month, and what share of national generation is that?
+  - How many hours was each unit running, on standby, in maintenance or out on a fault, and why?
+  - How much coal, limestone and diesel was burned, and at what heat rate?
+  - How are commercial availability and the IEEE indicators tracking against the rest of the year?
+dataSources:
+  - A PostgreSQL database with the plants' hourly operation
+  - Excel workbooks on SharePoint with outage causes and fuel inventory movements
+  - 'Public replica: synthetic data from a daily simulation per unit, generated in Python'
+highlightedMeasures:
+  - EFOF and FOR per unit, with equivalent derated hours
+  - Share of national generation
+  - Monthly and year-to-date commercial availability
+  - Starting reliability (synchronizations without a trip)
+liveReport: https://app.powerbi.com/view?r=eyJrIjoiY2FlN2Y2ZDktNDZhNS00YWZiLThmMWEtMzIzYWYwNjRmNzE2IiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

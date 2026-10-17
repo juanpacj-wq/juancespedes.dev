@@ -44,6 +44,10 @@ describe('content security policy', () => {
     expect(csp).not.toMatch(/script-src[^;]*unsafe-inline/);
   });
 
+  it('frames only the challenge and the Power BI reports', () => {
+    expect(csp).toContain('frame-src https://challenges.cloudflare.com https://app.powerbi.com');
+  });
+
   it('forbids framing, plugins and foreign form targets', () => {
     for (const directive of [
       "frame-ancestors 'none'",

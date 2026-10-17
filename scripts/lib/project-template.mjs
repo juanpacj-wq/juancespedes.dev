@@ -55,6 +55,7 @@ const kindFields = (kind, locale) => {
         'dataSources:',
         `  - ${quote(todo)}`,
         'highlightedMeasures: []',
+        'liveReport: null',
       ];
     case 'open-source':
       return ['repository: https://github.com/juanpacj-wq/TODO', 'license: MIT', 'install: null'];

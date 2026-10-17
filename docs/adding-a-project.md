@@ -14,9 +14,14 @@ Kinds:
 | Kind          | Use it for                                | Kind-specific fields                                                                             |
 | ------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | `case-study`  | Systems where the decisions are the story | `problem`, `responsibilities`, `constraints`, `decisions`, `architecture`, `outcomes`, `lessons` |
-| `report`      | Power BI reports and dashboards           | `tool`, `businessQuestions`, `dataSources`, `highlightedMeasures`                                |
+| `report`      | Power BI reports and dashboards           | `tool`, `businessQuestions`, `dataSources`, `highlightedMeasures`, `liveReport`                  |
 | `open-source` | Public repositories                       | `repository`, `license`, `install`                                                               |
 | `tool`        | Desktop apps, scripts and automations     | `platform`, `automates`                                                                          |
+
+`liveReport` is the "Publish to web" link of a replica with test data
+(`https://app.powerbi.com/view?r=...`), or `null`. The page draws a facade and loads the report
+only when the visitor clicks it, so the frame never weighs on the first load; never publish a
+report with real data, since anyone with the link can open it.
 
 This creates `content/projects/<slug>/es.mdx` and `en.mdx` as a valid **draft** full of `TODO`
 markers. Drafts show up in `pnpm dev` and never in a build.

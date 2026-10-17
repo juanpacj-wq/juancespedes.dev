@@ -11,6 +11,7 @@ import Container from '../primitives/Container.astro';
 import TextLink from '../primitives/TextLink.astro';
 import ArchitectureDiagram from './ArchitectureDiagram.astro';
 import DetailSection from './DetailSection.astro';
+import LiveReport from './LiveReport.astro';
 import { captionFor, mediaFor } from './media';
 import ProjectGallery from './ProjectGallery.astro';
 import ProjectScreens from './ProjectScreens.astro';
@@ -97,7 +98,12 @@ const kindChapters: Record<Project['kind'], [string, string][]> = {
     ['results', t.project.results],
     ['lessons', t.project.lessons],
   ],
-  report: [['report', t.project.businessQuestions]],
+  report: [
+    ['report', t.project.businessQuestions],
+    ...(project.kind === 'report' && project.liveReport
+      ? ([['live', t.project.liveReport]] as [string, string][])
+      : []),
+  ],
   'open-source': [['repository', t.project.repository]],
   tool: [['tool', t.project.automates]],
 };
@@ -521,6 +527,12 @@ const hookWords = project.kind === 'case-study' ? words(project.story.hook) : []
             </div>
           )}
         </dl>
+      </DetailSection>
+    )}
+
+    {project.kind === 'report' && project.liveReport && (
+      <DetailSection id="live" title={titleOf('live')} number={numberOf('live')} wide>
+        <LiveReport t={t} url={project.liveReport} title={project.title} />
       </DetailSection>
     )}
 

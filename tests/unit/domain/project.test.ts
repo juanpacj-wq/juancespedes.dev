@@ -152,6 +152,18 @@ describe('validateProjectContent', () => {
     expect(fields(issues)).toEqual(['businessQuestions', 'dataSources']);
   });
 
+  it('accepts only a Power BI "publish to web" link as the live report', () => {
+    const live = 'https://app.powerbi.com/view?r=eyJrIjoiYSJ9';
+    expect(validateProjectContent(reportContent({ liveReport: live }))).toEqual([]);
+    for (const liveReport of [
+      'https://app.powerbi.com/groups/me/reports/1',
+      'https://example.com/view?r=eyJrIjoiYSJ9',
+      'https://app.powerbi.com/view',
+    ]) {
+      expect(fields(validateProjectContent(reportContent({ liveReport })))).toEqual(['liveReport']);
+    }
+  });
+
   it('requires an https repository for open source', () => {
     const issues = validateProjectContent(openSourceContent({ repository: 'git@github.com:x/y' }));
     expect(fields(issues)).toEqual(['repository']);

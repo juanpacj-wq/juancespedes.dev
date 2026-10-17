@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { expect, test, type Page } from '@playwright/test';
@@ -23,6 +23,10 @@ const hasScreenshots = (slug: string) => {
 const withSolution = (sections: readonly string[], solution: string, slug: string) =>
   hasScreenshots(slug) ? [...sections.slice(0, 2), solution, ...sections.slice(2)] : [...sections];
 
+/** A report has its own chapters: the questions it answers, the live replica, screenshots, stack. */
+const isReport = (slug: string) =>
+  /^kind: report$/m.test(readFileSync(join(PROJECTS_DIR, slug, 'es.mdx'), 'utf8'));
+
 const TEMPLATE = {
   es: {
     path: (slug: string) => `/proyectos/${slug}`,
@@ -38,6 +42,8 @@ const TEMPLATE = {
       'Tecnologías',
     ],
     solution: 'La solución',
+    report: ['Preguntas que responde', 'Pruébalo en vivo'],
+    stack: 'Tecnologías',
     diagram: 'Diagrama de arquitectura',
     source: 'Fuente:',
   },
@@ -55,6 +61,8 @@ const TEMPLATE = {
       'Technologies',
     ],
     solution: 'The solution',
+    report: ['Questions it answers', 'Try it live'],
+    stack: 'Technologies',
     diagram: 'Architecture diagram',
     source: 'Source:',
   },
@@ -63,17 +71,27 @@ const TEMPLATE = {
 test.describe('project pages', () => {
   for (const [locale, template] of Object.entries(TEMPLATE)) {
     for (const slug of SLUGS) {
-      test(`${template.path(slug)} follows the case-study template`, async ({ page }) => {
+      const report = isReport(slug);
+      test(`${template.path(slug)} follows the ${report ? 'report' : 'case-study'} template`, async ({
+        page,
+      }) => {
         const response = await page.goto(template.path(slug));
         expect(response?.status()).toBe(200);
 
         await expect(page.locator('html')).toHaveAttribute('lang', locale);
         await expect(page.getByRole('heading', { level: 1 })).not.toBeEmpty();
         await expect(page.locator('main section[data-chapter] h2')).toHaveText(
-          withSolution(template.sections, template.solution, slug),
+          report
+            ? [
+                ...template.report,
+                ...(hasScreenshots(slug) ? [template.solution] : []),
+                template.stack,
+              ]
+            : withSolution(template.sections, template.solution, slug),
         );
-        await expect(page.getByRole('list', { name: template.diagram })).toBeVisible();
-        await expect(page.getByText(template.source).first()).toBeVisible();
+        if (!report) await expect(page.getByRole('list', { name: template.diagram })).toBeVisible();
+        // Metric sources are listed in a case study's results; other kinds show two figures in the hero.
+        if (!report) await expect(page.getByText(template.source).first()).toBeVisible();
         await expect(page).toHaveTitle(/\| Juan Céspedes$/);
       });
     }
@@ -291,6 +309,23 @@ test.describe('project pages', () => {
 
     await page.goto('/proyectos/plant-telemetry');
     await expect(page.getByText(/Sistema interno: el código es privado/)).toBeVisible();
+  });
+
+  test('a live report loads Power BI only when the visitor asks for it', async ({ page }) => {
+    const requests: string[] = [];
+    page.on('request', (request) => requests.push(request.url()));
+    await page.route('https://app.powerbi.com/**', (route) => route.fulfill({ body: '' }));
+    await page.goto('/proyectos/rainfall-monitoring');
+
+    const facade = page.locator('[data-live-report]');
+    await expect(facade).toHaveAttribute('href', /^https:\/\/app\.powerbi\.com\/view\?r=/);
+    await expect(page.locator('iframe')).toHaveCount(0);
+    expect(requests.filter((url) => url.startsWith('https://app.powerbi.com'))).toEqual([]);
+
+    await facade.click();
+    const frame = page.locator('[data-live-report-stage] iframe');
+    await expect(frame).toHaveAttribute('src', /^https:\/\/app\.powerbi\.com\/view\?r=/);
+    await expect(frame).toHaveAttribute('title', /.+/);
   });
 });
 

@@ -116,6 +116,7 @@ export const techId = (name: string): string =>
 const MONOGRAMS: Readonly<Record<string, string>> = {
   Azure: 'AZ',
   CustomTkinter: 'TK',
+  DAX: 'DAX',
   Excel: 'XLS',
   'Incident forensics': 'RCA',
   'Legacy code rescue': '</>',
@@ -128,8 +129,10 @@ const MONOGRAMS: Readonly<Record<string, string>> = {
   'pdfminer.six': 'PDF',
   Playwright: 'PW',
   'Power BI': 'BI',
+  'Power Query': 'PQ',
   PyInstaller: 'EXE',
   'REST APIs': '{ }',
+  SharePoint: 'SP',
   'SQL Server': 'SQL',
   systemd: 'SD',
   'WCAG 2.2': 'A11Y',

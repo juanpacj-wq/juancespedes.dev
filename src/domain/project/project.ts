@@ -82,6 +82,8 @@ export interface ReportContent extends CommonContent {
   readonly businessQuestions: readonly string[];
   readonly dataSources: readonly string[];
   readonly highlightedMeasures: readonly string[];
+  /** "Publish to web" link of a replica with test data, loaded only when the visitor asks. */
+  readonly liveReport: string | null;
 }
 
 export interface OpenSourceContent extends CommonContent {
@@ -128,6 +130,21 @@ const isHttpsUrl = (value: string): boolean => {
   }
 };
 
+/** A report published to the web: https://app.powerbi.com/view?r=... and nothing else. */
+const isPublicPowerBiUrl = (value: string): boolean => {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === 'https:' &&
+      url.host === 'app.powerbi.com' &&
+      url.pathname === '/view' &&
+      url.searchParams.has('r')
+    );
+  } catch {
+    return false;
+  }
+};
+
 const duplicates = (values: readonly string[]): string[] => {
   const seen = new Set<string>();
   const repeated = new Set<string>();
@@ -165,6 +182,14 @@ const kindIssues = (content: ProjectContent): ProjectIssue[] => {
       return [
         ...requireNonEmpty('businessQuestions', content.businessQuestions),
         ...requireNonEmpty('dataSources', content.dataSources),
+        ...(content.liveReport !== null && !isPublicPowerBiUrl(content.liveReport)
+          ? [
+              {
+                field: 'liveReport',
+                message: 'liveReport must be a Power BI "publish to web" link',
+              },
+            ]
+          : []),
       ];
     case 'open-source':
       return isHttpsUrl(content.repository)

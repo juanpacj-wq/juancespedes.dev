@@ -60,6 +60,7 @@ export const reportContent = (overrides: Partial<ReportContent> = {}): ReportCon
   businessQuestions: ['Which unit deviates most from dispatch?'],
   dataSources: ['Telemetry lakehouse'],
   highlightedMeasures: [],
+  liveReport: null,
   ...overrides,
 });
 

@@ -1,0 +1,46 @@
+---
+kind: report
+title: Control financiero de un programa de energía solar con recursos públicos
+summary: 'Informe en Power BI para la gerencia de un programa que lleva sistemas solares a zonas rurales: ejecución presupuestal por contrato, facturas en mora y saldos diarios de las subcuentas fiduciarias, con visuales en HTML hechos en DAX.'
+role: Autor del modelo semántico, las medidas en DAX y HTML y el diseño del informe
+period: { start: '2026-01', end: '2026-06' }
+capabilities: [data-bi]
+stack:
+  - Power BI
+  - DAX
+  - Power Query
+  - PostgreSQL
+  - Excel
+metrics:
+  - value: '43'
+    label: medidas DAX; 19 de ellas devuelven HTML y SVG para tarjetas, cascadas y curvas
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+  - value: '4'
+    label: subcuentas fiduciarias seguidas día a día, separadas entre implementación y remuneración
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+  - value: '2'
+    label: páginas, una de contratos y facturas y otra de fondos y saldos
+    source: Informe original y su réplica pública, revisados en octubre de 2026
+featured: false
+order: 12
+status: published
+confidentiality: anonymized
+tool: Power BI Desktop y servicio de Power BI
+businessQuestions:
+  - ¿Cuánto de cada contrato está comprometido, facturado y pagado?
+  - ¿Qué facturas están vencidas, cuántos días llevan en mora y en qué paso de aprobación están?
+  - ¿Cuánto dinero hay hoy en cada subcuenta y cómo se movió en el último mes?
+  - ¿La remuneración del programa deja la utilidad que se planeó?
+dataSources:
+  - Vistas de PostgreSQL con presupuesto, facturas, contratos y movimientos bancarios
+  - Libro de Excel con el plan de inversión del programa por año
+  - 'Réplica pública: datos sintéticos de contratos, facturas y movimientos de diciembre de 2025 a septiembre de 2026'
+highlightedMeasures:
+  - Cadena de ejecución presupuestal, dibujada en HTML
+  - Cascada de saldos con ingresos y egresos
+  - Matriz de contratos con su avance financiero
+  - Días en mora por factura
+liveReport: https://app.powerbi.com/view?r=eyJrIjoiZTllYTdjMGEtODg2ZC00ZWIxLWIxYzItM2M3MzAyODYzMmRmIiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

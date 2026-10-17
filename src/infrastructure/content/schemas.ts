@@ -82,6 +82,10 @@ const report = z.strictObject({
   businessQuestions: z.array(text).min(1),
   dataSources: z.array(text).min(1),
   highlightedMeasures: z.array(text).default([]),
+  liveReport: z
+    .url({ protocol: /^https$/ })
+    .nullable()
+    .default(null),
 });
 
 const openSource = z.strictObject({
