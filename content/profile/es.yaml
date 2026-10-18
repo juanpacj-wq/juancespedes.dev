@@ -66,6 +66,7 @@ services:
     price:
       from: 2500000
       scope: Un tablero con sus fuentes
+    featured: true
   - title: Aplicaciones web a la medida
     summary: Portales, plataformas internas y sistemas con inicio de sesión corporativo, de la base de datos al despliegue.
     deliverables:
@@ -75,7 +76,6 @@ services:
     price:
       from: null
       scope: Según el requerimiento
-    featured: true
   - title: Automatización e integración con IA
     summary: Bots, extracción de datos de documentos, integraciones entre sistemas y servidores MCP para asistentes de IA.
     deliverables:
