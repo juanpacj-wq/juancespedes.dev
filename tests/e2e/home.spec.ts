@@ -223,7 +223,7 @@ test.describe('projects', () => {
     await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('#work-full-stack [data-stage-slide]')).toHaveCount(5);
     await expect(page.locator('#work-analytics [data-stage-slide]')).toHaveCount(4);
-    await expect(page.locator('#work-automation [data-stage-slide]')).toHaveCount(3);
+    await expect(page.locator('#work-automation [data-stage-slide]')).toHaveCount(4);
     await expect(page.locator('#work-analytics')).toBeHidden();
     // The full-stack area in the order the author set.
     await expect(page.locator('#work-full-stack [data-stage-slide] h3')).toHaveText([
@@ -264,7 +264,7 @@ test.describe('projects', () => {
       'aria-selected',
       'true',
     );
-    await expect(page.locator('#project-linkedin-pilot')).toBeInViewport();
+    await expect(page.locator('#project-solar-fleet-telemetry')).toBeInViewport();
   });
 
   test('a click anywhere on a project opens its case study', async ({ page }) => {

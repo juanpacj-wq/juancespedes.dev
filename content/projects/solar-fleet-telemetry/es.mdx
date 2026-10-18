@@ -1,0 +1,131 @@
+---
+kind: case-study
+title: Telemetría de una flota solar, de dos nubes de fabricante a Fabric y PostgreSQL
+name: Telemetría de microinversores
+summary: Construí y opero el flujo que reúne la generación de cientos de techos solares desde dos plataformas de fabricante, la cruza con el maestro de viviendas y la publica en capas bronce, plata y oro en Microsoft Fabric y PostgreSQL.
+role: Ingeniero de datos a cargo del diseño, la construcción y la operación del sistema
+track: automation
+period: { start: '2026-07', end: null }
+capabilities: [automation-ai, data-bi, backend, infrastructure]
+stack:
+  - Python
+  - Polars
+  - Delta Lake
+  - MQTT
+  - SQLite
+  - Microsoft Fabric
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
+  - Power BI
+  - PostgreSQL
+  - Microsoft Graph
+  - systemd
+  - pytest
+metrics:
+  - value: '381'
+    label: pruebas automatizadas entre el ETL principal, el canal en tiempo real y el vigía
+    source: Suites de pytest de los tres componentes, octubre de 2026
+  - value: '1.498'
+    label: horas-planta comparadas con las aplicaciones de los fabricantes, sin diferencia de energía
+    source: Validación contra las aplicaciones de origen, agosto de 2026
+  - value: '3 h a 12 ms'
+    label: tiempo de la consulta de métricas de los analistas, tras pasarla a vistas materializadas
+    source: Corrección del incidente de bloqueos en PostgreSQL, octubre de 2026
+featured: false
+order: 0
+status: published
+confidentiality: anonymized
+story:
+  hook: 'Un programa solar en viviendas de interés social tenía la generación de cada techo repartida en dos nubes de fabricante, sin forma de verla junta.'
+  shifts:
+    - before: 'Cada fabricante mostraba sus equipos en su propia aplicación.'
+      after: 'Las dos fuentes llegan a un mismo modelo, una vivienda por planta, cada tres horas.'
+    - before: 'Una de las plataformas cobraba por consulta y su prueba gratuita se agotó.'
+      after: 'Sus equipos se leen por un canal push gratuito, con cobertura verificada hora a hora.'
+    - before: 'Si un proceso fallaba de noche, nadie se enteraba hasta el día siguiente.'
+      after: 'Un vigía revisa cada diez minutos y avisa por correo al fallar y al resolverse.'
+problem: Un grupo de energía instaló sistemas solares en techos de vivienda social, con una meta de miles de hogares. La generación quedaba en dos plataformas de fabricantes de microinversores, una sin API pública y otra con una API de pago cuyo costo crece con la energía producida. El negocio necesitaba ver cada vivienda como una planta, cruzada con su maestro de clientes, en Power BI y en SQL para sus analistas.
+responsibilities:
+  - Diseñé el modelo dimensional (cinco dimensiones y cuatro tablas de hechos) y la arquitectura medallón en dos destinos.
+  - Construí los colectores de ambas plataformas y el canal en tiempo real que reemplazó la API de pago.
+  - Audité el prototipo de un compañero para ese canal, corregí su lectura de los datos y lo llevé a producción.
+  - Desplegué y opero el sistema en un servidor Linux con servicios de systemd, alertas y un vigía con avisos por correo.
+constraints:
+  - Ninguna de las dos plataformas ofrece una API pensada para este uso, y la de pago agotó su cuota de prueba.
+  - La capacidad de Fabric es corporativa y compartida, y estuvo caída semanas por causas ajenas al proyecto.
+  - Los analistas consultan PostgreSQL mientras el ETL escribe, sobre una base detrás de un endpoint privado.
+  - Ningún dato real de viviendas, contratos o equipos puede salir del entorno del cliente.
+decisions:
+  - title: Una vivienda es una planta, identificada por su contrato
+    rationale: Un renombre masivo en las aplicaciones del fabricante borró la convención de nombres de la instalación. Anclar la identidad al contrato con el operador de red mantiene estables las llaves sustitutas aunque cambien los nombres.
+    alternatives:
+      - Seguir usando el nombre de cada planta en la aplicación
+  - title: Un canal push gratuito en lugar de la API de pago
+    rationale: El plan pago costaba del orden de decenas de miles de dólares al año y crecía con la generación. El canal push cuesta cero; el riesgo contractual quedó documentado y lo aceptó el negocio.
+    alternatives:
+      - Pagar el plan empresarial de la plataforma
+      - Un colector en la red local de cada vivienda
+  - title: Una hora sin reportes solo se cierra si el canal estaba escuchando
+    rationale: Con datos push, no recibir nada puede significar que el escucha estaba caído. La hora se cierra solo cuando los latidos la cubren, y los bordes de sesión quedan marcados como estimados, sin ceros falsos.
+    alternatives:
+      - Tratar la ausencia de reportes como generación cero
+  - title: Un watermark por destino
+    rationale: Fabric y PostgreSQL avanzan cada uno con su propia marca. Cuando la capacidad compartida de Fabric cayó durante semanas, PostgreSQL siguió al día y Fabric se puso al corriente sin perder datos.
+    alternatives:
+      - Una sola marca para los dos destinos
+architecture:
+  summary: Dos colectores leen las plataformas de los fabricantes, uno por lotes cada hora y otro escuchando un canal push las 24 horas. Un ETL en Python, sin Spark, publica bronce, plata y oro en lakehouses y un warehouse de Microsoft Fabric y en PostgreSQL, de donde leen Power BI y los analistas. Un motor de alertas y un vigía cuidan la operación.
+  layers:
+    - name: Origen
+      nodes:
+        - {
+            id: vendor-batch,
+            label: 'Plataforma de fabricante A',
+            detail: 'API no documentada, series del día completo',
+          }
+        - { id: vendor-push, label: 'Plataforma de fabricante B', detail: 'Canal push MQTT' }
+        - { id: master, label: 'Maestro de viviendas', detail: 'Libro de Excel del negocio' }
+    - name: Captura
+      nodes:
+        - { id: collector, label: 'Colector por lotes', detail: 'Cada hora, se cura solo' }
+        - { id: listener, label: 'Escucha 24/7', detail: 'SQLite en modo WAL, con latidos' }
+    - name: Medallón
+      nodes:
+        - { id: bronze, label: 'Bronce', detail: 'Lakehouse en Delta y PostgreSQL' }
+        - { id: silver, label: 'Plata', detail: 'Limpieza, unión y calidad de datos' }
+        - { id: gold, label: 'Oro', detail: 'Warehouse de Fabric y PostgreSQL' }
+    - name: Consumo
+      nodes:
+        - { id: power-bi, label: 'Power BI', detail: 'Modelo Direct Lake sobre el oro' }
+        - { id: analysts, label: 'Analistas en SQL', detail: 'Vistas materializadas' }
+    - name: Operación
+      nodes:
+        - {
+            id: alerts,
+            label: 'Motor de alertas',
+            detail: 'Cada diez minutos, un episodio por fila',
+          }
+        - { id: watchdog, label: 'Vigía', detail: 'systemd y correo por Microsoft Graph' }
+  flows:
+    - { from: vendor-batch, to: collector, label: 'Series de cinco minutos' }
+    - { from: vendor-push, to: listener, label: 'Reportes cada 30 segundos' }
+    - { from: collector, to: bronze, label: 'Cada tres horas' }
+    - { from: listener, to: bronze, label: 'Horas cubiertas por latidos' }
+    - { from: master, to: silver, label: 'Una vivienda, una planta' }
+    - { from: bronze, to: silver, label: 'Fuentes unificadas' }
+    - { from: silver, to: gold, label: 'MERGE en el modelo estrella' }
+    - { from: gold, to: power-bi, label: 'Direct Lake' }
+    - { from: gold, to: analysts, label: 'Vistas y tablas foráneas' }
+    - { from: listener, to: alerts, label: 'Equipos sin reporte y fallas' }
+    - { from: watchdog, to: collector, label: 'Revisa cada servicio y timer' }
+outcomes:
+  - La generación de las dos plataformas llega a un solo modelo cada tres horas, en Fabric y en PostgreSQL, con 1.498 horas-planta iguales a las de las aplicaciones de origen.
+  - El canal en tiempo real reemplazó la API de pago a costo cero, y su capa oro coincide celda por celda con la del ETL principal.
+  - Un incidente de bloqueos que dejó sin servicio a los analistas se corrigió con vistas materializadas, y su consulta de métricas pasó de 3 horas a 12 ms.
+  - Una caída de semanas de la capacidad compartida de Fabric no costó datos, porque cada destino lleva su propio avance.
+lessons:
+  - Mediría desde el primer día el costo de cada fuente por energía producida y no por equipo, porque fue lo que hizo inviable la API de pago al crecer la flota.
+  - Separaría antes la escritura del ETL de las consultas de los analistas, porque un TRUNCATE detrás de una consulta larga bloqueó a todos.
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

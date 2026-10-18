@@ -1,0 +1,127 @@
+---
+kind: case-study
+title: Telemetry for a solar fleet, from two vendor clouds to Fabric and PostgreSQL
+name: Micro-inverter telemetry
+summary: I built and run the flow that gathers the output of hundreds of rooftop solar systems from two vendor platforms, joins it with the homes master list and publishes it in bronze, silver and gold layers on Microsoft Fabric and PostgreSQL.
+role: Data engineer in charge of the design, build and operation of the system
+track: automation
+period: { start: '2026-07', end: null }
+capabilities: [automation-ai, data-bi, backend, infrastructure]
+stack:
+  - Python
+  - Polars
+  - Delta Lake
+  - MQTT
+  - SQLite
+  - Microsoft Fabric
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
+  - Power BI
+  - PostgreSQL
+  - Microsoft Graph
+  - systemd
+  - pytest
+metrics:
+  - value: '381'
+    label: automated tests across the main ETL, the real-time channel and the watchdog
+    source: pytest suites of the three components, October 2026
+  - value: '1,498'
+    label: plant-hours compared with the vendors' apps, with no difference in energy
+    source: Validation against the source apps, August 2026
+  - value: '3 h to 12 ms'
+    label: for the analysts' metrics query, once moved to materialized views
+    source: Fix for the PostgreSQL lock incident, October 2026
+featured: false
+order: 0
+status: published
+confidentiality: anonymized
+story:
+  hook: 'A solar program on social housing had the output of each rooftop split across two vendor clouds, with no way to see it together.'
+  shifts:
+    - before: 'Each vendor showed its devices in its own app.'
+      after: 'Both sources reach one model, one home per plant, every three hours.'
+    - before: 'One platform charged per call and its free trial ran out.'
+      after: 'Its devices are read through a free push channel, with coverage checked hour by hour.'
+    - before: 'If a job failed at night, nobody knew until the next day.'
+      after: 'A watchdog checks every ten minutes and emails on failure and on recovery.'
+problem: An energy group installed solar systems on social housing rooftops, aiming at thousands of homes. Output sat in two micro-inverter vendor platforms, one with no public API and one with a paid API whose cost grows with the energy produced. The business needed each home as a plant, joined with its customer master list, in Power BI and in SQL for its analysts.
+responsibilities:
+  - Designed the dimensional model (five dimensions and four fact tables) and the medallion architecture across two destinations.
+  - Built the collectors for both platforms and the real-time channel that replaced the paid API.
+  - Audited a colleague's prototype for that channel, corrected how it read the data and took it to production.
+  - Deployed and run the system on a Linux server with systemd services, alerts and a watchdog that emails.
+constraints:
+  - Neither platform offers an API meant for this use, and the paid one used up its trial quota.
+  - The Fabric capacity is corporate and shared, and it was down for weeks for reasons outside the project.
+  - Analysts query PostgreSQL while the ETL writes, on a database behind a private endpoint.
+  - No real data about homes, contracts or devices may leave the client's environment.
+decisions:
+  - title: A home is a plant, identified by its contract
+    rationale: A mass rename in the vendor apps erased the installer's naming convention. Anchoring identity to the grid operator contract keeps surrogate keys stable even when names change.
+    alternatives:
+      - Keep using each plant's name in the app
+  - title: A free push channel instead of the paid API
+    rationale: The paid plan cost in the tens of thousands of dollars a year and grew with output. The push channel costs nothing; the contractual risk was documented and accepted by the business.
+    alternatives:
+      - Pay for the platform's enterprise plan
+      - A collector on each home's local network
+  - title: An hour with no reports closes only if the channel was listening
+    rationale: With pushed data, receiving nothing can mean the listener was down. An hour closes only when heartbeats cover it, and session edges are marked as estimated, with no false zeros.
+    alternatives:
+      - Treat missing reports as zero output
+  - title: One watermark per destination
+    rationale: Fabric and PostgreSQL each advance with their own mark. When the shared Fabric capacity was down for weeks, PostgreSQL stayed current and Fabric caught up without losing data.
+    alternatives:
+      - A single mark for both destinations
+architecture:
+  summary: Two collectors read the vendor platforms, one in hourly batches and one listening to a push channel around the clock. A Python ETL, without Spark, publishes bronze, silver and gold to Microsoft Fabric lakehouses and a warehouse and to PostgreSQL, where Power BI and the analysts read. An alerts engine and a watchdog look after the operation.
+  layers:
+    - name: Sources
+      nodes:
+        - {
+            id: vendor-batch,
+            label: 'Vendor platform A',
+            detail: 'Undocumented API, whole-day series',
+          }
+        - { id: vendor-push, label: 'Vendor platform B', detail: 'MQTT push channel' }
+        - { id: master, label: 'Homes master list', detail: "The business's Excel workbook" }
+    - name: Capture
+      nodes:
+        - { id: collector, label: 'Batch collector', detail: 'Hourly, heals itself' }
+        - { id: listener, label: '24/7 listener', detail: 'SQLite in WAL mode, with heartbeats' }
+    - name: Medallion
+      nodes:
+        - { id: bronze, label: 'Bronze', detail: 'Delta lakehouse and PostgreSQL' }
+        - { id: silver, label: 'Silver', detail: 'Cleaning, union and data quality' }
+        - { id: gold, label: 'Gold', detail: 'Fabric warehouse and PostgreSQL' }
+    - name: Consumption
+      nodes:
+        - { id: power-bi, label: 'Power BI', detail: 'Direct Lake model on gold' }
+        - { id: analysts, label: 'Analysts in SQL', detail: 'Materialized views' }
+    - name: Operations
+      nodes:
+        - { id: alerts, label: 'Alerts engine', detail: 'Every ten minutes, one episode per row' }
+        - { id: watchdog, label: 'Watchdog', detail: 'systemd and email through Microsoft Graph' }
+  flows:
+    - { from: vendor-batch, to: collector, label: 'Five-minute series' }
+    - { from: vendor-push, to: listener, label: 'Reports every 30 seconds' }
+    - { from: collector, to: bronze, label: 'Every three hours' }
+    - { from: listener, to: bronze, label: 'Hours covered by heartbeats' }
+    - { from: master, to: silver, label: 'One home, one plant' }
+    - { from: bronze, to: silver, label: 'Sources unified' }
+    - { from: silver, to: gold, label: 'MERGE into the star schema' }
+    - { from: gold, to: power-bi, label: 'Direct Lake' }
+    - { from: gold, to: analysts, label: 'Views and foreign tables' }
+    - { from: listener, to: alerts, label: 'Silent devices and faults' }
+    - { from: watchdog, to: collector, label: 'Checks every service and timer' }
+outcomes:
+  - Output from both platforms reaches one model every three hours, on Fabric and on PostgreSQL, with 1,498 plant-hours equal to the source apps.
+  - The real-time channel replaced the paid API at zero cost, and its gold layer matches the main ETL's cell by cell.
+  - A lock incident that left the analysts without service was fixed with materialized views, and their metrics query went from 3 hours to 12 ms.
+  - A weeks-long outage of the shared Fabric capacity cost no data, because each destination keeps its own progress.
+lessons:
+  - I would measure each source's cost per unit of energy produced from day one, not per device, since that is what made the paid API unworkable as the fleet grew.
+  - I would separate the ETL's writes from the analysts' queries sooner, since one TRUNCATE queued behind a long query blocked everyone.
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}
