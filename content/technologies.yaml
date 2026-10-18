@@ -24,6 +24,7 @@
 - { id: entra-id, name: Microsoft Entra ID, capability: backend }
 - { id: directus, name: Directus, capability: backend }
 - { id: pytest, name: pytest, capability: backend }
+- { id: mqtt, name: MQTT, capability: backend }
 
 # Data and BI
 - { id: sql-server, name: SQL Server, capability: data-bi }
@@ -44,6 +45,8 @@
 - { id: modbus-tcp, name: Modbus TCP, capability: data-bi }
 - { id: mariadb, name: MariaDB, capability: data-bi }
 - { id: pandas, name: pandas, capability: data-bi }
+- { id: polars, name: Polars, capability: data-bi }
+- { id: delta-lake, name: Delta Lake, capability: data-bi }
 - { id: pdfminer, name: pdfminer.six, capability: data-bi }
 
 # Automation and AI
