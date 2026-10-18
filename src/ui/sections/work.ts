@@ -139,16 +139,20 @@ export const mountWork = (): void => {
    * on its last. The last area lets go into the next section and the first into the one above.
    * Phones and reduced motion keep each area as a list, and the tabs and the "next" link lead on.
    *
-   * Only a reader crossing the edge counts: the scroll before was held at that edge (the last
-   * project pinned, or the area at its start) and moved less than a screen. A jump from a link
-   * to an anchor passes through the section until its scroll settles, and a jump made at once
-   * never starts at the edge.
+   * Only a reader crossing the edge counts: one scroll event before it (the last project pinned,
+   * or the area at its start) and the next past it, less than a screen apart. Each event of a
+   * wheel or a trackpad moves tens of pixels, so the edge is crossed, rarely landed on. A jump
+   * from a link to an anchor passes through the section until its scroll settles, and a jump made
+   * at once moves more than a screen.
    */
   const pinned = (): HTMLElement | null =>
     panels.get(active)?.querySelector<HTMLElement>('[data-project-stage][data-stage-ready]') ??
     null;
   const neighbour = (offset: 1 | -1): string | undefined =>
     tabs[tabs.findIndex((tab) => tab.dataset.workTab === active) + offset]?.dataset.workTab;
+  /** The scroll position that holds a stage on its last project. */
+  const endOf = (stage: HTMLElement): number =>
+    stage.getBoundingClientRect().top + scrollY + stage.offsetHeight - innerHeight;
 
   let jumping = false;
   let settle = 0;
@@ -164,60 +168,40 @@ export const mountWork = (): void => {
   );
   addEventListener('hashchange', jump);
 
-  /** Where the reader rests: at the end of the stage, at the start of the area, or neither. */
-  const edgeOf = (stage: HTMLElement): 'end' | 'start' | null => {
-    const bottom = stage.getBoundingClientRect().bottom;
-    if (Math.abs(bottom - innerHeight) <= 2) return 'end';
-    if (Math.abs(work.getBoundingClientRect().top - restingTop()) <= 2) return 'start';
-    return null;
-  };
-
   let lastY = scrollY;
-  let lastEdge: 'end' | 'start' | null = null;
   addEventListener(
     'scroll',
     () => {
-      const delta = scrollY - lastY;
+      const from = lastY;
       lastY = scrollY;
-      const stage = pinned();
-      const was = lastEdge;
-      lastEdge = stage ? edgeOf(stage) : null;
       if (jumping) {
         clearTimeout(settle);
         settle = window.setTimeout(() => {
           jumping = false;
-          const now = pinned();
-          lastEdge = now ? edgeOf(now) : null;
         }, 200);
         return;
       }
-      if (!stage || Math.abs(delta) >= innerHeight) return;
-      if (was === 'end' && delta > 0 && stage.getBoundingClientRect().bottom < innerHeight - 2) {
+      const stage = pinned();
+      if (!stage || Math.abs(scrollY - from) >= innerHeight) return;
+      const end = endOf(stage);
+      const start = startOf();
+      if (from <= end + 2 && scrollY > end + 2) {
         const next = neighbour(1);
         if (!next) return;
         show(next, true);
         history.replaceState(null, '', `#${next}`);
         scrollTo({ top: startOf(), behavior: 'instant' });
-      } else if (
-        was === 'start' &&
-        delta < 0 &&
-        work.getBoundingClientRect().top > restingTop() + 2
-      ) {
+      } else if (from >= start - 2 && scrollY < start - 2) {
         const previous = neighbour(-1);
         if (!previous) return;
         show(previous, true);
         history.replaceState(null, '', `#${previous}`);
-        const end = pinned();
-        if (end) {
-          const top = end.getBoundingClientRect().top + scrollY;
-          scrollTo({ top: top + end.offsetHeight - innerHeight, behavior: 'instant' });
-        }
+        const last = pinned();
+        if (last) scrollTo({ top: endOf(last), behavior: 'instant' });
       } else {
         return;
       }
       lastY = scrollY;
-      const now = pinned();
-      lastEdge = now ? edgeOf(now) : null;
     },
     { passive: true },
   );
