@@ -387,6 +387,23 @@ test.describe('projects', () => {
       await expect(page.locator('#about')).toBeInViewport();
     });
 
+    test('a quick scroll that never rests on the edge still runs on to the next area', async ({
+      page,
+    }) => {
+      // A few screens before the end, as a reader scrolling through the projects would be.
+      await stage(page).evaluate((root: HTMLElement) => {
+        const top = root.getBoundingClientRect().top + scrollY;
+        scrollTo({ top: top + root.offsetHeight - innerHeight * 1.7, behavior: 'instant' });
+      });
+      await page.mouse.move(700, 500);
+      for (let step = 0; step < 16; step += 1) await page.mouse.wheel(0, 70);
+      await expect(page.getByRole('tab', { name: /Analítica/ })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      await expect(page.locator('#about')).not.toBeInViewport();
+    });
+
     test('the rail jumps to a project and the stage shows it', async ({ page }) => {
       const rail = page.getByRole('navigation', { name: 'Ir a un proyecto' });
       await rail.scrollIntoViewIfNeeded();
