@@ -347,7 +347,7 @@ test.describe('project pages', () => {
     const facade = page.locator('[data-live-report]');
     await expect(facade).toHaveAttribute('href', /^https:\/\/app\.powerbi\.com\/view\?r=/);
     await expect(page.locator('iframe')).toHaveCount(0);
-    expect(requests.filter((url) => url.startsWith('https://app.powerbi.com'))).toEqual([]);
+    expect(requests.filter((url) => new URL(url).hostname === 'app.powerbi.com')).toEqual([]);
 
     await facade.click();
     const frame = page.locator('[data-live-report-stage] iframe');
