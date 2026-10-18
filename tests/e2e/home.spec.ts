@@ -357,6 +357,36 @@ test.describe('projects', () => {
       await expect.poll(() => onStage(page, 'solar-program-finance')).toBe(true);
     });
 
+    test('scrolling runs on from one area to the next and back', async ({ page }) => {
+      const tab = (name: RegExp) => page.getByRole('tab', { name });
+      /** Holds the active stage on its last project, then scrolls by `delta` with the wheel. */
+      const pastTheEnd = async (delta: number) => {
+        await page
+          .locator('.work-panel:not([hidden]) [data-project-stage]')
+          .evaluate((root: HTMLElement) => {
+            const top = root.getBoundingClientRect().top + scrollY;
+            scrollTo({ top: top + root.offsetHeight - innerHeight, behavior: 'instant' });
+          });
+        await page.mouse.move(700, 500);
+        await page.mouse.wheel(0, delta);
+      };
+
+      await pastTheEnd(400);
+      await expect(tab(/Analítica/)).toHaveAttribute('aria-selected', 'true');
+      await expect(current(page)).toHaveAccessibleName(/programa de energía solar/);
+
+      // Back up from the first project of an area: the previous one, on its last project.
+      await page.mouse.wheel(0, -400);
+      await expect(tab(/Full-stack/)).toHaveAttribute('aria-selected', 'true');
+      await expect(current(page)).toHaveAccessibleName(/Este portafolio/);
+
+      // The last area lets go into the next section.
+      await tab(/IA y automatización/).click();
+      await pastTheEnd(1200);
+      await expect(tab(/IA y automatización/)).toHaveAttribute('aria-selected', 'true');
+      await expect(page.locator('#about')).toBeInViewport();
+    });
+
     test('the rail jumps to a project and the stage shows it', async ({ page }) => {
       const rail = page.getByRole('navigation', { name: 'Ir a un proyecto' });
       await rail.scrollIntoViewIfNeeded();

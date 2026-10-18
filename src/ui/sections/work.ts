@@ -2,7 +2,8 @@
  * The areas of work on the home page (ProjectsSection): turns the jump links above the projects
  * into tabs. One area shows at a time; switching keeps the reader where the section starts, so a
  * new area always opens on its first project. Links that point to an area (`/#work-analytics`
- * from the header menu, the "next" link at the end of a stage) open it the same way.
+ * from the header menu, the "next" link at the end of a stage) open it the same way. On the
+ * pinned stage, scrolling also runs on from one area to the next.
  *
  * Plain DOM, no framework (ADR 0009). Without this script every area shows, one after another.
  */
@@ -131,6 +132,95 @@ export const mountWork = (): void => {
     event.preventDefault();
     open(link.hash.slice(1), 'link');
   });
+
+  /*
+   * On the pinned stage the scroll runs through the areas in order: past the last project of
+   * one, the next opens on its first project; above the first project of one, the previous opens
+   * on its last. The last area lets go into the next section and the first into the one above.
+   * Phones and reduced motion keep each area as a list, and the tabs and the "next" link lead on.
+   *
+   * Only a reader crossing the edge counts: the scroll before was held at that edge (the last
+   * project pinned, or the area at its start) and moved less than a screen. A jump from a link
+   * to an anchor passes through the section until its scroll settles, and a jump made at once
+   * never starts at the edge.
+   */
+  const pinned = (): HTMLElement | null =>
+    panels.get(active)?.querySelector<HTMLElement>('[data-project-stage][data-stage-ready]') ??
+    null;
+  const neighbour = (offset: 1 | -1): string | undefined =>
+    tabs[tabs.findIndex((tab) => tab.dataset.workTab === active) + offset]?.dataset.workTab;
+
+  let jumping = false;
+  let settle = 0;
+  const jump = (): void => {
+    jumping = true;
+  };
+  document.addEventListener(
+    'click',
+    (event) => {
+      if ((event.target as Element).closest('a[href*="#"]')) jump();
+    },
+    true,
+  );
+  addEventListener('hashchange', jump);
+
+  /** Where the reader rests: at the end of the stage, at the start of the area, or neither. */
+  const edgeOf = (stage: HTMLElement): 'end' | 'start' | null => {
+    const bottom = stage.getBoundingClientRect().bottom;
+    if (Math.abs(bottom - innerHeight) <= 2) return 'end';
+    if (Math.abs(work.getBoundingClientRect().top - restingTop()) <= 2) return 'start';
+    return null;
+  };
+
+  let lastY = scrollY;
+  let lastEdge: 'end' | 'start' | null = null;
+  addEventListener(
+    'scroll',
+    () => {
+      const delta = scrollY - lastY;
+      lastY = scrollY;
+      const stage = pinned();
+      const was = lastEdge;
+      lastEdge = stage ? edgeOf(stage) : null;
+      if (jumping) {
+        clearTimeout(settle);
+        settle = window.setTimeout(() => {
+          jumping = false;
+          const now = pinned();
+          lastEdge = now ? edgeOf(now) : null;
+        }, 200);
+        return;
+      }
+      if (!stage || Math.abs(delta) >= innerHeight) return;
+      if (was === 'end' && delta > 0 && stage.getBoundingClientRect().bottom < innerHeight - 2) {
+        const next = neighbour(1);
+        if (!next) return;
+        show(next, true);
+        history.replaceState(null, '', `#${next}`);
+        scrollTo({ top: startOf(), behavior: 'instant' });
+      } else if (
+        was === 'start' &&
+        delta < 0 &&
+        work.getBoundingClientRect().top > restingTop() + 2
+      ) {
+        const previous = neighbour(-1);
+        if (!previous) return;
+        show(previous, true);
+        history.replaceState(null, '', `#${previous}`);
+        const end = pinned();
+        if (end) {
+          const top = end.getBoundingClientRect().top + scrollY;
+          scrollTo({ top: top + end.offsetHeight - innerHeight, behavior: 'instant' });
+        }
+      } else {
+        return;
+      }
+      lastY = scrollY;
+      const now = pinned();
+      lastEdge = now ? edgeOf(now) : null;
+    },
+    { passive: true },
+  );
 
   // The address names an area: open on it (a link from another page, a shared address).
   const fromHash = () => {

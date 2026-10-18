@@ -18,14 +18,19 @@ a projects menu in the header that leads to each group.
   `analytics` or `automation`); `order` sets its place inside the area. Display order sorts by
   area first, so previous and next links on project pages walk one area, then the next.
 - **Tabs above one stage per area.** The title and the three areas sit above the projects, set
-  as words: the current one in ink with a fine accent line under it, the count as a small
-  superscript, one line on the area below; each area is its own `ProjectStage`, and one shows at a time. Switching
+  as words, without counts: the current one in ink with a fine accent line under it, one line on
+  the area below; each area is its own `ProjectStage`, and one shows at a time. Switching
   keeps the reader at the start of the section, so a new area opens on its first project. Arrow
   keys move between tabs (WAI-ARIA tabs), and the address follows the area (`/#work-analytics`).
 - **The title and tabs stick with the stage.** On wide screens they stay 5.5rem from the top
   while the stage plays. Their bottom margin is one screen minus their height and the stage
   starts one screen higher, so both pin and let go at the same scroll; their height is measured
   into `--work-head`.
+- **Scrolling runs through the areas.** On the pinned stage, scrolling past the last project of
+  an area opens the next one on its first project, and scrolling above the first project of one
+  opens the previous one on its last: full-stack, analytics, AI and automation, then the section
+  that follows. Only the reader's own scrolling counts (wheel, touch, keys), so a jump from a
+  header link passes through. Phones and reduced motion keep each area as a list.
 - **The end of a stage leads on.** Under the rail, where the link to the grid was, a link opens
   the next area.
 - **A projects menu in the header.** The Projects item keeps its link and gains an arrow button
