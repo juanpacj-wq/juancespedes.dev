@@ -1,8 +1,8 @@
 /**
- * The site header's one script: the theme switch and the header's motion (the pill that follows
- * the pointer across the menu, the menu item of the section being read, the rolling labels and
- * the scrambled name on the logo). Plain DOM, no framework (ADR 0009). The motion is decoration;
- * the header works the same without it.
+ * The site header's one script: its motion (the pill that follows the pointer across the menu,
+ * the menu item of the section being read, the rolling labels and the scrambled name on the
+ * logo) and the projects menu that opens from its item. Plain DOM, no framework (ADR 0009). The
+ * motion is decoration; the header works the same without it.
  */
 
 const GLYPHS = 'abcdefghijklmnopqrstuvwxyz<>/{}[]=+*#';
@@ -54,7 +54,7 @@ const mountPill = (list: HTMLElement): void => {
  */
 const mountSectionSpy = (list: HTMLElement): void => {
   const links = new Map<Element, HTMLAnchorElement>();
-  for (const link of list.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')) {
+  for (const link of list.querySelectorAll<HTMLAnchorElement>('a.nav-link[href^="#"]')) {
     const section = document.getElementById(link.hash.slice(1));
     if (section) links.set(section, link);
   }
@@ -71,6 +71,101 @@ const mountSectionSpy = (list: HTMLElement): void => {
     { rootMargin: '-50% 0px -50% 0px' },
   );
   for (const section of links.keys()) observer.observe(section);
+};
+
+/**
+ * The projects menu: a disclosure that opens on hover (after a short pause, so a pointer passing
+ * by does not flash it) or from its arrow button, and closes on Escape, on a click elsewhere and
+ * when focus leaves it. Its screenshots load the first time it opens; the preview shows the
+ * project under the pointer or the focus, and the first project until then.
+ */
+const mountMenu = (menu: HTMLElement): void => {
+  const toggle = menu.querySelector<HTMLButtonElement>('[data-nav-menu-toggle]');
+  const panel = menu.querySelector<HTMLElement>('[data-nav-menu-panel]');
+  if (!toggle || !panel) return;
+  let hover = 0;
+  let hide = 0;
+  let loaded = false;
+  const isOpen = (): boolean => toggle.getAttribute('aria-expanded') === 'true';
+
+  const preview = (slug: string | undefined): void => {
+    if (!slug) return;
+    for (const each of panel.querySelectorAll<HTMLElement>('[data-preview], .nav-menu-project')) {
+      each.toggleAttribute(
+        'data-current',
+        (each.dataset.preview ?? each.dataset.menuPreview) === slug,
+      );
+    }
+  };
+  const previewFrom = (event: Event): void => {
+    const link = (event.target as Element).closest<HTMLElement>('[data-menu-preview]');
+    if (link) preview(link.dataset.menuPreview);
+  };
+  panel.addEventListener('pointerover', previewFrom);
+  panel.addEventListener('focusin', previewFrom);
+  preview(panel.querySelector<HTMLElement>('[data-menu-preview]')?.dataset.menuPreview);
+
+  const set = (open: boolean): void => {
+    clearTimeout(hover);
+    if (open === isOpen()) return;
+    toggle.setAttribute('aria-expanded', String(open));
+    clearTimeout(hide);
+    if (open) {
+      if (!loaded) {
+        loaded = true;
+        for (const shot of panel.querySelectorAll<HTMLImageElement>('img[data-src]')) {
+          shot.src = shot.dataset.src ?? '';
+        }
+      }
+      panel.hidden = false;
+      // One frame shown before it moves, so it rises in instead of appearing in place.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (isOpen()) panel.dataset.open = '';
+        });
+      });
+    } else {
+      delete panel.dataset.open;
+      hide = window.setTimeout(
+        () => {
+          if (!isOpen()) panel.hidden = true;
+        },
+        reducedMotion() ? 0 : 200,
+      );
+    }
+  };
+  const later = (open: boolean, delay: number): void => {
+    clearTimeout(hover);
+    hover = window.setTimeout(() => {
+      set(open);
+    }, delay);
+  };
+
+  menu.addEventListener('pointerenter', (event) => {
+    if (event.pointerType === 'mouse') later(true, 120);
+  });
+  menu.addEventListener('pointerleave', (event) => {
+    if (event.pointerType === 'mouse') later(false, 220);
+  });
+  toggle.addEventListener('click', () => {
+    set(!isOpen());
+  });
+  // On the document: Safari does not focus a button on click, so the key may not reach the menu.
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !isOpen()) return;
+    set(false);
+    toggle.focus();
+  });
+  menu.addEventListener('focusout', (event) => {
+    if (!menu.contains(event.relatedTarget as Node | null)) set(false);
+  });
+  document.addEventListener('click', (event) => {
+    if (!menu.contains(event.target as Node)) set(false);
+  });
+  // A link to an area of this page opens it in place; the menu steps out of the way.
+  panel.addEventListener('click', (event) => {
+    if ((event.target as Element).closest('a')) set(false);
+  });
 };
 
 /** The logo's letters shuffle through code glyphs and settle from left to right. */
@@ -130,5 +225,6 @@ export const mountSiteHeader = (): void => {
     mountPill(list);
     mountSectionSpy(list);
   }
+  for (const menu of document.querySelectorAll<HTMLElement>('[data-nav-menu]')) mountMenu(menu);
   for (const logo of document.querySelectorAll<HTMLElement>('[data-scramble]')) mountScramble(logo);
 };

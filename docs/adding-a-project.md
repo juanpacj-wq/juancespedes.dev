@@ -14,15 +14,22 @@ Kinds:
 | Kind          | Use it for                                | Kind-specific fields                                                                             |
 | ------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | `case-study`  | Systems where the decisions are the story | `problem`, `responsibilities`, `constraints`, `decisions`, `architecture`, `outcomes`, `lessons` |
-| `report`      | Power BI reports and dashboards           | `tool`, `businessQuestions`, `dataSources`, `highlightedMeasures`                                |
+| `report`      | Power BI reports and dashboards           | `tool`, `businessQuestions`, `dataSources`, `highlightedMeasures`, `liveReport`                  |
 | `open-source` | Public repositories                       | `repository`, `license`, `install`                                                               |
 | `tool`        | Desktop apps, scripts and automations     | `platform`, `automates`                                                                          |
+
+`liveReport` is the "Publish to web" link of a replica with test data
+(`https://app.powerbi.com/view?r=...`), or `null`. The page draws a facade and loads the report
+only when the visitor clicks it, so the frame never weighs on the first load; never publish a
+report with real data, since anyone with the link can open it.
 
 This creates `content/projects/<slug>/es.mdx` and `en.mdx` as a valid **draft** full of `TODO`
 markers. Drafts show up in `pnpm dev` and never in a build.
 
 ## 2. Fill it in
 
+- `name` is the short form of the title (32 characters at most) that the header's projects menu
+  lists; the scaffold starts it as the title cut short.
 - Replace every `TODO` in both languages. The page is built from the frontmatter only; the MDX
   body is not rendered (see ADR 0011).
 - `stack` names must exist in `content/technologies.yaml`. Add new technologies there first, under
@@ -83,9 +90,9 @@ people are checked against a private denylist: `.content-denylist` locally (git-
 A published project gets two pages, `/proyectos/<slug>` and `/en/projects/<slug>`, an Open
 Graph card per language and its place in `sitemap.xml`, all without touching code.
 
-Set `status: published` (and `featured: true` plus `order` if it belongs on the home page).
-`pnpm test` refuses a published project that still contains `TODO`. Featured projects get the
-wide card on the home page; the rest share the grid of smaller cards.
+Set `status: published`. `track` puts it under one of the three areas of the home page
+(`full-stack`, `analytics` or `automation`), and `order` sets its place inside that area.
+`pnpm test` refuses a published project that still contains `TODO`.
 
 ## 5. Add its images (optional)
 

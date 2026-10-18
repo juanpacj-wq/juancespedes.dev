@@ -21,7 +21,7 @@ const page = await container.getNowPage(locale);
   description={t.now.description}
   locale={locale}
   route={{ page: 'now' }}
-  navItems={siteNav(t, locale)}
+  navItems={await siteNav(t, locale)}
 >
   <NowView t={t} locale={locale} page={page} />
 </BaseLayout>

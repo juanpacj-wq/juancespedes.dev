@@ -1,0 +1,13 @@
+# Gitleaks: every default rule, plus one exception.
+#
+# A Power BI "Publish to web" link carries its embed key in `?r=`, a base64 JSON string that the
+# grafana-api-key rule mistakes for a token. The link is public by design: the case studies show
+# replicas built on test data, never a report with real data (docs/adding-a-project.md).
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Power BI Publish to web links, public by design"
+regexTarget = "line"
+regexes = ['''https://app\.powerbi\.com/view\?r=''']

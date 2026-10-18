@@ -1,0 +1,18 @@
+{
+  "cover": {
+    "es": "Réplica pública con datos sintéticos: generación neta por unidad y por planta, consumo de combustible y disponibilidad comercial acumulada.",
+    "en": "Public replica with synthetic data: net generation by unit and by plant, fuel consumption and accumulated commercial availability."
+  },
+  "gallery-1": {
+    "es": "Histórico de generación neta por planta y disponibilidad mensual en MW, mes a mes.",
+    "en": "Net generation history by plant and monthly availability in MW, month by month."
+  },
+  "gallery-2": {
+    "es": "Horas de operación, reserva, mantenimiento e indisponibilidad, con el detalle de cada evento y la tasa de salidas forzadas por unidad.",
+    "en": "Hours in operation, reserve, maintenance and unavailability, with the detail of each event and the forced outage rate per unit."
+  },
+  "gallery-3": {
+    "es": "Indicadores de confiabilidad del estándar IEEE: salidas forzadas y programadas, disponibilidad, factor de capacidad y confiabilidad de arranque.",
+    "en": "Reliability indicators from the IEEE standard: forced and scheduled outages, availability, capacity factor and starting reliability."
+  }
+}

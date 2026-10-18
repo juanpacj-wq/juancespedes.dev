@@ -198,3 +198,162 @@
     translate: 0 2px;
   }
 }
+
+/* ---------- The projects menu (SiteHeader, site-header.ts) ---------- */
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+}
+
+.nav-menu-toggle {
+  display: inline-flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-chip);
+  color: var(--color-subtle);
+  transition:
+    color 200ms ease,
+    rotate 300ms var(--ease-out);
+}
+
+.nav-menu-toggle:hover,
+.nav-menu-toggle[aria-expanded='true'] {
+  color: var(--color-ink);
+}
+
+.nav-menu-toggle[aria-expanded='true'] {
+  rotate: 180deg;
+}
+
+/* Under the header, centred on the page. The header (sticky at the top) is its frame either way,
+   so a fixed length places it the same whether or not the header has its blur. */
+.nav-menu-panel {
+  position: fixed;
+  top: 4.5rem;
+  left: 50%;
+  display: grid;
+  width: min(62rem, calc(100vw - 2rem));
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  gap: 2.5rem;
+  padding: 2rem;
+  border-radius: var(--radius-panel);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-bevel), var(--shadow-lift);
+  opacity: 0;
+  translate: -50% -0.75rem;
+  transition:
+    opacity 200ms ease,
+    translate 400ms var(--ease-out);
+}
+
+.nav-menu-panel[data-open] {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+/* Three columns of names: the area, then its projects. */
+.nav-menu-areas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.nav-menu-area {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.nav-menu-head {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.25rem;
+  color: var(--color-ink);
+  font-weight: 500;
+  transition: color 200ms ease;
+}
+
+.nav-menu-head:hover,
+.nav-menu-head:focus-visible {
+  color: var(--color-accent-ink);
+}
+
+/* How many projects the area holds, set small and high like a footnote mark. */
+.nav-menu-count {
+  color: var(--color-subtle);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.nav-menu-projects {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-menu-project {
+  display: block;
+  padding-block: 0.3125rem;
+  color: var(--color-muted);
+  font-size: var(--text-small);
+  line-height: 1.4;
+  text-wrap: balance;
+  transition: color 200ms ease;
+}
+
+.nav-menu-project:hover,
+.nav-menu-project:focus-visible,
+.nav-menu-project[data-current] {
+  color: var(--color-ink);
+}
+
+/* The one image: the screen of the project being pointed at, with its full title under it. */
+.nav-menu-screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  background-color: var(--color-canvas);
+  box-shadow: var(--shadow-bevel);
+}
+
+.nav-menu-screen img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+
+.nav-menu-screen img[data-current] {
+  opacity: 1;
+}
+
+.nav-menu-caption {
+  margin-top: 0.875rem;
+  color: var(--color-muted);
+  font-size: var(--text-small);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.nav-menu-caption:not([data-current]) {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-menu-toggle,
+  .nav-menu-panel,
+  .nav-menu-head,
+  .nav-menu-project,
+  .nav-menu-screen img {
+    transition: none;
+  }
+}

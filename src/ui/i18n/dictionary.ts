@@ -1,6 +1,6 @@
 import type { ContactField, ContactIssueCode } from '../../domain/contact/contact-request';
 import type { Capability } from '../../domain/project/capability';
-import type { ProjectKind } from '../../domain/project/project';
+import type { ProjectKind, ProjectTrack } from '../../domain/project/project';
 import type { Locale } from '../../domain/shared/locale';
 
 /*
@@ -90,11 +90,14 @@ const es = {
     stack: 'Tecnologías',
     anonymized: 'Anonimizado',
     featuredTitle: 'Proyectos',
-    moreTitle: 'Más proyectos',
     viewCase: 'Ver caso de estudio',
     viewProject: 'Ver proyecto',
-    stageRail: 'Ir a un caso de estudio',
-    moreLink: 'Ver todos',
+    stageRail: 'Ir a un proyecto',
+    tracks: 'Áreas de trabajo',
+    nextTrack: 'Siguiente',
+    menu: 'Proyectos por área',
+    menuToggle: 'Abrir los proyectos por área',
+    menuCount: 'proyectos',
   },
   capabilities: {
     title: 'Stack',
@@ -213,6 +216,11 @@ const es = {
     ctaTitle: '¿Trabajas en algo parecido?',
     ctaBody: 'Escríbeme y cuéntame qué necesitas.',
     ctaContact: 'Escríbeme',
+    liveReport: 'Pruébalo en vivo',
+    liveReportOpen: 'Cargar el informe interactivo',
+    liveReportNote:
+      'Réplica con datos de prueba publicada en Power BI. Se carga desde los servidores de Microsoft solo cuando haces clic.',
+    liveReportNewTab: 'Abrir en una pestaña nueva',
   },
   chat: {
     title: 'Pregúntale a mi portafolio',
@@ -313,9 +321,24 @@ const es = {
     'open-source': 'Código abierto',
     tool: 'Herramienta',
   },
+  trackLabels: {
+    'full-stack': {
+      label: 'Full-stack',
+      blurb: 'Aplicaciones web completas, en producción y con usuarios reales.',
+    },
+    analytics: {
+      label: 'Analítica',
+      blurb: 'Informes en Power BI, cada uno con una réplica pública sobre datos de prueba.',
+    },
+    automation: {
+      label: 'IA y automatización',
+      blurb: 'Agentes, servidores MCP y procesos de datos que trabajan solos.',
+    },
+  },
 } as const satisfies Record<string, unknown> & {
   capabilityLabels: Record<Capability, string>;
   kindLabels: Record<ProjectKind, string>;
+  trackLabels: Record<ProjectTrack, { label: string; blurb: string }>;
   form: Record<string, unknown> & {
     fieldErrors: Partial<Record<`${ContactField}.${ContactIssueCode}`, string>>;
   };
@@ -409,11 +432,14 @@ const en: Dictionary = {
     stack: 'Technologies',
     anonymized: 'Anonymized',
     featuredTitle: 'Work',
-    moreTitle: 'More projects',
     viewCase: 'View case study',
     viewProject: 'View project',
-    stageRail: 'Go to a case study',
-    moreLink: 'View all',
+    stageRail: 'Go to a project',
+    tracks: 'Areas of work',
+    nextTrack: 'Next',
+    menu: 'Projects by area',
+    menuToggle: 'Open the projects by area',
+    menuCount: 'projects',
   },
   capabilities: {
     title: 'Stack',
@@ -532,6 +558,11 @@ const en: Dictionary = {
     ctaTitle: 'Working on something similar?',
     ctaBody: 'Write to me and tell me what you need.',
     ctaContact: 'Get in touch',
+    liveReport: 'Try it live',
+    liveReportOpen: 'Load the interactive report',
+    liveReportNote:
+      "A replica with test data, published on Power BI. It loads from Microsoft's servers only when you click.",
+    liveReportNewTab: 'Open in a new tab',
   },
   chat: {
     title: 'Ask my portfolio',
@@ -630,6 +661,20 @@ const en: Dictionary = {
     report: 'Report',
     'open-source': 'Open source',
     tool: 'Tool',
+  },
+  trackLabels: {
+    'full-stack': {
+      label: 'Full-stack',
+      blurb: 'Complete web applications, in production with real users.',
+    },
+    analytics: {
+      label: 'Analytics',
+      blurb: 'Power BI reports, each with a public replica on test data.',
+    },
+    automation: {
+      label: 'AI & automation',
+      blurb: 'Agents, MCP servers and data pipelines that run on their own.',
+    },
   },
 };
 

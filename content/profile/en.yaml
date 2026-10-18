@@ -58,7 +58,7 @@ currency: USD
 
 services:
   - title: Data, dashboards and reports
-    summary: Data models, ETL and Power BI dashboards that answer concrete business questions.
+    summary: Data models, ETL and Power BI dashboards that answer concrete business questions, taken to production on Microsoft Fabric with bronze, silver and gold lakehouses.
     deliverables:
       - Documented data model and SQL queries
       - Dashboard or report with agreed indicators

@@ -1,0 +1,55 @@
+---
+kind: report
+title: Ejecución presupuestal de una empresa pública de generación
+name: Ejecución presupuestal
+summary: Informe en Power BI que sigue el ciclo presupuestal completo (apropiación, disponibilidad, compromiso, obligación y pago) de una empresa y su filial, con ingresos, requisiciones de compra y el avance de los pagos contra la meta.
+role: Autor del modelo semántico, las consultas a la base de datos, el informe y el flujo de datos en Microsoft Fabric
+track: analytics
+period: { start: '2025-01', end: '2026-04' }
+capabilities: [data-bi]
+stack:
+  - Power BI
+  - DAX
+  - Power Query
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
+  - PostgreSQL
+  - Azure
+metrics:
+  - value: '6'
+    label: páginas, del resumen de indicadores al seguimiento de requisiciones pendientes
+    source: Informe original y su réplica pública, revisados en octubre de 2026
+  - value: '42'
+    label: medidas DAX sobre gastos, ingresos, disponibilidad inicial y requisiciones
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+  - value: '5'
+    label: etapas del ciclo presupuestal seguidas por rubro, dependencia y contrato
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+featured: false
+order: 4
+status: published
+confidentiality: anonymized
+tool: Power BI sobre Microsoft Fabric (pipelines, notebooks, lakehouses y warehouse)
+businessQuestions:
+  - ¿Cuánto del presupuesto apropiado ya está reservado, comprometido, facturado y pagado?
+  - ¿Qué rubros y qué dependencias tienen más saldo disponible?
+  - ¿Cómo va el recaudo de ingresos frente al aforo, mes a mes?
+  - ¿Qué requisiciones de compra siguen sin asignar, y desde cuándo?
+dataSources:
+  - Vistas de PostgreSQL en Azure con los movimientos del sistema financiero y el maestro de proveedores
+  - Vistas del sistema de compras con las requisiciones aprobadas
+  - En producción, pipelines ETL y notebooks de Microsoft Fabric llevan esos orígenes a lakehouses por capas (bronce, plata y oro, arquitectura medallón) y un warehouse de Fabric alimenta el modelo del informe
+  - 'Réplica pública: datos sintéticos que simulan siete vigencias del ciclo presupuestal'
+highlightedMeasures:
+  - Disponible (apropiado menos provisional)
+  - Pagado acumulado del año frente a la meta de ejecución
+  - Recaudo más disponibilidad inicial
+  - Variación frente al mes anterior
+  - Registros con saldo provisional por liberar
+liveReport: https://app.powerbi.com/view?r=eyJrIjoiMGM1ZmViYjQtZTc1Zi00NjM3LTg1YjgtNjlkMDgwNjExNjBhIiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

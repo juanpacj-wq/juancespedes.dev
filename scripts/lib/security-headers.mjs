@@ -49,7 +49,7 @@ export const contentSecurityPolicy = (hashes) =>
     "img-src 'self' data:",
     "font-src 'self'",
     `connect-src 'self' ${ORIGINS.analyticsEndpoint}`,
-    `frame-src ${ORIGINS.turnstile}`,
+    `frame-src ${ORIGINS.turnstile} ${ORIGINS.powerBi}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

@@ -1,0 +1,55 @@
+---
+kind: report
+title: Control financiero de un programa de energía solar con recursos públicos
+name: Finanzas del programa solar
+summary: 'Informe en Power BI para un programa que lleva energía solar a zonas rurales: fiducia y flujo de saldos de las subcuentas, ejecución por contrato, facturas en mora y estructura de la remuneración, con visuales HTML hechos en DAX.'
+role: Autor del modelo semántico, las medidas en DAX y HTML, el diseño del informe y el flujo de datos en Microsoft Fabric
+track: analytics
+period: { start: '2026-01', end: '2026-06' }
+capabilities: [data-bi]
+stack:
+  - Power BI
+  - DAX
+  - Power Query
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
+  - PostgreSQL
+  - Excel
+metrics:
+  - value: '56'
+    label: medidas DAX; 29 de ellas devuelven HTML y SVG para tarjetas, cascadas, donas y tablas
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+  - value: '4'
+    label: subcuentas fiduciarias seguidas día a día, separadas entre implementación y remuneración
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+  - value: '2'
+    label: páginas, una de gestión de la fiducia y otra de ejecución presupuestal y remuneración
+    source: Informe original y su réplica pública, revisados en octubre de 2026
+featured: false
+order: 1
+status: published
+confidentiality: anonymized
+tool: Power BI sobre Microsoft Fabric (pipelines, notebooks, lakehouses y warehouse)
+businessQuestions:
+  - ¿Cuánto de cada contrato está comprometido, facturado y pagado?
+  - ¿Qué facturas están vencidas, cuántos días llevan en mora y en qué paso de aprobación están?
+  - ¿Cuánto dinero hay hoy en cada subcuenta y cómo se movió en el último mes?
+  - ¿Cómo se reparte la remuneración entre gastos de administración, gastos contractuales y margen?
+dataSources:
+  - Vistas de PostgreSQL con presupuesto, facturas, contratos y movimientos bancarios
+  - Libro de Excel con el plan del programa y el desglose de la remuneración por año
+  - En producción, pipelines ETL y notebooks de Microsoft Fabric llevan esos orígenes a lakehouses por capas (bronce, plata y oro, arquitectura medallón) y un warehouse de Fabric alimenta el modelo del informe
+  - 'Réplica pública: datos sintéticos de contratos, facturas y movimientos de diciembre de 2025 a septiembre de 2026'
+highlightedMeasures:
+  - Flujo de saldos bancarios en cascada, agrupado por mes cuando hay muchos movimientos
+  - Cadena de ejecución presupuestal, dibujada en HTML
+  - Estructura de la remuneración por concepto
+  - Matriz de contratos con su avance financiero
+  - Días en mora por factura
+liveReport: https://app.powerbi.com/view?r=eyJrIjoiZTllYTdjMGEtODg2ZC00ZWIxLWIxYzItM2M3MzAyODYzMmRmIiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

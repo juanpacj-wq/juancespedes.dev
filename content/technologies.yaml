@@ -32,7 +32,14 @@
 - { id: mongodb, name: MongoDB, capability: data-bi }
 - { id: sqlite, name: SQLite, capability: data-bi }
 - { id: power-bi, name: Power BI, capability: data-bi }
+- { id: dax, name: DAX, capability: data-bi }
+- { id: power-query, name: Power Query, capability: data-bi }
+- { id: sharepoint, name: SharePoint, capability: data-bi }
 - { id: microsoft-fabric, name: Microsoft Fabric, capability: data-bi }
+- { id: fabric-data-pipelines, name: Fabric Data Pipelines, capability: data-bi }
+- { id: fabric-notebooks, name: Fabric Notebooks, capability: data-bi }
+- { id: fabric-lakehouse, name: Fabric Lakehouse, capability: data-bi }
+- { id: fabric-data-warehouse, name: Fabric Data Warehouse, capability: data-bi }
 - { id: excel, name: Excel, capability: data-bi }
 - { id: modbus-tcp, name: Modbus TCP, capability: data-bi }
 - { id: mariadb, name: MariaDB, capability: data-bi }

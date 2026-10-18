@@ -11,8 +11,10 @@ import type { Locale } from '../../src/domain/shared/locale';
 
 const common = {
   title: 'Operations logbook',
+  name: 'Logbook',
   summary: 'Replaced Excel logbooks with a real-time web app.',
   role: 'Full-stack engineer',
+  track: 'full-stack',
   period: { start: '2026-03', end: null },
   capabilities: ['backend', 'frontend'],
   stack: ['React', 'Node.js'],
@@ -60,6 +62,7 @@ export const reportContent = (overrides: Partial<ReportContent> = {}): ReportCon
   businessQuestions: ['Which unit deviates most from dispatch?'],
   dataSources: ['Telemetry lakehouse'],
   highlightedMeasures: [],
+  liveReport: null,
   ...overrides,
 });
 

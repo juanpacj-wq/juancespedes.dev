@@ -37,7 +37,7 @@ const jsonLd = noteGraph({
   description={note.summary}
   locale={locale}
   route={route}
-  navItems={siteNav(t, locale)}
+  navItems={await siteNav(t, locale)}
   ogType="article"
   jsonLd={jsonLd}
 >

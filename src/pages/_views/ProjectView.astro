@@ -22,7 +22,7 @@ if (!page.ok) throw new Error(`Project "${slug}" is not published in "${locale}"
 const { project, previous, next } = page.value;
 const route = { page: 'project', slug } as const;
 
-const navItems = siteNav(t, locale);
+const navItems = await siteNav(t, locale);
 
 const jsonLd = projectGraph({
   project,

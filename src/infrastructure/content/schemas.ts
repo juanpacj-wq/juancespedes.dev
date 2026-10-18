@@ -7,7 +7,11 @@ import {
   type Amount,
 } from '../../domain/project/achievement';
 import { CAPABILITIES } from '../../domain/project/capability';
-import { validateProjectContent, type ProjectContent } from '../../domain/project/project';
+import {
+  PROJECT_TRACKS,
+  validateProjectContent,
+  type ProjectContent,
+} from '../../domain/project/project';
 import type { Locale } from '../../domain/shared/locale';
 import { validateNoteContent, type NoteContent } from '../../domain/writing/note';
 
@@ -24,8 +28,11 @@ const metric = z.strictObject({ value: text, label: text, source: text });
 
 const common = {
   title: text.max(90),
+  /** A short name for menus and lists, where the title would be cut. */
+  name: text.max(32),
   summary: text.max(240),
   role: text,
+  track: z.enum(PROJECT_TRACKS),
   period: z.strictObject({ start: yearMonth, end: yearMonth.nullable() }),
   capabilities: z.array(z.enum(CAPABILITIES)).min(1),
   stack: z.array(text).min(1),
@@ -82,6 +89,10 @@ const report = z.strictObject({
   businessQuestions: z.array(text).min(1),
   dataSources: z.array(text).min(1),
   highlightedMeasures: z.array(text).default([]),
+  liveReport: z
+    .url({ protocol: /^https$/ })
+    .nullable()
+    .default(null),
 });
 
 const openSource = z.strictObject({

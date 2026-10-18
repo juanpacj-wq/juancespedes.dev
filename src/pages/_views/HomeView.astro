@@ -12,6 +12,7 @@ import HeroSection from '../../ui/sections/HeroSection.astro';
 import ImpactSection from '../../ui/sections/ImpactSection.astro';
 import ProjectsSection from '../../ui/sections/ProjectsSection.astro';
 import ServicesSection from '../../ui/sections/ServicesSection.astro';
+import { workMenu } from '../../ui/project/work-menu';
 import { homeGraph } from '../../ui/seo/structured-data';
 import { SITE } from '../../ui/site';
 
@@ -31,7 +32,11 @@ const [projects, matrix, profile, achievements] = await Promise.all([
 ]);
 
 const navItems = [
-  { href: '#projects', label: t.nav.projects },
+  {
+    href: '#projects',
+    label: t.nav.projects,
+    menu: await workMenu(t, projects, (id) => `#${id}`),
+  },
   { href: '#capabilities', label: t.nav.skills },
   { href: '#services', label: t.nav.services },
   { href: '#contact', label: t.nav.contact },

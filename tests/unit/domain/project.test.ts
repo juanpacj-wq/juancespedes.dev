@@ -152,6 +152,18 @@ describe('validateProjectContent', () => {
     expect(fields(issues)).toEqual(['businessQuestions', 'dataSources']);
   });
 
+  it('accepts only a Power BI "publish to web" link as the live report', () => {
+    const live = 'https://app.powerbi.com/view?r=eyJrIjoiYSJ9';
+    expect(validateProjectContent(reportContent({ liveReport: live }))).toEqual([]);
+    for (const liveReport of [
+      'https://app.powerbi.com/groups/me/reports/1',
+      'https://example.com/view?r=eyJrIjoiYSJ9',
+      'https://app.powerbi.com/view',
+    ]) {
+      expect(fields(validateProjectContent(reportContent({ liveReport })))).toEqual(['liveReport']);
+    }
+  });
+
   it('requires an https repository for open source', () => {
     const issues = validateProjectContent(openSourceContent({ repository: 'git@github.com:x/y' }));
     expect(fields(issues)).toEqual(['repository']);
@@ -168,6 +180,8 @@ describe('ordering and publication', () => {
   );
   const alpha = project('alpha', caseStudyContent({ order: 50, title: 'Alpha' }));
   const beta = project('beta', caseStudyContent({ order: 50, title: 'Beta' }));
+  const report = project('report', reportContent({ track: 'analytics', order: 1 }));
+  const agent = project('agent', toolContent({ track: 'automation', order: 1 }));
 
   it('sorts featured, then order, then recency, then title', () => {
     expect(sortProjects([finished, ongoing, firstByOrder, featured]).map((p) => p.slug)).toEqual([
@@ -177,6 +191,15 @@ describe('ordering and publication', () => {
       'finished',
     ]);
     expect(compareProjects(beta, alpha)).toBeGreaterThan(0);
+  });
+
+  it('keeps each area together, full-stack first, then analytics, then automation', () => {
+    expect(sortProjects([agent, report, finished, featured]).map((p) => p.slug)).toEqual([
+      'featured',
+      'finished',
+      'report',
+      'agent',
+    ]);
   });
 
   it('does not mutate the input', () => {

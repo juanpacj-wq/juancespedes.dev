@@ -1,0 +1,10 @@
+{
+  "cover": {
+    "es": "Réplica pública con datos sintéticos: lluvia de la semana y del mes por sede y por pluviómetro, con los días de mayor lluvia.",
+    "en": "Public replica with synthetic data: this week's and this month's rain by site and by gauge, with the wettest days."
+  },
+  "gallery-1": {
+    "es": "Histórico: comparación anual mes a mes, días de lluvia y lectura total por sede y por ubicación, con la variación frente al año anterior.",
+    "en": "History: a month-by-month comparison across years, rainy days and total readings by site and location, with the change from the previous year."
+  }
+}

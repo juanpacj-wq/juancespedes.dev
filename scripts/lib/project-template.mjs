@@ -55,6 +55,7 @@ const kindFields = (kind, locale) => {
         'dataSources:',
         `  - ${quote(todo)}`,
         'highlightedMeasures: []',
+        'liveReport: null',
       ];
     case 'open-source':
       return ['repository: https://github.com/juanpacj-wq/TODO', 'license: MIT', 'install: null'];
@@ -65,10 +66,10 @@ const kindFields = (kind, locale) => {
 
 /** Default capability and stack per kind, so the draft is valid from the first save. */
 const DEFAULTS = {
-  'case-study': { capabilities: ['backend'], stack: ['TypeScript'] },
-  report: { capabilities: ['data-bi'], stack: ['Power BI'] },
-  'open-source': { capabilities: ['automation-ai'], stack: ['TypeScript'] },
-  tool: { capabilities: ['automation-ai'], stack: ['Python'] },
+  'case-study': { track: 'full-stack', capabilities: ['backend'], stack: ['TypeScript'] },
+  report: { track: 'analytics', capabilities: ['data-bi'], stack: ['Power BI'] },
+  'open-source': { track: 'automation', capabilities: ['automation-ai'], stack: ['TypeScript'] },
+  tool: { track: 'automation', capabilities: ['automation-ai'], stack: ['Python'] },
 };
 
 /**
@@ -76,14 +77,16 @@ const DEFAULTS = {
  * @returns {string} the MDX file content
  */
 export const renderProjectFile = ({ kind, title, locale, start }) => {
-  const { capabilities, stack } = DEFAULTS[kind];
+  const { track, capabilities, stack } = DEFAULTS[kind];
   const todo = TODO[locale];
   return [
     '---',
     `kind: ${kind}`,
     `title: ${quote(title)}`,
+    `name: ${quote(title.slice(0, 32))}`,
     `summary: ${quote(todo)}`,
     `role: ${quote(todo)}`,
+    `track: ${track}`,
     `period: { start: '${start}', end: null }`,
     `capabilities: [${capabilities.join(', ')}]`,
     'stack:',

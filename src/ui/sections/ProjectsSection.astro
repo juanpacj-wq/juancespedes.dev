@@ -1,14 +1,19 @@
 ---
-import type { Project } from '../../domain/project/project';
+import { PROJECT_TRACKS, type Project } from '../../domain/project/project';
 import type { Dictionary } from '../i18n/dictionary';
 import Container from '../primitives/Container.astro';
-import ProjectCard from '../project/ProjectCard.astro';
 import ProjectStage from '../project/ProjectStage.astro';
+import { workAnchor } from '../project/work-menu';
 
 /**
- * Projects that open their own page. Featured projects play one at a time on the pinned stage
- * (ProjectStage); the rest share a grid of smaller cards below it. Both lists keep the display
- * order set in the content (`order`).
+ * Projects grouped by area of work (full-stack, analytics, AI and automation), so a visitor
+ * hiring for one role finds its projects together. Each area is its own stage (ProjectStage),
+ * in the display order set in the content (`order`).
+ *
+ * Progressive: without JavaScript the areas follow one another, each under its own heading, and
+ * the tabs are links that jump to them. The script below turns them into tabs: one area shows at
+ * a time, the tabs and the title stick while its stage plays, and an address like
+ * `/#work-analytics` (the header menu's links) opens on that area.
  */
 interface Props {
   t: Dictionary;
@@ -16,8 +21,13 @@ interface Props {
 }
 
 const { t, projects } = Astro.props;
-const featured = projects.filter((project) => project.featured);
-const others = projects.filter((project) => !project.featured);
+
+const areas = PROJECT_TRACKS.map((track) => ({
+  track,
+  id: workAnchor(track),
+  ...t.trackLabels[track],
+  projects: projects.filter((project) => project.track === track),
+})).filter((area) => area.projects.length > 0);
 ---
 
 <section
@@ -38,26 +48,91 @@ const others = projects.filter((project) => !project.featured);
       </p>
     </Container>
   ) : (
-    <>
-      <ProjectStage t={t} projects={featured} headingId="projects-title" />
+    <div class="work" data-work>
+      <Container class="work-head">
+        <div class="work-head-row">
+          <h2 id="projects-title" class="font-display text-heading font-medium text-balance">
+            {t.projects.featuredTitle}
+          </h2>
+          <div class="work-switch">
+            <nav aria-label={t.projects.tracks}>
+              <ul class="work-tabs" data-work-tabs>
+                <li class="work-tab-pill" aria-hidden="true" data-work-pill />
+                {areas.map((area) => (
+                  <li>
+                    <a
+                      href={`#${area.id}`}
+                      id={`${area.id}-tab`}
+                      class="work-tab"
+                      data-work-tab={area.id}
+                    >
+                      {area.label}
+                      <span class="work-tab-count" aria-hidden="true">
+                        {area.projects.length}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            {areas.map((area, index) => (
+              <p class="work-blurb" data-work-blurb={area.id} hidden={index > 0 ? true : undefined}>
+                {area.blurb}
+              </p>
+            ))}
+          </div>
+        </div>
+      </Container>
 
-      {others.length > 0 && (
-        <Container class="pt-16 lg:pt-24">
-          <section aria-labelledby="more-projects-title" class="flex flex-col gap-8">
-            <h3
-              id="more-projects-title"
-              class="scroll-mt-24 border-t border-line pt-6 text-title font-medium text-ink"
-            >
-              {t.projects.moreTitle}
-            </h3>
-            <div class="grid gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-              {others.map((project) => (
-                <ProjectCard t={t} project={project} />
-              ))}
-            </div>
-          </section>
-        </Container>
-      )}
-    </>
+      {areas.map((area, index) => {
+        const next = areas[index + 1];
+        return (
+          <div
+            id={area.id}
+            class="work-panel"
+            data-work-panel={area.id}
+            hidden={index > 0 ? true : undefined}
+          >
+            <Container>
+              <h3 class="work-panel-title sr-only">{area.label}</h3>
+            </Container>
+            <ProjectStage
+              t={t}
+              projects={area.projects}
+              next={next ? { id: next.id, label: next.label, href: `#${next.id}` } : null}
+            />
+          </div>
+        );
+      })}
+      {/* Without the script every area shows, one after another, under its own heading. */}
+      <noscript>
+        <style is:inline>
+          .work-panel[hidden] {
+            display: block;
+            margin-top: 6rem;
+          }
+          .work-blurb,
+          .work-tab-pill {
+            display: none;
+          }
+          .work-panel-title {
+            position: static;
+            width: auto;
+            height: auto;
+            margin: 0 0 2rem;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+            font-size: var(--text-title);
+          }
+        </style>
+      </noscript>
+    </div>
   )}
 </section>
+
+<script>
+  import { mountWork } from './work';
+
+  mountWork();
+</script>

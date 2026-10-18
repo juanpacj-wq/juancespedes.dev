@@ -1,0 +1,52 @@
+---
+kind: report
+title: Rainfall monitoring for a mining operation
+name: Rainfall monitoring
+summary: A Power BI report that brings together the daily readings of eight rain gauges across three sites, with weekly and monthly summaries, rain events hour by hour and a comparison with past years.
+role: Author of the model, the DAX measures, the report and the data flow in Microsoft Fabric
+track: analytics
+period: { start: '2024-08', end: '2024-10' }
+capabilities: [data-bi]
+stack:
+  - Power BI
+  - DAX
+  - Power Query
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
+  - SharePoint
+  - Excel
+metrics:
+  - value: '8'
+    label: rain gauges across three sites, each read once a day
+    source: Semantic model of the original report, reviewed in October 2026
+  - value: '15'
+    label: DAX measures for totals by week, month, site and year
+    source: Semantic model of the original report, reviewed in October 2026
+  - value: '1'
+    label: relationship missing from the model and added in the replica, because the per-site donuts repeated the total
+    source: Review of the original model while building the replica, October 2026
+featured: false
+order: 3
+status: published
+confidentiality: anonymized
+tool: Power BI on Microsoft Fabric (pipelines, notebooks, lakehouses and a warehouse)
+businessQuestions:
+  - How much did it rain this week and this month at each site and at each gauge?
+  - Which days concentrated the rain, and when did each event start and end?
+  - How does this year compare with the area's rainfall history?
+dataSources:
+  - SharePoint lists where field staff log the daily readings
+  - An Excel workbook with the earlier readings
+  - In production, Microsoft Fabric ETL pipelines and notebooks load those sources into layered lakehouses (bronze, silver and gold, a medallion architecture), and a Fabric warehouse feeds the report's model
+  - 'Public replica: synthetic data following the two rainy seasons of the Colombian Caribbean'
+highlightedMeasures:
+  - Rainfall totals by week, month and site
+  - Duration and depth of each rain event
+  - Comparison with the same period in past years
+liveReport: https://app.powerbi.com/view?r=eyJrIjoiOWY1NmIyZTYtZjRlOC00YjU3LWJjOTUtNzc0OWUwNmE3N2RmIiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

@@ -1,0 +1,55 @@
+---
+kind: report
+title: Cuadro de mando de generación térmica en Power BI
+name: Cuadro de mando de generación
+summary: Seis páginas que reúnen generación, disponibilidad, consumo de combustibles e indicadores IEEE de cuatro unidades térmicas, para que la gerencia vea en una sola pantalla cómo va cada planta frente al mercado.
+role: Autor del modelo semántico, las medidas DAX, el diseño del informe y el flujo de datos en Microsoft Fabric
+track: analytics
+period: { start: '2024-09', end: '2025-09' }
+capabilities: [data-bi]
+stack:
+  - Power BI
+  - DAX
+  - Power Query
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
+  - PostgreSQL
+  - SharePoint
+  - Excel
+metrics:
+  - value: '6'
+    label: páginas, de la generación neta del mes a los indicadores IEEE de confiabilidad
+    source: Informe original y su réplica pública, revisados en octubre de 2026
+  - value: '33'
+    label: medidas DAX, entre ellas EFOF, FOR, SOF y la confiabilidad de arranque
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+  - value: '4'
+    label: unidades térmicas comparadas mes a mes con la generación nacional
+    source: Modelo semántico del informe original, revisado en octubre de 2026
+featured: false
+order: 2
+status: published
+confidentiality: anonymized
+tool: Power BI sobre Microsoft Fabric (pipelines, notebooks, lakehouses y warehouse)
+businessQuestions:
+  - ¿Cuánta energía neta entregó cada unidad en el mes y qué parte de la generación nacional representa?
+  - ¿Cuántas horas estuvo cada unidad en operación, reserva, mantenimiento o falla, y por qué causas?
+  - ¿Cuánto carbón, caliza y ACPM se consumió y con qué heat rate?
+  - ¿Cómo van la disponibilidad comercial y los indicadores IEEE frente al resto del año?
+dataSources:
+  - Base de datos PostgreSQL con la operación horaria de las plantas
+  - Libros de Excel en SharePoint con causas de indisponibilidad y movimientos de inventario de combustibles
+  - En producción, pipelines ETL y notebooks de Microsoft Fabric llevan esos orígenes a lakehouses por capas (bronce, plata y oro, arquitectura medallón) y un warehouse de Fabric alimenta el modelo del informe
+  - 'Réplica pública: datos sintéticos de una simulación diaria por unidad, generados en Python'
+highlightedMeasures:
+  - EFOF y FOR por unidad, con las horas equivalentes de derrateo
+  - Participación en la generación nacional
+  - Disponibilidad comercial mensual y acumulada
+  - Confiabilidad de arranque (sincronizaciones sin disparo)
+liveReport: https://app.powerbi.com/view?r=eyJrIjoiY2FlN2Y2ZDktNDZhNS00YWZiLThmMWEtMzIzYWYwNjRmNzE2IiwidCI6ImQxZTU5OTQwLWNjYjUtNDYwMC1hMzdjLWI4YTZhNWM2ZmRiYyIsImMiOjR9
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

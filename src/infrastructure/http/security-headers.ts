@@ -11,6 +11,8 @@ export const THIRD_PARTY_ORIGINS = {
   // Cloudflare Web Analytics: the cookieless beacon script and the endpoint it reports to.
   analyticsScript: 'https://static.cloudflareinsights.com',
   analyticsEndpoint: 'https://cloudflareinsights.com',
+  // Power BI "publish to web": the live replicas of the reports, framed only after a click.
+  powerBi: 'https://app.powerbi.com',
 } as const;
 
 /** Headers that do not depend on the page. */

@@ -22,7 +22,7 @@ const notes = await container.listNotes(locale);
   description={t.notes.description}
   locale={locale}
   route={{ page: 'notes' }}
-  navItems={siteNav(t, locale)}
+  navItems={await siteNav(t, locale)}
 >
   <Container class="flex flex-col gap-10 py-16 sm:py-24">
     <header class="flex max-w-3xl flex-col gap-4">

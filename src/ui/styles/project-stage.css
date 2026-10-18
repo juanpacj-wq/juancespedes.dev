@@ -1,3 +1,5 @@
+@import './screen-placeholder.css';
+
 /*
  * The project stage on the home page (src/ui/project/ProjectStage.astro). Not part of the
  * stylesheet every page waits for: the stage script loads this file after the page has loaded,
@@ -34,37 +36,48 @@
 /* ---------- Wide screens with motion: the pinned stage ---------- */
 
 @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-  /* A jump to #projects lands on the pinned stage itself, whose own padding clears the header:
-     the margin cancels the section's top padding (7rem). */
+  /* A jump to #projects lands where the stage pins: the title of the section 5.5rem from the
+     top, clear of the sticky site header (4rem), with the section's top padding (7rem) above. */
   #projects:has([data-stage-ready]) {
-    scroll-margin-top: -7rem;
+    scroll-margin-top: -1.5rem;
   }
 
-  /* The section is as tall as one screen per project; the pin stays while it scrolls past. */
+  /*
+   * The title and the area tabs (ProjectsSection, `--work-head` tall) stick 5.5rem from the top,
+   * over the stage. Their bottom margin makes them let go when the stage does: a sticky box stops
+   * where its margin meets the end of the section.
+   */
+  .work:has([data-stage-ready]) .work-head {
+    position: sticky;
+    top: 5.5rem;
+    z-index: 10;
+    margin-bottom: calc(100svh - 5.5rem - var(--work-head, 0px));
+  }
+
+  /*
+   * The section is as tall as one screen per project; the pin stays while it scrolls past. It
+   * starts a screen higher, back under the title's margin, so it pins at the same scroll as the
+   * title does and its padding clears it.
+   */
   .project-stage[data-stage-ready] {
     height: calc(var(--count) * 100svh);
+    margin-top: -100svh;
   }
 
-  /* Title across the top; under it, the rail of thumbnails and the stage. */
+  /* The rail of thumbnails on the left, the stage on the right. */
   [data-stage-ready] .project-stage-pin {
     position: sticky;
     top: 0;
     display: grid;
     grid-template-columns: 8rem minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
     column-gap: clamp(1.5rem, 3vw, 3.5rem);
-    row-gap: 1.5rem;
     height: 100svh;
-    /* Clears the sticky site header (4rem). */
-    padding-block: 5.5rem 1.5rem;
+    padding-block: calc(5.5rem + var(--work-head, 0px) + 1.5rem) 1.5rem;
   }
 
   [data-stage-ready] .project-stage-aside {
     display: contents;
-  }
-
-  [data-stage-ready] .project-stage-aside h2 {
-    grid-column: 1 / -1;
   }
 
   /* ----- Left: thumbnails and the way out ----- */
@@ -72,7 +85,7 @@
   [data-stage-ready] .project-stage-rail {
     display: block;
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
     min-height: 0;
   }
 
@@ -108,28 +121,17 @@
     outline-offset: 2px;
   }
 
+  /* The way on to the next area, under the thumbnails. */
   [data-stage-ready] .project-stage-more {
-    display: inline-flex;
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
+    flex-direction: column;
     align-self: end;
-    justify-self: start;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--ink);
-    font-size: var(--text-small);
-    font-weight: 500;
-    text-decoration: underline;
-    text-decoration-color: var(--line-strong);
-    text-underline-offset: 0.3em;
-    transition: text-decoration-color 300ms ease;
+    align-items: flex-start;
+    gap: 0.25rem;
   }
 
-  [data-stage-ready] .project-stage-more:hover {
-    text-decoration-color: var(--accent);
-  }
-
-  /* Short screens keep the thumbnails; the link to every project waits below the stage. */
+  /* Short screens keep the thumbnails; the area tabs above still lead to the next area. */
   @media (max-height: 48rem) {
     [data-stage-ready] .project-stage-more {
       display: none;
@@ -141,7 +143,7 @@
   [data-stage-ready] .project-stage-main {
     display: flex;
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 1;
     flex-direction: column;
     gap: 1rem;
     min-height: 0;

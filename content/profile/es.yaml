@@ -58,7 +58,7 @@ currency: COP
 
 services:
   - title: Datos, dashboards y reportes
-    summary: Modelos de datos, ETL y tableros de Power BI que responden preguntas concretas del negocio.
+    summary: Modelos de datos, ETL y tableros de Power BI que responden preguntas concretas del negocio, llevados a producción en Microsoft Fabric con lakehouses bronce, plata y oro.
     deliverables:
       - Modelo de datos y consultas SQL documentadas
       - Tablero o reporte con indicadores acordados

@@ -13,8 +13,10 @@ import {
 const minimalCaseStudy = {
   kind: 'case-study',
   title: 'Logbook',
+  name: 'Logbook',
   summary: 'Real-time logbook.',
   role: 'Engineer',
+  track: 'full-stack',
   period: { start: '2026-03', end: null },
   capabilities: ['backend'],
   stack: ['Node.js'],
@@ -63,6 +65,15 @@ describe('projectFrontmatterSchema', () => {
     expect(
       projectFrontmatterSchema.safeParse({ ...minimalCaseStudy, capabilities: ['marketing'] })
         .success,
+    ).toBe(false);
+  });
+
+  it('requires one of the three areas of work', () => {
+    expect(
+      projectFrontmatterSchema.safeParse({ ...minimalCaseStudy, track: undefined }).success,
+    ).toBe(false);
+    expect(
+      projectFrontmatterSchema.safeParse({ ...minimalCaseStudy, track: 'design' }).success,
     ).toBe(false);
   });
 
