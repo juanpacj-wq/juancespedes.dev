@@ -180,6 +180,8 @@ describe('ordering and publication', () => {
   );
   const alpha = project('alpha', caseStudyContent({ order: 50, title: 'Alpha' }));
   const beta = project('beta', caseStudyContent({ order: 50, title: 'Beta' }));
+  const report = project('report', reportContent({ track: 'analytics', order: 1 }));
+  const agent = project('agent', toolContent({ track: 'automation', order: 1 }));
 
   it('sorts featured, then order, then recency, then title', () => {
     expect(sortProjects([finished, ongoing, firstByOrder, featured]).map((p) => p.slug)).toEqual([
@@ -189,6 +191,15 @@ describe('ordering and publication', () => {
       'finished',
     ]);
     expect(compareProjects(beta, alpha)).toBeGreaterThan(0);
+  });
+
+  it('keeps each area together, full-stack first, then analytics, then automation', () => {
+    expect(sortProjects([agent, report, finished, featured]).map((p) => p.slug)).toEqual([
+      'featured',
+      'finished',
+      'report',
+      'agent',
+    ]);
   });
 
   it('does not mutate the input', () => {

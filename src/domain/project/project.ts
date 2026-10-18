@@ -10,6 +10,14 @@ import { normalizeTechnologyName } from './technology';
 export const PROJECT_KINDS = ['case-study', 'report', 'open-source', 'tool'] as const;
 export type ProjectKind = (typeof PROJECT_KINDS)[number];
 
+/**
+ * The line of work a project shows, in the order the home page presents them: full-stack
+ * products, data analytics, and AI and automation. A visitor hiring for one role finds its
+ * projects together, without scrolling past the others.
+ */
+export const PROJECT_TRACKS = ['full-stack', 'analytics', 'automation'] as const;
+export type ProjectTrack = (typeof PROJECT_TRACKS)[number];
+
 export type PublicationStatus = 'draft' | 'published';
 
 /** `anonymized`: built for an employer or client; names, data and screenshots are recreated. */
@@ -46,6 +54,7 @@ interface CommonContent {
   readonly title: string;
   readonly summary: string;
   readonly role: string;
+  readonly track: ProjectTrack;
   readonly period: { readonly start: string; readonly end: string | null };
   readonly capabilities: readonly Capability[];
   readonly stack: readonly string[];

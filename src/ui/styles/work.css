@@ -1,0 +1,144 @@
+/*
+ * The areas of work on the home page (src/ui/sections/ProjectsSection.astro and work.ts): the
+ * title with its tabs, and the panels they switch. What the pinned stage adds (the title and the
+ * tabs sticking above it) lives in project-stage.css, which loads after the page.
+ */
+
+.work-head {
+  margin-bottom: 3rem;
+}
+
+.work-head-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border-top: 1px solid var(--color-line);
+  padding-top: 1.5rem;
+}
+
+@media (min-width: 64rem) {
+  .work-head-row {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 3rem;
+  }
+
+  .work-switch {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
+/* A segmented control on a raised track; the light under the current area glides between tabs. */
+.work-tabs {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  overflow-x: auto;
+  border-radius: var(--radius-chip);
+  background-color: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  box-shadow: var(--shadow-bevel);
+  scrollbar-width: none;
+}
+
+.work-tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.625rem;
+  padding-inline: 1rem;
+  border-radius: var(--radius-chip);
+  color: var(--color-muted);
+  font-size: var(--text-small);
+  white-space: nowrap;
+  transition:
+    color 200ms ease,
+    scale 300ms var(--ease-out);
+}
+
+.work-tab:hover,
+.work-tab[aria-selected='true'] {
+  color: var(--color-ink);
+}
+
+.work-tab:active {
+  scale: 0.96;
+}
+
+.work-tab:focus-visible {
+  outline: 2px solid var(--color-accent-ink);
+  outline-offset: -2px;
+}
+
+.work-tab-count {
+  color: var(--color-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--text-eyebrow);
+  transition: color 200ms ease;
+}
+
+.work-tab[aria-selected='true'] .work-tab-count {
+  color: var(--color-accent-ink);
+}
+
+.work-tab-pill {
+  position: absolute;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  left: 0;
+  width: var(--pill-w, 0);
+  border-radius: var(--radius-chip);
+  background-color: var(--color-surface-raised);
+  box-shadow: var(--shadow-bevel);
+  opacity: 0;
+  translate: var(--pill-x, 0) 0;
+  pointer-events: none;
+  transition:
+    translate 450ms var(--ease-out),
+    width 450ms var(--ease-out);
+}
+
+[data-work-ready] .work-tab-pill {
+  opacity: 1;
+}
+
+.work-blurb {
+  margin-top: 0.75rem;
+  color: var(--color-muted);
+  font-size: var(--text-small);
+}
+
+/* A new area rises into place; the first one is simply there. */
+.work-panel[data-work-enter] {
+  animation: work-enter 600ms var(--ease-out);
+}
+
+@keyframes work-enter {
+  from {
+    opacity: 0;
+    translate: 0 2rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .work-tab {
+    padding-inline: 0.75rem;
+  }
+
+  .work-tab-count {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-tab,
+  .work-tab-pill {
+    transition: none;
+  }
+}

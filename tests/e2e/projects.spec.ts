@@ -264,7 +264,7 @@ test.describe('project pages', () => {
   test('a project on the home page opens its page', async ({ page }) => {
     // Reduced motion keeps the home page projects as a list (the stage has its own tests).
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/#projects');
+    await page.goto('/#work-automation');
     await page.locator('#project-invoice-etl-rescue').getByRole('link').click();
     await expect(page).toHaveURL(/\/proyectos\/invoice-etl-rescue$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
@@ -273,17 +273,44 @@ test.describe('project pages', () => {
   });
 
   test('previous and next links walk the projects in display order', async ({ page }) => {
-    await page.goto('/proyectos/operations-logbook');
+    await page.goto('/proyectos/event-platform');
     const more = page.getByRole('navigation', { name: 'Más proyectos' });
     await expect(more.getByRole('link')).toHaveCount(1);
 
     await more.getByRole('link', { name: /Siguiente/ }).click();
-    await expect(page).toHaveURL(/\/proyectos\/plant-telemetry$/);
+    await expect(page).toHaveURL(/\/proyectos\/corporate-portal$/);
     await page
       .getByRole('navigation', { name: 'Más proyectos' })
       .getByRole('link', { name: /Anterior/ })
       .click();
-    await expect(page).toHaveURL(/\/proyectos\/operations-logbook$/);
+    await expect(page).toHaveURL(/\/proyectos\/event-platform$/);
+  });
+
+  test('the header menu lists the projects by area and opens an area', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(
+      isMobile,
+      'Phones reach the areas from the tabs; the header menu is for wide screens',
+    );
+    await page.goto('/proyectos/plant-telemetry');
+    const toggle = page.getByRole('button', { name: 'Abrir los proyectos por área' });
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const menu = page.getByRole('region', { name: 'Proyectos por área' });
+    await expect(menu.getByRole('link', { name: /Cuadro de mando de generación/ })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(menu).toBeHidden();
+    await expect(toggle).toBeFocused();
+
+    await toggle.click();
+    await menu.getByRole('link', { name: /Analítica/ }).click();
+    await expect(page).toHaveURL(/\/#work-analytics$/);
+    await expect(page.getByRole('tab', { name: /Analítica/ })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
   });
 
   test('the logo leads home from any page, in its language', async ({ page }) => {

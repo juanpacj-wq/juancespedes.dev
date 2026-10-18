@@ -216,14 +216,55 @@ test.describe('hero headline', () => {
 });
 
 test.describe('projects', () => {
-  test('featured cases play on the stage and the rest share a grid', async ({ page }) => {
+  test('projects are grouped by area, one area at a time', async ({ page }) => {
     await page.goto('/#projects');
-    await expect(page.locator('#projects [data-stage-slide]')).toHaveCount(5);
-    await expect(page.locator('#projects .project-card')).toHaveCount(7);
+    const tabs = page.getByRole('tablist', { name: 'Áreas de trabajo' }).getByRole('tab');
+    await expect(tabs).toHaveText([/Full-stack/, /Analítica/, /IA y automatización/]);
+    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('#work-full-stack [data-stage-slide]')).toHaveCount(5);
+    await expect(page.locator('#work-analytics [data-stage-slide]')).toHaveCount(4);
+    await expect(page.locator('#work-automation [data-stage-slide]')).toHaveCount(3);
+    await expect(page.locator('#work-analytics')).toBeHidden();
+    // The full-stack area in the order the author set.
+    await expect(page.locator('#work-full-stack [data-stage-slide] h3')).toHaveText([
+      /foro corporativo/,
+      /Portal corporativo/,
+      /Bitácora digital/,
+      /Telemetría/,
+      /Este portafolio/,
+    ]);
     // One link per project, named by the project's title.
     const slide = page.locator('#project-operations-logbook');
     await expect(slide.getByRole('link')).toHaveCount(1);
     await expect(slide.getByRole('link')).toHaveAccessibleName(/Bitácora digital de operación/);
+  });
+
+  test('a tab opens its area on its first project', async ({ page }) => {
+    await page.goto('/#projects');
+    const tablist = page.getByRole('tablist', { name: 'Áreas de trabajo' });
+    await tablist.getByRole('tab', { name: /Analítica/ }).click();
+    await expect(page.locator('#work-analytics')).toBeVisible();
+    await expect(page.locator('#work-full-stack')).toBeHidden();
+    await expect(page.locator('#work-analytics [data-stage-slide] h3')).toHaveText([
+      /programa de energía solar/,
+      /Cuadro de mando/,
+      /precipitaciones/,
+      /Ejecución presupuestal/,
+    ]);
+    await expect(page).toHaveURL(/#work-analytics$/);
+    // Arrow keys move between areas.
+    await page.keyboard.press('ArrowRight');
+    await expect(tablist.getByRole('tab', { name: /IA y automatización/ })).toBeFocused();
+    await expect(page.locator('#work-automation')).toBeVisible();
+  });
+
+  test('an address that names an area opens on it', async ({ page }) => {
+    await page.goto('/#work-automation');
+    await expect(page.getByRole('tab', { name: /IA y automatización/ })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await expect(page.locator('#project-linkedin-pilot')).toBeInViewport();
   });
 
   test('a click anywhere on a project opens its case study', async ({ page }) => {
@@ -245,13 +286,15 @@ test.describe('projects', () => {
   test.describe('the pinned stage', () => {
     test.skip(({ isMobile }) => isMobile, 'Phones keep the projects as a list');
 
-    const stage = (page: Page) => page.locator('[data-project-stage]');
+    const stage = (page: Page) => page.locator('#work-full-stack [data-project-stage]');
     const current = (page: Page) =>
-      page.getByRole('navigation', { name: 'Ir a un caso de estudio' }).locator('[aria-current]');
+      page.getByRole('navigation', { name: 'Ir a un proyecto' }).locator('[aria-current]');
     /** Whether a project's title sits inside the stage's visible frame (it clips the others). */
     const onStage = (page: Page, slug: string) =>
       page.evaluate((id) => {
-        const frame = document.querySelector('.project-stage-slides')?.getBoundingClientRect();
+        const frame = document
+          .querySelector('.work-panel:not([hidden]) .project-stage-slides')
+          ?.getBoundingClientRect();
         const title = document.querySelector(`#project-${id} h3`)?.getBoundingClientRect();
         if (!frame || !title) return false;
         return (
@@ -278,18 +321,48 @@ test.describe('projects', () => {
           behavior: 'instant',
         });
       });
-      await expect(current(page)).toHaveAccessibleName(/Portal corporativo bilingüe/);
-      await expect(page.locator('[data-stage-counter]')).toHaveText('03 / 05');
-      // The section is pinned: its title stays in view while the projects change.
+      await expect(current(page)).toHaveAccessibleName(/Bitácora digital de operación/);
+      await expect(stage(page).locator('[data-stage-counter]')).toHaveText('03 / 05');
+      // The section is pinned: its title and tabs stay in view while the projects change.
+      await expect(page.locator('#projects-title')).toBeInViewport();
+      await expect(page.getByRole('tab', { name: /Analítica/ })).toBeInViewport();
+    });
+
+    test('switching areas mid-stage starts the new one at its first project', async ({ page }) => {
+      await stage(page).evaluate((root: HTMLElement) => {
+        const span = root.offsetHeight - innerHeight;
+        scrollTo({
+          top: root.getBoundingClientRect().top + scrollY + span * 0.75,
+          behavior: 'instant',
+        });
+      });
+      await page.getByRole('tab', { name: /Analítica/ }).click();
+      await expect(current(page)).toHaveAccessibleName(/programa de energía solar/);
+      await expect.poll(() => onStage(page, 'solar-program-finance')).toBe(true);
       await expect(page.locator('#projects-title')).toBeInViewport();
     });
 
+    test('the link under the rail leads on to the next area', async ({ page }) => {
+      // Short screens keep only the thumbnails under the rail; the tabs lead on there.
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.locator('#projects').scrollIntoViewIfNeeded();
+      await page
+        .locator('#work-full-stack')
+        .getByRole('link', { name: /Siguiente\s*Analítica/ })
+        .click();
+      await expect(page.getByRole('tab', { name: /Analítica/ })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      );
+      await expect.poll(() => onStage(page, 'solar-program-finance')).toBe(true);
+    });
+
     test('the rail jumps to a project and the stage shows it', async ({ page }) => {
-      const rail = page.getByRole('navigation', { name: 'Ir a un caso de estudio' });
+      const rail = page.getByRole('navigation', { name: 'Ir a un proyecto' });
       await rail.scrollIntoViewIfNeeded();
-      await rail.getByRole('link', { name: /Plataforma de un foro/ }).click();
-      await expect(current(page)).toHaveAccessibleName(/Plataforma de un foro/);
-      await expect.poll(() => onStage(page, 'event-platform')).toBe(true);
+      await rail.getByRole('link', { name: /Telemetría de generación/ }).click();
+      await expect(current(page)).toHaveAccessibleName(/Telemetría de generación/);
+      await expect.poll(() => onStage(page, 'plant-telemetry')).toBe(true);
     });
 
     test('focus on a project that waits off the stage brings it on', async ({ page }) => {

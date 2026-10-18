@@ -88,9 +88,9 @@ people are checked against a private denylist: `.content-denylist` locally (git-
 A published project gets two pages, `/proyectos/<slug>` and `/en/projects/<slug>`, an Open
 Graph card per language and its place in `sitemap.xml`, all without touching code.
 
-Set `status: published` (and `featured: true` plus `order` if it belongs on the home page).
-`pnpm test` refuses a published project that still contains `TODO`. Featured projects get the
-wide card on the home page; the rest share the grid of smaller cards.
+Set `status: published`. `track` puts it under one of the three areas of the home page
+(`full-stack`, `analytics` or `automation`), and `order` sets its place inside that area.
+`pnpm test` refuses a published project that still contains `TODO`.
 
 ## 5. Add its images (optional)
 

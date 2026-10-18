@@ -62,9 +62,11 @@ nodes and flows as text, and `case-study-motion.ts` adds the wires, highlights a
 walk on top. Motion on these pages is scroll-driven CSS plus that one deferred script, and no
 starting state lowers text contrast ([ADR 0021](adr/0021-case-study-redesign.md)).
 
-Home page projects: `ProjectStage` pins the featured case studies on wide screens and brings one
-in over the other as the visitor scrolls, from a single `--p` property; phones and reduced motion
-keep a list ([ADR 0028](adr/0028-pinned-project-stage.md)).
+Home page projects: grouped by area of work behind tabs (`ProjectsSection`, `work.ts`, styles in
+`work.css`), one `ProjectStage` per area. The stage pins on wide screens and brings one project in
+over the other as the visitor scrolls, from a single `--p` property; phones and reduced motion
+keep a list ([ADR 0028](adr/0028-pinned-project-stage.md),
+[ADR 0033](adr/0033-work-by-area.md)). The header's Projects item opens the same areas as a menu.
 
 Impact (`src/ui/impact`): `AchievementCard` is a figure, one sentence and the project it came from,
 under a hairline; the whole item opens the case study, where the story, chart and source live

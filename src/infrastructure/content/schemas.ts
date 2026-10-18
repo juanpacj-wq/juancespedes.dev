@@ -7,7 +7,11 @@ import {
   type Amount,
 } from '../../domain/project/achievement';
 import { CAPABILITIES } from '../../domain/project/capability';
-import { validateProjectContent, type ProjectContent } from '../../domain/project/project';
+import {
+  PROJECT_TRACKS,
+  validateProjectContent,
+  type ProjectContent,
+} from '../../domain/project/project';
 import type { Locale } from '../../domain/shared/locale';
 import { validateNoteContent, type NoteContent } from '../../domain/writing/note';
 
@@ -26,6 +30,7 @@ const common = {
   title: text.max(90),
   summary: text.max(240),
   role: text,
+  track: z.enum(PROJECT_TRACKS),
   period: z.strictObject({ start: yearMonth, end: yearMonth.nullable() }),
   capabilities: z.array(z.enum(CAPABILITIES)).min(1),
   stack: z.array(text).min(1),

@@ -12,7 +12,7 @@ import ScreenPlaceholder from './ScreenPlaceholder.astro';
 import { SCREENSHOT_QUALITY } from './screenshots';
 
 /**
- * The featured case studies as a stage: on wide screens the section pins to the viewport and
+ * The projects of one area of work as a stage: on wide screens the section pins to the viewport and
  * scrolling no longer moves the page, it brings the next project in over the current one. A rail
  * of thumbnails on the left marks where you are and jumps to a project; the stage on the right
  * holds one project at a time, and clicking it opens the case study.
@@ -30,14 +30,19 @@ import { SCREENSHOT_QUALITY } from './screenshots';
  * every slide's offset, scale and the progress bars from it: transforms only, one style write per
  * frame. Each project holds still for part of its scroll before the next one slides in, so the
  * stage reads as one screen per project rather than a strip.
+ *
+ * The home page holds one stage per area of work, of which one shows at a time
+ * (ProjectsSection); the title and the area tabs sit above it, so the stage carries only the
+ * projects and a way on to the next area.
  */
 interface Props {
   t: Dictionary;
   projects: readonly Project[];
-  headingId: string;
+  /** The area that follows, for the link that ends the stage; null on the last one. */
+  next: { readonly id: string; readonly label: string; readonly href: string } | null;
 }
 
-const { t, projects, headingId } = Astro.props;
+const { t, projects, next } = Astro.props;
 const pad = (value: number) => String(value).padStart(2, '0');
 const total = pad(projects.length);
 
@@ -79,15 +84,8 @@ const slides = await Promise.all(
   data-stage-track
   style={`--count: ${String(projects.length)}; --p: 0`}
 >
-  <Container class="project-stage-pin">
-    <div class="project-stage-aside mb-10 sm:mb-14">
-      <h2
-        id={headingId}
-        class="border-t border-line pt-6 font-display text-heading font-medium text-balance"
-      >
-        {t.projects.featuredTitle}
-      </h2>
-
+  <Container class="project-stage-pin flex flex-col">
+    <div class="project-stage-aside order-last mt-12">
       <nav class="project-stage-rail hidden" aria-label={t.projects.stageRail}>
         <ol class="flex flex-col gap-2">
           {slides.map((slide) => (
@@ -117,10 +115,25 @@ const slides = await Promise.all(
         </ol>
       </nav>
 
-      <a href="#more-projects-title" class="project-stage-more hidden">
-        {t.projects.moreLink}
-        <Icon name="arrow-right" size={16} />
-      </a>
+      {next && (
+        <a
+          href={next.href}
+          class="project-stage-more group inline-flex items-center gap-3 text-small text-muted"
+          data-work-goto={next.id}
+        >
+          <span class="font-mono text-eyebrow tracking-widest text-subtle uppercase">
+            {t.projects.nextTrack}
+          </span>
+          <span class="inline-flex items-center gap-2 font-medium text-ink">
+            {next.label}
+            <Icon
+              name="arrow-right"
+              size={16}
+              class="transition-transform duration-300 group-hover:translate-x-1"
+            />
+          </span>
+        </a>
+      )}
     </div>
 
     <div class="project-stage-main">
@@ -197,16 +210,17 @@ const slides = await Promise.all(
 <script>
   import stageStyles from '../styles/project-stage.css?url';
 
-  const root = document.querySelector<HTMLElement>('[data-project-stage]');
-  if (root) {
+  // The stage only pins where there is room and motion is welcome; elsewhere it stays a list.
+  const stageable = matchMedia('(min-width: 64rem) and (prefers-reduced-motion: no-preference)');
+  const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+  /** Turns one list of projects into a stage; returns the switch that follows the media query. */
+  const mountStage = (root: HTMLElement) => {
     const slides = [...root.querySelectorAll<HTMLElement>('[data-stage-slide]')];
     const rail = [...root.querySelectorAll<HTMLAnchorElement>('[data-stage-goto]')];
     const counter = root.querySelector('[data-stage-counter]');
     const last = slides.length - 1;
     const total = String(slides.length).padStart(2, '0');
-    // The stage only pins where there is room and motion is welcome; elsewhere it stays a list.
-    const stageable = matchMedia('(min-width: 64rem) and (prefers-reduced-motion: no-preference)');
-    const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
     /*
      * The screenshots load when the section comes within a screen of the viewport. It sits below
@@ -346,12 +360,25 @@ const slides = await Promise.all(
       mark(0);
     };
 
-    const sync = () => {
+    // A stage that was hidden behind another area measures itself again when it shows.
+    addEventListener('work:show', () => {
+      if (root.dataset.stageReady !== undefined) onScroll();
+    });
+
+    return () => {
       if (stageable.matches && root.dataset.stageReady === undefined) enter();
       else if (!stageable.matches && root.dataset.stageReady !== undefined) leave();
     };
+  };
 
-    // The stage styles arrive after the page has loaded; the stage switches on when they apply.
+  const stages = [...document.querySelectorAll<HTMLElement>('[data-project-stage]')];
+  if (stages.length > 0) {
+    const syncs = stages.map(mountStage);
+    const sync = () => {
+      for (const each of syncs) each();
+    };
+
+    // The stage styles arrive after the page has loaded; the stages switch on when they apply.
     const addStyles = () => {
       const sheet = document.createElement('link');
       sheet.rel = 'stylesheet';

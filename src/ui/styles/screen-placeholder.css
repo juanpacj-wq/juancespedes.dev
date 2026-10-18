@@ -1,7 +1,7 @@
 /*
  * The drawn screen (ScreenPlaceholder.astro): an app window in tokens. Shared by the home page
- * cards (inside the deferred cards.css) and the case study cover (case-study.css). Short element
- * and class names, because seven of them are in the home page's HTML.
+ * stage (inside the deferred project-stage.css) and the case study cover (case-study.css). Short
+ * element and class names, because they would sit in the home page's HTML.
  */
 
 @layer components {

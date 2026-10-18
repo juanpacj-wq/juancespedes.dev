@@ -1,14 +1,13 @@
 ---
 import type { Locale } from '../../domain/shared/locale';
 import type { Dictionary } from '../i18n/dictionary';
+import Icon from '../icons/Icon.astro';
 import Container from '../primitives/Container.astro';
 import CommandPalette from './CommandPalette.astro';
+import type { NavItem } from './nav';
 import RollingLabel from './RollingLabel.astro';
 
-export interface NavItem {
-  readonly href: string;
-  readonly label: string;
-}
+export type { NavItem };
 
 interface Props {
   t: Dictionary;
@@ -21,6 +20,7 @@ interface Props {
 }
 
 const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.props;
+const pad = (value: number) => String(value).padStart(2, '0');
 ---
 
 <header class="site-header sticky top-0 z-40 border-b border-line/60 bg-canvas/80 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70">
@@ -39,13 +39,77 @@ const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.
         <nav aria-label={t.a11y.mainNavigation} class="hidden md:block">
           <ul class="nav-list text-small text-muted" data-nav>
             <li class="nav-pill" aria-hidden="true" data-nav-pill></li>
-            {navItems.map((item) => (
-              <li>
-                <a href={item.href} class="nav-link">
-                  <RollingLabel text={item.label} />
-                </a>
-              </li>
-            ))}
+            {navItems.map((item) =>
+              item.menu ? (
+                <li class="nav-menu" data-nav-menu>
+                  <a href={item.href} class="nav-link">
+                    <RollingLabel text={item.label} />
+                  </a>
+                  <button
+                    type="button"
+                    class="nav-menu-toggle"
+                    aria-expanded="false"
+                    aria-controls="projects-menu"
+                    aria-label={t.projects.menuToggle}
+                    data-nav-menu-toggle
+                  >
+                    <Icon name="chevron-down" size={14} />
+                  </button>
+                  <div
+                    id="projects-menu"
+                    class="nav-menu-panel"
+                    role="region"
+                    aria-label={t.projects.menu}
+                    data-nav-menu-panel
+                    hidden
+                  >
+                    <ul class="nav-menu-areas">
+                      {item.menu.map((area, index) => (
+                        <li class="nav-menu-area">
+                          <a href={area.href} class="nav-menu-head" data-work-goto={area.id}>
+                            <span class="nav-menu-shots" aria-hidden="true">
+                              {area.shots.map((shot, shotIndex) => (
+                                <img
+                                  data-src={shot.src}
+                                  width={shot.width}
+                                  height={shot.height}
+                                  alt=""
+                                  decoding="async"
+                                  style={`--i: ${String(shotIndex)}`}
+                                />
+                              ))}
+                            </span>
+                            <span class="nav-menu-index">
+                              {pad(index + 1)} · {pad(area.projects.length)} {t.projects.menuCount}
+                            </span>
+                            <span class="nav-menu-label">
+                              {area.label}
+                              <Icon name="arrow-right" size={16} />
+                            </span>
+                            <span class="nav-menu-blurb">{area.blurb}</span>
+                          </a>
+                          <ul class="nav-menu-projects">
+                            {area.projects.map((project) => (
+                              <li>
+                                <a href={project.href} class="nav-menu-project">
+                                  {project.title}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </li>
+              ) : (
+                <li>
+                  <a href={item.href} class="nav-link">
+                    <RollingLabel text={item.label} />
+                  </a>
+                </li>
+              ),
+            )}
             {chatLabel && (
               <li>
                 <button

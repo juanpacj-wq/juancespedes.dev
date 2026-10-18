@@ -13,6 +13,7 @@ const common = {
   title: 'Operations logbook',
   summary: 'Replaced Excel logbooks with a real-time web app.',
   role: 'Full-stack engineer',
+  track: 'full-stack',
   period: { start: '2026-03', end: null },
   capabilities: ['backend', 'frontend'],
   stack: ['React', 'Node.js'],
