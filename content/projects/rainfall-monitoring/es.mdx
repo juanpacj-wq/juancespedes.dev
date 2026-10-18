@@ -1,8 +1,9 @@
 ---
 kind: report
 title: Monitoreo de precipitaciones para una operación minera
+name: Monitoreo de lluvias
 summary: Informe en Power BI que consolida las lecturas diarias de ocho pluviómetros en tres sedes, con resumen de la semana y del mes, eventos de lluvia hora a hora y comparación con el histórico.
-role: Autor del modelo, las medidas DAX y el informe
+role: Autor del modelo, las medidas DAX, el informe y el flujo de datos en Microsoft Fabric
 track: analytics
 period: { start: '2024-08', end: '2024-10' }
 capabilities: [data-bi]
@@ -10,6 +11,11 @@ stack:
   - Power BI
   - DAX
   - Power Query
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
   - SharePoint
   - Excel
 metrics:
@@ -26,7 +32,7 @@ featured: false
 order: 3
 status: published
 confidentiality: anonymized
-tool: Power BI Desktop y servicio de Power BI
+tool: Power BI sobre Microsoft Fabric (pipelines, notebooks, lakehouses y warehouse)
 businessQuestions:
   - ¿Cuánto llovió esta semana y este mes en cada sede y en cada punto de medición?
   - ¿Qué días concentraron la lluvia, y a qué hora empezó y terminó cada evento?
@@ -34,6 +40,7 @@ businessQuestions:
 dataSources:
   - Listas de SharePoint donde el personal de campo registra las lecturas diarias
   - Libro de Excel con el histórico de lecturas anteriores
+  - En producción, pipelines ETL y notebooks de Microsoft Fabric llevan esos orígenes a lakehouses por capas (bronce, plata y oro, arquitectura medallón) y un warehouse de Fabric alimenta el modelo del informe
   - 'Réplica pública: datos sintéticos con el régimen bimodal de lluvias del Caribe colombiano'
 highlightedMeasures:
   - Lluvia acumulada por semana, mes y sede

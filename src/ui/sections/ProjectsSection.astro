@@ -21,7 +21,6 @@ interface Props {
 }
 
 const { t, projects } = Astro.props;
-const pad = (value: number) => String(value).padStart(2, '0');
 
 const areas = PROJECT_TRACKS.map((track) => ({
   track,
@@ -69,7 +68,7 @@ const areas = PROJECT_TRACKS.map((track) => ({
                     >
                       {area.label}
                       <span class="work-tab-count" aria-hidden="true">
-                        {pad(area.projects.length)}
+                        {area.projects.length}
                       </span>
                     </a>
                   </li>

@@ -1,8 +1,9 @@
 ---
 kind: report
 title: Financial control of a publicly funded solar energy program
+name: Solar program finance
 summary: 'A Power BI report for a program that brings solar power to rural areas: trust balances and their flow, budget execution by contract, overdue invoices and the fee structure, with HTML visuals built in DAX.'
-role: Author of the semantic model, the DAX and HTML measures and the report design
+role: Author of the semantic model, the DAX and HTML measures, the report design and the data flow in Microsoft Fabric
 track: analytics
 period: { start: '2026-01', end: '2026-06' }
 capabilities: [data-bi]
@@ -10,6 +11,11 @@ stack:
   - Power BI
   - DAX
   - Power Query
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
   - PostgreSQL
   - Excel
 metrics:
@@ -26,7 +32,7 @@ featured: false
 order: 1
 status: published
 confidentiality: anonymized
-tool: Power BI Desktop and the Power BI service
+tool: Power BI on Microsoft Fabric (pipelines, notebooks, lakehouses and a warehouse)
 businessQuestions:
   - How much of each contract is committed, invoiced and paid?
   - Which invoices are overdue, by how many days, and at which approval step?
@@ -35,6 +41,7 @@ businessQuestions:
 dataSources:
   - PostgreSQL views with budget, invoices, contracts and bank transactions
   - An Excel workbook with the program plan and the fee breakdown by year
+  - In production, Microsoft Fabric ETL pipelines and notebooks load those sources into layered lakehouses (bronze, silver and gold, a medallion architecture), and a Fabric warehouse feeds the report's model
   - 'Public replica: synthetic contracts, invoices and transactions from December 2025 to September 2026'
 highlightedMeasures:
   - Bank balance waterfall, grouped by month when there are many transactions

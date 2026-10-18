@@ -83,6 +83,7 @@ export const renderProjectFile = ({ kind, title, locale, start }) => {
     '---',
     `kind: ${kind}`,
     `title: ${quote(title)}`,
+    `name: ${quote(title.slice(0, 32))}`,
     `summary: ${quote(todo)}`,
     `role: ${quote(todo)}`,
     `track: ${track}`,

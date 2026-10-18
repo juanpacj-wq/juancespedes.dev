@@ -11,6 +11,7 @@ import type { Locale } from '../../src/domain/shared/locale';
 
 const common = {
   title: 'Operations logbook',
+  name: 'Logbook',
   summary: 'Replaced Excel logbooks with a real-time web app.',
   role: 'Full-stack engineer',
   track: 'full-stack',

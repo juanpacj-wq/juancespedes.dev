@@ -20,7 +20,6 @@ interface Props {
 }
 
 const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.props;
-const pad = (value: number) => String(value).padStart(2, '0');
 ---
 
 <header class="site-header sticky top-0 z-40 border-b border-line/60 bg-canvas/80 backdrop-blur-md supports-[backdrop-filter]:bg-canvas/70">
@@ -63,43 +62,63 @@ const pad = (value: number) => String(value).padStart(2, '0');
                     data-nav-menu-panel
                     hidden
                   >
-                    <ul class="nav-menu-areas">
-                      {item.menu.map((area, index) => (
-                        <li class="nav-menu-area">
-                          <a href={area.href} class="nav-menu-head" data-work-goto={area.id}>
-                            <span class="nav-menu-shots" aria-hidden="true">
-                              {area.shots.map((shot, shotIndex) => (
-                                <img
-                                  data-src={shot.src}
-                                  width={shot.width}
-                                  height={shot.height}
-                                  alt=""
-                                  decoding="async"
-                                  style={`--i: ${String(shotIndex)}`}
-                                />
-                              ))}
+                    <div class="nav-menu-areas">
+                      {item.menu.map((area) => (
+                        <div class="nav-menu-area">
+                          <a
+                            href={area.href}
+                            class="nav-menu-head"
+                            data-work-goto={area.id}
+                            data-menu-preview={area.projects[0]?.slug}
+                          >
+                            {area.label}
+                            <span class="nav-menu-count" aria-hidden="true">
+                              {area.projects.length}
                             </span>
-                            <span class="nav-menu-index">
-                              {pad(index + 1)} · {pad(area.projects.length)} {t.projects.menuCount}
-                            </span>
-                            <span class="nav-menu-label">
-                              {area.label}
-                              <Icon name="arrow-right" size={16} />
-                            </span>
-                            <span class="nav-menu-blurb">{area.blurb}</span>
                           </a>
                           <ul class="nav-menu-projects">
                             {area.projects.map((project) => (
                               <li>
-                                <a href={project.href} class="nav-menu-project">
-                                  {project.title}
+                                <a
+                                  href={project.href}
+                                  class="nav-menu-project"
+                                  data-menu-preview={project.slug}
+                                >
+                                  {project.name}
                                 </a>
                               </li>
                             ))}
                           </ul>
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
+                    {/* One screen at a time: the project under the pointer or the focus. */}
+                    <div class="nav-menu-preview" aria-hidden="true">
+                      <div class="nav-menu-screen">
+                        {item.menu.flatMap((area) =>
+                          area.projects.map(
+                            (project) =>
+                              project.shot && (
+                                <img
+                                  data-src={project.shot.src}
+                                  data-preview={project.slug}
+                                  width={project.shot.width}
+                                  height={project.shot.height}
+                                  alt=""
+                                  decoding="async"
+                                />
+                              ),
+                          ),
+                        )}
+                      </div>
+                      {item.menu.flatMap((area) =>
+                        area.projects.map((project) => (
+                          <p class="nav-menu-caption" data-preview={project.slug}>
+                            {project.title}
+                          </p>
+                        )),
+                      )}
+                    </div>
                   </div>
                 </li>
               ) : (

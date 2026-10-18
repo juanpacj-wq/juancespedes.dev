@@ -28,6 +28,8 @@ markers. Drafts show up in `pnpm dev` and never in a build.
 
 ## 2. Fill it in
 
+- `name` is the short form of the title (32 characters at most) that the header's projects menu
+  lists; the scaffold starts it as the title cut short.
 - Replace every `TODO` in both languages. The page is built from the frontmatter only; the MDX
   body is not rendered (see ADR 0011).
 - `stack` names must exist in `content/technologies.yaml`. Add new technologies there first, under

@@ -1,8 +1,9 @@
 ---
 kind: report
 title: Ejecución presupuestal de una empresa pública de generación
+name: Ejecución presupuestal
 summary: Informe en Power BI que sigue el ciclo presupuestal completo (apropiación, disponibilidad, compromiso, obligación y pago) de una empresa y su filial, con ingresos, requisiciones de compra y el avance de los pagos contra la meta.
-role: Autor del modelo semántico, las consultas a la base de datos y el informe
+role: Autor del modelo semántico, las consultas a la base de datos, el informe y el flujo de datos en Microsoft Fabric
 track: analytics
 period: { start: '2025-01', end: '2026-04' }
 capabilities: [data-bi]
@@ -10,6 +11,11 @@ stack:
   - Power BI
   - DAX
   - Power Query
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
   - PostgreSQL
   - Azure
 metrics:
@@ -26,7 +32,7 @@ featured: false
 order: 4
 status: published
 confidentiality: anonymized
-tool: Power BI Desktop y servicio de Power BI
+tool: Power BI sobre Microsoft Fabric (pipelines, notebooks, lakehouses y warehouse)
 businessQuestions:
   - ¿Cuánto del presupuesto apropiado ya está reservado, comprometido, facturado y pagado?
   - ¿Qué rubros y qué dependencias tienen más saldo disponible?
@@ -35,6 +41,7 @@ businessQuestions:
 dataSources:
   - Vistas de PostgreSQL en Azure con los movimientos del sistema financiero y el maestro de proveedores
   - Vistas del sistema de compras con las requisiciones aprobadas
+  - En producción, pipelines ETL y notebooks de Microsoft Fabric llevan esos orígenes a lakehouses por capas (bronce, plata y oro, arquitectura medallón) y un warehouse de Fabric alimenta el modelo del informe
   - 'Réplica pública: datos sintéticos que simulan siete vigencias del ciclo presupuestal'
 highlightedMeasures:
   - Disponible (apropiado menos provisional)

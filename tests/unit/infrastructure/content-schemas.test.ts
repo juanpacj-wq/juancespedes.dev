@@ -13,6 +13,7 @@ import {
 const minimalCaseStudy = {
   kind: 'case-study',
   title: 'Logbook',
+  name: 'Logbook',
   summary: 'Real-time logbook.',
   role: 'Engineer',
   track: 'full-stack',

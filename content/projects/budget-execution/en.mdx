@@ -1,8 +1,9 @@
 ---
 kind: report
 title: Budget execution for a public power generation company
+name: Budget execution
 summary: A Power BI report that follows the whole budget cycle (appropriation, availability, commitment, obligation and payment) for a company and its subsidiary, with revenue, purchase requisitions and payments against the target.
-role: Author of the semantic model, the database queries and the report
+role: Author of the semantic model, the database queries, the report and the data flow in Microsoft Fabric
 track: analytics
 period: { start: '2025-01', end: '2026-04' }
 capabilities: [data-bi]
@@ -10,6 +11,11 @@ stack:
   - Power BI
   - DAX
   - Power Query
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
   - PostgreSQL
   - Azure
 metrics:
@@ -26,7 +32,7 @@ featured: false
 order: 4
 status: published
 confidentiality: anonymized
-tool: Power BI Desktop and the Power BI service
+tool: Power BI on Microsoft Fabric (pipelines, notebooks, lakehouses and a warehouse)
 businessQuestions:
   - How much of the appropriated budget is already reserved, committed, invoiced and paid?
   - Which budget lines and departments have the most money left?
@@ -35,6 +41,7 @@ businessQuestions:
 dataSources:
   - PostgreSQL views on Azure with the financial system's transactions and the supplier master
   - Views of the purchasing system with the approved requisitions
+  - In production, Microsoft Fabric ETL pipelines and notebooks load those sources into layered lakehouses (bronze, silver and gold, a medallion architecture), and a Fabric warehouse feeds the report's model
   - 'Public replica: synthetic data that simulates seven fiscal years of the budget cycle'
 highlightedMeasures:
   - Available (appropriated minus reserved)

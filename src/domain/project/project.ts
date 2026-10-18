@@ -52,6 +52,8 @@ export interface Decision {
 /** Fields every kind shares. Locale-specific text lives in each localized file. */
 interface CommonContent {
   readonly title: string;
+  /** A short name for menus and lists, where the title would be cut. */
+  readonly name: string;
   readonly summary: string;
   readonly role: string;
   readonly track: ProjectTrack;

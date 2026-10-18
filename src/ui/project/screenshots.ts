@@ -7,6 +7,11 @@
 export const SCREENSHOT_WIDTHS = {
   /** A browser frame, up to 64rem (1024 px) wide. */
   wide: [640, 960, 1280, 1600, 2048, 2400],
+  /**
+   * The home page stage: about 900 to 1500 px wide on laptops and desktops, and at least 32rem
+   * on phones. Even steps, so the file chosen is near the size it is painted at.
+   */
+  stage: [720, 1080, 1440, 1800, 2160, 2880],
   /** A phone frame in the gallery, up to 22rem. */
   tall: [360, 540, 720, 1080],
   /** A phone beside others (ProjectScreens), up to 15rem. */

@@ -1,8 +1,9 @@
 ---
 kind: report
 title: Thermal generation scorecard in Power BI
+name: Generation scorecard
 summary: Six pages that bring together generation, availability, fuel use and IEEE indicators for four thermal units, so management sees on one screen how each plant is doing against the market.
-role: Author of the semantic model, the DAX measures and the report design
+role: Author of the semantic model, the DAX measures, the report design and the data flow in Microsoft Fabric
 track: analytics
 period: { start: '2024-09', end: '2025-09' }
 capabilities: [data-bi]
@@ -10,6 +11,11 @@ stack:
   - Power BI
   - DAX
   - Power Query
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
   - PostgreSQL
   - SharePoint
   - Excel
@@ -27,7 +33,7 @@ featured: false
 order: 2
 status: published
 confidentiality: anonymized
-tool: Power BI Desktop and the Power BI service
+tool: Power BI on Microsoft Fabric (pipelines, notebooks, lakehouses and a warehouse)
 businessQuestions:
   - How much net energy did each unit deliver this month, and what share of national generation is that?
   - How many hours was each unit running, on standby, in maintenance or out on a fault, and why?
@@ -36,6 +42,7 @@ businessQuestions:
 dataSources:
   - A PostgreSQL database with the plants' hourly operation
   - Excel workbooks on SharePoint with outage causes and fuel inventory movements
+  - In production, Microsoft Fabric ETL pipelines and notebooks load those sources into layered lakehouses (bronze, silver and gold, a medallion architecture), and a Fabric warehouse feeds the report's model
   - 'Public replica: synthetic data from a daily simulation per unit, generated in Python'
 highlightedMeasures:
   - EFOF and FOR per unit, with equivalent derated hours

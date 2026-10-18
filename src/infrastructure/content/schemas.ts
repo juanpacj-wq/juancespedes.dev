@@ -28,6 +28,8 @@ const metric = z.strictObject({ value: text, label: text, source: text });
 
 const common = {
   title: text.max(90),
+  /** A short name for menus and lists, where the title would be cut. */
+  name: text.max(32),
   summary: text.max(240),
   role: text,
   track: z.enum(PROJECT_TRACKS),

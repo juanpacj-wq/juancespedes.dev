@@ -1,8 +1,8 @@
 /**
- * The site header's one script: the theme switch and the header's motion (the pill that follows
- * the pointer across the menu, the menu item of the section being read, the rolling labels and
- * the scrambled name on the logo) and the projects menu that opens from its item. Plain DOM, no framework (ADR 0009). The motion is decoration;
- * the header works the same without it.
+ * The site header's one script: its motion (the pill that follows the pointer across the menu,
+ * the menu item of the section being read, the rolling labels and the scrambled name on the
+ * logo) and the projects menu that opens from its item. Plain DOM, no framework (ADR 0009). The
+ * motion is decoration; the header works the same without it.
  */
 
 const GLYPHS = 'abcdefghijklmnopqrstuvwxyz<>/{}[]=+*#';
@@ -76,7 +76,8 @@ const mountSectionSpy = (list: HTMLElement): void => {
 /**
  * The projects menu: a disclosure that opens on hover (after a short pause, so a pointer passing
  * by does not flash it) or from its arrow button, and closes on Escape, on a click elsewhere and
- * when focus leaves it. Its screenshots load the first time it opens.
+ * when focus leaves it. Its screenshots load the first time it opens; the preview shows the
+ * project under the pointer or the focus, and the first project until then.
  */
 const mountMenu = (menu: HTMLElement): void => {
   const toggle = menu.querySelector<HTMLButtonElement>('[data-nav-menu-toggle]');
@@ -86,6 +87,23 @@ const mountMenu = (menu: HTMLElement): void => {
   let hide = 0;
   let loaded = false;
   const isOpen = (): boolean => toggle.getAttribute('aria-expanded') === 'true';
+
+  const preview = (slug: string | undefined): void => {
+    if (!slug) return;
+    for (const each of panel.querySelectorAll<HTMLElement>('[data-preview], .nav-menu-project')) {
+      each.toggleAttribute(
+        'data-current',
+        (each.dataset.preview ?? each.dataset.menuPreview) === slug,
+      );
+    }
+  };
+  const previewFrom = (event: Event): void => {
+    const link = (event.target as Element).closest<HTMLElement>('[data-menu-preview]');
+    if (link) preview(link.dataset.menuPreview);
+  };
+  panel.addEventListener('pointerover', previewFrom);
+  panel.addEventListener('focusin', previewFrom);
+  preview(panel.querySelector<HTMLElement>('[data-menu-preview]')?.dataset.menuPreview);
 
   const set = (open: boolean): void => {
     clearTimeout(hover);
