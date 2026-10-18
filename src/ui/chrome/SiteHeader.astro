@@ -72,9 +72,6 @@ const { t, homeHref, navItems = [], switchTo = null, chatLabel = null } = Astro.
                             data-menu-preview={area.projects[0]?.slug}
                           >
                             {area.label}
-                            <span class="nav-menu-count" aria-hidden="true">
-                              {area.projects.length}
-                            </span>
                           </a>
                           <ul class="nav-menu-projects">
                             {area.projects.map((project) => (

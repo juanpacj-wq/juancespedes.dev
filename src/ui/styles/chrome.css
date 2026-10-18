@@ -269,9 +269,6 @@
 }
 
 .nav-menu-head {
-  display: inline-flex;
-  align-items: flex-start;
-  gap: 0.25rem;
   color: var(--color-ink);
   font-weight: 500;
   transition: color 200ms ease;
@@ -280,14 +277,6 @@
 .nav-menu-head:hover,
 .nav-menu-head:focus-visible {
   color: var(--color-accent-ink);
-}
-
-/* How many projects the area holds, set small and high like a footnote mark. */
-.nav-menu-count {
-  color: var(--color-subtle);
-  font-size: 0.6875rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.2;
 }
 
 .nav-menu-projects {

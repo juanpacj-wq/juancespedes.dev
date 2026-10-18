@@ -2,7 +2,8 @@
  * The areas of work on the home page (ProjectsSection): turns the jump links above the projects
  * into tabs. One area shows at a time; switching keeps the reader where the section starts, so a
  * new area always opens on its first project. Links that point to an area (`/#work-analytics`
- * from the header menu, the "next" link at the end of a stage) open it the same way.
+ * from the header menu, the "next" link at the end of a stage) open it the same way. On the
+ * pinned stage, scrolling also runs on from one area to the next.
  *
  * Plain DOM, no framework (ADR 0009). Without this script every area shows, one after another.
  */
@@ -131,6 +132,56 @@ export const mountWork = (): void => {
     event.preventDefault();
     open(link.hash.slice(1), 'link');
   });
+
+  /*
+   * On the pinned stage the scroll runs through the areas in order: past the last project of
+   * one, the next opens on its first project; above the first project of one, the previous opens
+   * on its last. The last area lets go into the next section and the first into the one above.
+   * Phones and reduced motion keep each area as a list, and the tabs and the "next" link lead on.
+   * Only the reader's own scrolling counts (wheel, touch, keys): a jump from a header link passes
+   * through the section on its way elsewhere.
+   */
+  let readerAt = 0;
+  const reading = (): void => {
+    readerAt = performance.now();
+  };
+  for (const type of ['wheel', 'touchmove', 'keydown'] as const) {
+    addEventListener(type, reading, { passive: true });
+  }
+  const pinned = (): HTMLElement | null =>
+    panels.get(active)?.querySelector<HTMLElement>('[data-project-stage][data-stage-ready]') ??
+    null;
+  const neighbour = (offset: 1 | -1): string | undefined =>
+    tabs[tabs.findIndex((tab) => tab.dataset.workTab === active) + offset]?.dataset.workTab;
+  let lastY = scrollY;
+  addEventListener(
+    'scroll',
+    () => {
+      const down = scrollY > lastY;
+      lastY = scrollY;
+      const stage = pinned();
+      if (!stage || performance.now() - readerAt > 250) return;
+      if (down && stage.getBoundingClientRect().bottom < innerHeight - 1) {
+        const next = neighbour(1);
+        if (!next) return;
+        show(next, true);
+        history.replaceState(null, '', `#${next}`);
+        scrollTo({ top: startOf(), behavior: 'instant' });
+      } else if (!down && work.getBoundingClientRect().top > restingTop() + 2) {
+        const previous = neighbour(-1);
+        if (!previous) return;
+        show(previous, true);
+        history.replaceState(null, '', `#${previous}`);
+        const end = pinned();
+        if (end) {
+          const top = end.getBoundingClientRect().top + scrollY;
+          scrollTo({ top: top + end.offsetHeight - innerHeight, behavior: 'instant' });
+        }
+      }
+      lastY = scrollY;
+    },
+    { passive: true },
+  );
 
   // The address names an area: open on it (a link from another page, a shared address).
   const fromHash = () => {
