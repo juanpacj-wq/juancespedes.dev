@@ -66,6 +66,7 @@ services:
     price:
       from: 650
       scope: One dashboard and its sources
+    featured: true
   - title: Custom web applications
     summary: Portals, internal platforms and systems with corporate sign-in, from the database to deployment.
     deliverables:
@@ -75,7 +76,6 @@ services:
     price:
       from: null
       scope: Depends on the requirement
-    featured: true
   - title: Automation and AI integration
     summary: Bots, document data extraction, integrations between systems and MCP servers for AI assistants.
     deliverables:
