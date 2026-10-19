@@ -1,21 +1,17 @@
 {
   "cover": {
-    "es": "Réplica pública con datos sintéticos: indicadores generales del presupuesto de ingresos y gastos, con filtros por empresa, vigencia y mes.",
-    "en": "Public replica with synthetic data: headline indicators for the revenue and spending budget, filtered by company, fiscal year and month."
+    "es": "Réplica pública con datos sintéticos: ejecución presupuestal de gastos por cuenta, nivel y registro, con indicadores y análisis mensual.",
+    "en": "Public replica with synthetic data: spending execution by budget line, level and commitment, with indicators and the monthly analysis."
   },
   "gallery-1": {
     "es": "Seguimiento de la ejecución: pagos del mes y acumulados frente a la meta, los diez contratos de mayor valor por proveedor y los registros con saldo provisional por liberar.",
     "en": "Execution tracking: monthly and year-to-date payments against the target, the ten largest contracts by supplier and the commitments with provisional balance still to release."
   },
   "gallery-2": {
-    "es": "Ejecución de gastos por cuenta, nivel y registro presupuestal, con el análisis mensual de cada etapa.",
-    "en": "Spending by budget line, level and commitment, with the monthly analysis of each stage."
-  },
-  "gallery-3": {
     "es": "Ejecución de ingresos: aforo frente a recaudo por concepto y comparación con el mes anterior.",
     "en": "Revenue: forecast against collection by item, compared with the previous month."
   },
-  "gallery-4": {
+  "gallery-3": {
     "es": "Requisiciones de compra pendientes de asignar, con su fecha de aprobación y su valor.",
     "en": "Purchase requisitions still waiting to be assigned, with their approval date and value."
   }
