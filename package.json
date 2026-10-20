@@ -30,7 +30,8 @@
     "prepare": "git config core.hooksPath .githooks || true",
     "bundle:check": "node scripts/check-bundle.mjs",
     "lighthouse:local": "node scripts/lighthouse-local.mjs",
-    "pages:check": "node scripts/check-pages.mjs"
+    "pages:check": "node scripts/check-pages.mjs",
+    "dist:compare": "node scripts/compare-dist.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.129.0",
