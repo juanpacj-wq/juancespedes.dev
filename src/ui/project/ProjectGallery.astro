@@ -129,7 +129,13 @@ const slides = await Promise.all(
   {slides.length > 1 && (
     <div class="cs-gallery-tabs" hidden data-gallery-tabs>
       {slides.map(({ caption }, index) => (
-        <button type="button" class="cs-gallery-tab" data-go={index} aria-label={caption}>
+        // The name starts with the visible number, so voice control can say "02" (WCAG 2.5.3).
+        <button
+          type="button"
+          class="cs-gallery-tab"
+          data-go={index}
+          aria-label={`${two(index)}. ${caption}`}
+        >
           <span class="cs-gallery-tab-bar" aria-hidden="true">
             <span />
           </span>
