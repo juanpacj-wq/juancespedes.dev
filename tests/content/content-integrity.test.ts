@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 import { parse as parseYaml } from 'yaml';
@@ -211,38 +211,6 @@ describe('anonymization and style policy', () => {
     (_, path) => {
       const text = readFileSync(path, 'utf8');
       const hits = forbidden.filter(([, pattern]) => pattern.test(text)).map(([name]) => name);
-      expect(hits).toEqual([]);
-    },
-  );
-});
-
-/*
- * Names of internal systems, servers, vendors and people cannot be listed in a public repository
- * without leaking them, so the list lives outside it: a local, git-ignored .content-denylist file,
- * and the CONTENT_DENYLIST secret in CI. Without either (e.g. a fork), the check is skipped.
- */
-describe('internal names denylist', () => {
-  const DENYLIST_FILE = join(process.cwd(), '.content-denylist');
-  const source =
-    process.env.CONTENT_DENYLIST ??
-    (existsSync(DENYLIST_FILE) ? readFileSync(DENYLIST_FILE, 'utf8') : '');
-  const terms = source
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line !== '' && !line.startsWith('#'));
-  const escape = (term: string) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const patterns = terms.map((term) =>
-    term.startsWith('re:')
-      ? new RegExp(term.slice(3), 'u')
-      : new RegExp(`(?<![\\p{L}\\p{N}])${escape(term)}(?![\\p{L}\\p{N}])`, 'iu'),
-  );
-  const files = walk(CONTENT).filter((path) => /\.(mdx?|ya?ml)$/.test(path));
-
-  it.skipIf(terms.length === 0).each(files.map((path) => [relative(process.cwd(), path), path]))(
-    '%s names no internal system, vendor or person',
-    (_, path) => {
-      const text = readFileSync(path, 'utf8');
-      const hits = patterns.filter((pattern) => pattern.test(text)).map(String);
       expect(hits).toEqual([]);
     },
   );

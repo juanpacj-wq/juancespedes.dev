@@ -38,5 +38,6 @@ accepted; a change of mind is a new record that supersedes the old one.
 | [0031](0031-fragment-mono.md)                             | Fragment Mono replaces Geist Mono                                        | Accepted                   |
 | [0032](0032-dark-only.md)                                 | One theme: dark                                                          | Accepted                   |
 | [0033](0033-work-by-area.md)                              | Projects by area of work, with tabs and a header menu                    | Accepted                   |
+| [0034](0034-engine-and-instance.md)                       | The site as the first instance of a reusable engine                      | Accepted                   |
 
 Template: copy any record, keep the headings (Context, Decision, Consequences), number it next.

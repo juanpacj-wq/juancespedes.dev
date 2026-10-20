@@ -19,7 +19,7 @@ describe('chat evaluation grading', () => {
       { ...base, links: ['/proyectos/a'], anyOf: ['oracle'], noneOf: ['$'], maxWords: 3 },
       'Cuesta $100 dólares por hora',
       'truncated',
-      [/CADENA/u],
+      [/ACME/u],
     );
     expect(grade.failures).toEqual([
       'outcome was truncated',
@@ -42,8 +42,8 @@ describe('chat evaluation grading', () => {
   });
 
   it('flags internal names from the denylist', () => {
-    const pattern = /\bCADENA\b/u;
-    expect(gradeAnswer(base, 'El portal CADENA', 'answered', [pattern]).failures).toEqual([
+    const pattern = /\bACME\b/u;
+    expect(gradeAnswer(base, 'El portal ACME', 'answered', [pattern]).failures).toEqual([
       `internal name: ${pattern.source}`,
     ]);
   });
