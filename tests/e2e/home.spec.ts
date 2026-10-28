@@ -221,8 +221,8 @@ test.describe('projects', () => {
     const tabs = page.getByRole('tablist', { name: 'Áreas de trabajo' }).getByRole('tab');
     await expect(tabs).toHaveText([/Full-stack/, /Analítica/, /IA y automatización/]);
     await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
-    await expect(page.locator('#work-full-stack [data-stage-slide]')).toHaveCount(5);
-    await expect(page.locator('#work-analytics [data-stage-slide]')).toHaveCount(4);
+    await expect(page.locator('#work-full-stack [data-stage-slide]')).toHaveCount(6);
+    await expect(page.locator('#work-analytics [data-stage-slide]')).toHaveCount(5);
     await expect(page.locator('#work-automation [data-stage-slide]')).toHaveCount(4);
     await expect(page.locator('#work-analytics')).toBeHidden();
     // The full-stack area in the order the author set.
@@ -232,6 +232,7 @@ test.describe('projects', () => {
       /Bitácora digital/,
       /Telemetría/,
       /Este portafolio/,
+      /Hoja de vida digital/,
     ]);
     // One link per project, named by the project's title.
     const slide = page.locator('#project-operations-logbook');
@@ -250,6 +251,7 @@ test.describe('projects', () => {
       /Cuadro de mando/,
       /precipitaciones/,
       /Ejecución presupuestal/,
+      /mina de carbón/,
     ]);
     await expect(page).toHaveURL(/#work-analytics$/);
     // Arrow keys move between areas.
@@ -314,15 +316,15 @@ test.describe('projects', () => {
       page,
     }) => {
       await stage(page).evaluate((root: HTMLElement) => {
-        // Halfway through the section: the third of five projects, holding still.
+        // Two fifths of the way: the third of six projects, holding still.
         const span = root.offsetHeight - innerHeight;
         scrollTo({
-          top: root.getBoundingClientRect().top + scrollY + span * 0.5,
+          top: root.getBoundingClientRect().top + scrollY + span * 0.4,
           behavior: 'instant',
         });
       });
       await expect(current(page)).toHaveAccessibleName(/Bitácora digital de operación/);
-      await expect(stage(page).locator('[data-stage-counter]')).toHaveText('03 / 05');
+      await expect(stage(page).locator('[data-stage-counter]')).toHaveText('03 / 06');
       // The section is pinned: its title and tabs stay in view while the projects change.
       await expect(page.locator('#projects-title')).toBeInViewport();
       await expect(page.getByRole('tab', { name: /Analítica/ })).toBeInViewport();
@@ -378,7 +380,7 @@ test.describe('projects', () => {
       // Back up from the first project of an area: the previous one, on its last project.
       await page.mouse.wheel(0, -400);
       await expect(tab(/Full-stack/)).toHaveAttribute('aria-selected', 'true');
-      await expect(current(page)).toHaveAccessibleName(/Este portafolio/);
+      await expect(current(page)).toHaveAccessibleName(/Hoja de vida digital/);
 
       // The last area lets go into the next section.
       await tab(/IA y automatización/).click();

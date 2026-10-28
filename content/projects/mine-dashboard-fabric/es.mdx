@@ -1,0 +1,128 @@
+---
+kind: case-study
+title: Tablero de operación de una mina de carbón, de Excel a Microsoft Fabric
+name: Tablero minero en Fabric
+summary: Estoy llevando el tablero diario de una mina de carbón, hecho en libros de Excel, a Power BI sobre Microsoft Fabric, con un modelo bronce, plata y oro cuyas cifras cuadran con el Excel y canalizaciones generadas desde código.
+role: Ingeniero de datos, a cargo del análisis del sistema actual, el modelo en Fabric, su verificación y su despliegue
+track: analytics
+period: { start: '2026-10', end: null }
+capabilities: [data-bi, automation-ai]
+stack:
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
+  - Power BI
+  - DAX
+  - Python
+  - Apache Spark
+  - SQL Server
+  - Excel
+  - SharePoint
+  - Microsoft Graph
+  - Model Context Protocol
+  - Claude Code
+metrics:
+  - value: '158'
+    label: actividades en 10 canalizaciones, generadas desde código y subidas con la CLI de Fabric
+    source: Definiciones versionadas de las canalizaciones, octubre de 2026
+  - value: '24 de 24'
+    label: indicadores del tablero dan el valor esperado al recalcularlos con el modelo
+    source: Verificación con Spark 3.5 contra el tablero de Excel, 27 de octubre de 2026
+  - value: '30 de 30'
+    label: tablas de plata idénticas entre la especificación en Spark y el T-SQL de Fabric
+    source: Prueba de paridad en Fabric, 28 de octubre de 2026
+featured: false
+order: 5
+status: published
+confidentiality: anonymized
+story:
+  hook: 'El tablero diario de la mina se armaba en libros de Excel con macros que juntaban dos básculas y varios formatos de captura.'
+  shifts:
+    - before: 'Cada fuente se consultaba por separado y se juntaba en Excel.'
+      after: 'Básculas, libros de captura y listas de la app llegan a un solo modelo en capas bronce, plata y oro.'
+    - before: 'Las reglas del cálculo estaban escondidas en fórmulas y macros.'
+      after: 'Cada regla quedó escrita, confirmada por el área y probada contra las cifras del tablero.'
+    - before: 'Montar las cargas en Fabric era configurar cada actividad a mano en el portal.'
+      after: 'Las canalizaciones se generan desde código versionado y se suben, corren y revisan desde la terminal.'
+problem: La gerencia de la mina sigue su operación diaria (carbón producido y despachado, estéril, horas perdidas, trituración, bombeo, inventarios y planes) en un tablero de Excel que se alimenta de dos bases de báscula, cuatro libros de captura y una app de seguimiento. La empresa pidió llevarlo a Power BI sobre su plataforma de Microsoft Fabric sin cambiar las cifras que el área ya conoce.
+responsibilities:
+  - Documenté el sistema actual (registro diario, tablero, formatos de captura y app) y llevé al área las reglas de cálculo que el Excel dejaba ambiguas, hasta tenerlas confirmadas por escrito.
+  - Diseñé el modelo estrella y lo construí en capas bronce, plata y oro con la metodología y la nomenclatura de la plataforma de datos de la empresa.
+  - Verifiqué cada capa con Spark local contra el tablero de Excel y con pruebas de paridad contra Fabric.
+  - Operé Fabric desde la terminal con la CLI y el servidor MCP de Fabric, conectados a Claude Code, para crear, importar, correr y revisar canalizaciones sin pasar por el portal.
+  - Redacté el documento de análisis de requerimientos para la aprobación de los usuarios.
+constraints:
+  - Las cifras del tablero nuevo deben coincidir con las del Excel, salvo los cambios que el área apruebe.
+  - Los libros de captura siguen en una carpeta de la red interna, y Fabric los lee por un gateway local.
+  - La metodología, la nomenclatura y las carpetas de la plataforma de datos de la empresa ya estaban definidas.
+  - Las bases de báscula traen datos personales de los conductores, que no deben llegar al modelo.
+decisions:
+  - title: Canalizaciones como código, subidas con la CLI de Fabric
+    rationale: Las consultas de cada capa viven en archivos T-SQL versionados, y tres generadores en Python arman las 10 canalizaciones, con 78 copias y una alerta de falla por copia. La CLI de Fabric las importa y el servidor MCP de Fabric deja revisar y correr el workspace desde el asistente. Me ahorró varias horas frente a configurar las 158 actividades a mano en el portal, y un cambio de consulta se aplica regenerando, no repitiendo clics.
+    alternatives:
+      - Configurar cada actividad de copia en el portal de Fabric
+  - title: Especificación en Spark, producción en T-SQL
+    rationale: El modelo se escribió y se verificó primero con Spark 3.5 sobre una réplica local. Después se tradujo a T-SQL para seguir la metodología de la plataforma, y una prueba de paridad compara las dos versiones tabla por tabla, columna por columna.
+    alternatives:
+      - Escribir directo en T-SQL y verificar solo en el informe final
+  - title: Recarga completa en cada corrida
+    rationale: La báscula corrige tiquetes de días anteriores, así que una carga incremental por fecha perdería esas correcciones. Las cinco canalizaciones de bronce recargan todo en unos 13 minutos.
+    alternatives:
+      - Carga incremental por la fecha del tiquete
+  - title: Columnas nombradas en las copias de bronce
+    rationale: Las copias de las básculas leen con una consulta que nombra cada columna y deja fuera los datos personales de los conductores desde la primera capa.
+    alternatives:
+      - Copiar las tablas completas y limpiar en plata
+architecture:
+  summary: Las básculas, los libros de captura y las listas de la app llegan a un lakehouse de bronce. Canalizaciones de copia con T-SQL los llevan a un lakehouse de plata y a un warehouse de oro con el modelo estrella, que alimentará un modelo semántico Direct Lake y el informe de Power BI. Todo se genera, importa y corre desde la terminal.
+  layers:
+    - name: Fuentes
+      nodes:
+        - { id: scales, label: 'Bases de báscula', detail: 'SQL Server de la mina y de la central' }
+        - {
+            id: workbooks,
+            label: 'Libros de captura',
+            detail: 'Excel en la red interna, por un gateway',
+          }
+        - {
+            id: app-lists,
+            label: 'Listas de la app',
+            detail: 'SharePoint, con su contrato de columnas',
+          }
+    - name: Fabric
+      nodes:
+        - { id: bronze, label: 'Lakehouse bronce', detail: '23 tablas tal como llegan' }
+        - { id: silver, label: 'Lakehouse plata', detail: '30 tablas con nombres de negocio' }
+        - { id: gold, label: 'Warehouse oro', detail: '17 dimensiones y 11 hechos' }
+    - name: Consumo
+      nodes:
+        - { id: semantic-model, label: 'Modelo semántico', detail: 'Direct Lake y medidas DAX' }
+        - { id: report, label: 'Informe de Power BI', detail: 'El tablero diario' }
+    - name: Operación
+      nodes:
+        - {
+            id: terminal,
+            label: 'CLI y MCP de Fabric',
+            detail: 'Generan, importan y corren las canalizaciones',
+          }
+  flows:
+    - { from: scales, to: bronze, label: 'Copias con columnas nombradas' }
+    - { from: workbooks, to: bronze, label: 'Copia de archivos y notebook' }
+    - { from: app-lists, to: bronze, label: 'Notebook' }
+    - { from: bronze, to: silver, label: 'Copias con T-SQL' }
+    - { from: silver, to: gold, label: 'Dimensiones y hechos' }
+    - { from: gold, to: semantic-model, label: 'Direct Lake' }
+    - { from: semantic-model, to: report, label: 'Medidas DAX' }
+    - { from: terminal, to: silver, label: 'Importa y corre las 10 canalizaciones' }
+outcomes:
+  - Bronce y plata corren en Fabric, con 23 tablas en bronce y 30 en plata verificadas contra la réplica local, y oro está en su primera corrida.
+  - Con las reglas confirmadas por escrito por el área, 24 de 24 indicadores del tablero dan el valor esperado al recalcularlos con el modelo.
+  - Faltan el modelo semántico Direct Lake, el informe y la orquestación cada hora. El proyecto sigue en curso.
+lessons:
+  - Habría instalado la CLI y el servidor MCP de Fabric desde el primer día. Los empecé a usar con el modelo ya verificado y aceleraron justo la parte más repetitiva.
+  - Pediría desde el inicio el documento de la nomenclatura de la plataforma. Como no existía, hubo que deducirla de otro workspace.
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

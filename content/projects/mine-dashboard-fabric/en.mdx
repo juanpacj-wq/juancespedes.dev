@@ -1,0 +1,128 @@
+---
+kind: case-study
+title: A coal mine's operations dashboard, from Excel to Microsoft Fabric
+name: Mine dashboard on Fabric
+summary: I am moving a coal mine's daily dashboard, built in Excel workbooks, to Power BI on Microsoft Fabric, with a bronze, silver and gold model whose figures match the Excel ones and pipelines generated from code.
+role: Data engineer, in charge of analyzing the current system, the Fabric model, its verification and its deployment
+track: analytics
+period: { start: '2026-10', end: null }
+capabilities: [data-bi, automation-ai]
+stack:
+  - Microsoft Fabric
+  - Fabric Data Pipelines
+  - Fabric Notebooks
+  - Fabric Lakehouse
+  - Fabric Data Warehouse
+  - Power BI
+  - DAX
+  - Python
+  - Apache Spark
+  - SQL Server
+  - Excel
+  - SharePoint
+  - Microsoft Graph
+  - Model Context Protocol
+  - Claude Code
+metrics:
+  - value: '158'
+    label: activities in 10 pipelines, generated from code and uploaded with the Fabric CLI
+    source: Versioned pipeline definitions, October 2026
+  - value: '24 of 24'
+    label: dashboard indicators return the expected value when recomputed with the model
+    source: Spark 3.5 verification against the Excel dashboard, October 27, 2026
+  - value: '30 of 30'
+    label: silver tables identical between the Spark specification and Fabric's T-SQL
+    source: Parity test in Fabric, October 28, 2026
+featured: false
+order: 5
+status: published
+confidentiality: anonymized
+story:
+  hook: "The mine's daily dashboard was assembled in macro-enabled Excel workbooks that pulled together two weighbridges and several capture forms."
+  shifts:
+    - before: 'Each source was queried on its own and combined in Excel.'
+      after: 'Weighbridges, capture workbooks and app lists land in one bronze, silver and gold model.'
+    - before: 'The calculation rules were hidden in formulas and macros.'
+      after: 'Every rule is written down, confirmed by the team and tested against the dashboard figures.'
+    - before: 'Building the loads in Fabric meant configuring every activity by hand in the portal.'
+      after: 'Pipelines are generated from versioned code and uploaded, run and checked from the terminal.'
+problem: The mine's management follows daily operations (coal produced and shipped, overburden, lost hours, crushing, pumping, stockpiles and plans) on an Excel dashboard fed by two weighbridge databases, four capture workbooks and a tracking app. The company asked to move it to Power BI on its Microsoft Fabric platform without changing the figures the team already knows.
+responsibilities:
+  - I documented the current system (daily log, dashboard, capture forms and app) and took the calculation rules the Excel left ambiguous to the team until they were confirmed in writing.
+  - I designed the star model and built it in bronze, silver and gold layers following the methodology and naming of the company's data platform.
+  - I verified every layer with local Spark against the Excel dashboard and with parity tests against Fabric.
+  - I ran Fabric from the terminal with the Fabric CLI and the Fabric MCP server, connected to Claude Code, to create, import, run and check pipelines without going through the portal.
+  - I wrote the requirements analysis document for the users' approval.
+constraints:
+  - The new dashboard's figures must match the Excel ones, except for changes the team approves.
+  - The capture workbooks stay in a folder on the internal network, and Fabric reads them through an on-premises gateway.
+  - The methodology, naming and folders of the company's data platform were already set.
+  - The weighbridge databases hold drivers' personal data, which must never reach the model.
+decisions:
+  - title: Pipelines as code, uploaded with the Fabric CLI
+    rationale: The queries of each layer live in versioned T-SQL files, and three Python generators build the 10 pipelines, with 78 copies and a failure alert per copy. The Fabric CLI imports them and the Fabric MCP server lets the assistant inspect and run the workspace. It saved me several hours compared with configuring the 158 activities by hand in the portal, and a query change is applied by regenerating, not by repeating clicks.
+    alternatives:
+      - Configure every copy activity in the Fabric portal
+  - title: Specification in Spark, production in T-SQL
+    rationale: The model was written and verified first with Spark 3.5 on a local replica. It was then translated to T-SQL to follow the platform's methodology, and a parity test compares both versions table by table, column by column.
+    alternatives:
+      - Write straight in T-SQL and verify only in the final report
+  - title: Full reload on every run
+    rationale: The weighbridge corrects tickets from earlier days, so an incremental load by date would miss those corrections. The five bronze pipelines reload everything in about 13 minutes.
+    alternatives:
+      - Incremental load by ticket date
+  - title: Named columns in the bronze copies
+    rationale: The weighbridge copies read with a query that names every column and leaves the drivers' personal data out from the first layer.
+    alternatives:
+      - Copy whole tables and clean them in silver
+architecture:
+  summary: Weighbridges, capture workbooks and app lists land in a bronze lakehouse. Copy pipelines with T-SQL move them to a silver lakehouse and to a gold warehouse with the star model, which will feed a Direct Lake semantic model and the Power BI report. Everything is generated, imported and run from the terminal.
+  layers:
+    - name: Sources
+      nodes:
+        - {
+            id: scales,
+            label: 'Weighbridge databases',
+            detail: 'SQL Server at the mine and the plant',
+          }
+        - {
+            id: workbooks,
+            label: 'Capture workbooks',
+            detail: 'Excel on the internal network, via a gateway',
+          }
+        - { id: app-lists, label: 'App lists', detail: 'SharePoint, with their column contract' }
+    - name: Fabric
+      nodes:
+        - { id: bronze, label: 'Bronze lakehouse', detail: '23 tables as they arrive' }
+        - { id: silver, label: 'Silver lakehouse', detail: '30 tables with business names' }
+        - { id: gold, label: 'Gold warehouse', detail: '17 dimensions and 11 facts' }
+    - name: Consumption
+      nodes:
+        - { id: semantic-model, label: 'Semantic model', detail: 'Direct Lake and DAX measures' }
+        - { id: report, label: 'Power BI report', detail: 'The daily dashboard' }
+    - name: Operations
+      nodes:
+        - {
+            id: terminal,
+            label: 'Fabric CLI and MCP',
+            detail: 'Generate, import and run the pipelines',
+          }
+  flows:
+    - { from: scales, to: bronze, label: 'Copies with named columns' }
+    - { from: workbooks, to: bronze, label: 'File copy and notebook' }
+    - { from: app-lists, to: bronze, label: 'Notebook' }
+    - { from: bronze, to: silver, label: 'Copies with T-SQL' }
+    - { from: silver, to: gold, label: 'Dimensions and facts' }
+    - { from: gold, to: semantic-model, label: 'Direct Lake' }
+    - { from: semantic-model, to: report, label: 'DAX measures' }
+    - { from: terminal, to: silver, label: 'Imports and runs the 10 pipelines' }
+outcomes:
+  - Bronze and silver run in Fabric, with 23 bronze and 30 silver tables verified against the local replica, and gold is on its first run.
+  - With the rules confirmed in writing by the team, 24 of 24 dashboard indicators return the expected value when recomputed with the model.
+  - The Direct Lake semantic model, the report and hourly orchestration are still to come. The project is ongoing.
+lessons:
+  - I would have installed the Fabric CLI and MCP server from day one. I started using them once the model was verified, and they sped up exactly the most repetitive part.
+  - I would ask for the platform's naming document from the start. Since there was none, it had to be inferred from another workspace.
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}

@@ -13,10 +13,12 @@
 - { id: accessibility, name: WCAG 2.2, capability: frontend }
 - { id: customtkinter, name: CustomTkinter, capability: frontend }
 - { id: javascript, name: JavaScript, capability: frontend }
+- { id: tanstack-query, name: TanStack Query, capability: frontend }
 
 # Backend
 - { id: nodejs, name: Node.js, capability: backend }
 - { id: express, name: Express, capability: backend }
+- { id: kysely, name: Kysely, capability: backend }
 - { id: websockets, name: WebSockets, capability: backend }
 - { id: php, name: PHP, capability: backend }
 - { id: python, name: Python, capability: backend }
@@ -47,11 +49,13 @@
 - { id: pandas, name: pandas, capability: data-bi }
 - { id: polars, name: Polars, capability: data-bi }
 - { id: delta-lake, name: Delta Lake, capability: data-bi }
+- { id: apache-spark, name: Apache Spark, capability: data-bi }
 - { id: pdfminer, name: pdfminer.six, capability: data-bi }
 
 # Automation and AI
 - { id: mcp, name: Model Context Protocol, capability: automation-ai }
 - { id: playwright, name: Playwright, capability: automation-ai }
+- { id: claude-code, name: Claude Code, capability: automation-ai }
 - { id: airflow, name: Apache Airflow, capability: automation-ai }
 - { id: selenium, name: Selenium, capability: automation-ai }
 - { id: microsoft-graph, name: Microsoft Graph, capability: automation-ai }

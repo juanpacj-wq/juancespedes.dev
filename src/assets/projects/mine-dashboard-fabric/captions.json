@@ -1,0 +1,12 @@
+{
+  "cover": {
+    "es": "El workspace en Fabric leído con la CLI, y los generadores que arman las canalizaciones de plata y oro desde el T-SQL versionado (nombres internos anonimizados).",
+    "en": "The Fabric workspace read with the CLI, and the generators that build the silver and gold pipelines from versioned T-SQL (internal names anonymized).",
+    "frame": "none"
+  },
+  "gallery-1": {
+    "es": "La última corrida de cada canalización, leída con la CLI de Fabric: bronce y plata completas, oro en su primera corrida.",
+    "en": "The latest run of each pipeline, read with the Fabric CLI: bronze and silver complete, gold on its first run.",
+    "frame": "none"
+  }
+}
