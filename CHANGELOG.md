@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/juanpacj-wq/juancespedes.dev/compare/juancespedes.dev-v1.1.0...juancespedes.dev-v1.2.0) (2026-10-28)
+
+
+### Features
+
+* **content:** add the metering point records and mine dashboard cases ([#76](https://github.com/juanpacj-wq/juancespedes.dev/issues/76)) ([5bbad80](https://github.com/juanpacj-wq/juancespedes.dev/commit/5bbad8007f3e5d4f20f47b9544e103044ad76b50))
+
+
+### Bug Fixes
+
+* **content:** hide the company logo in the metering records cover ([#79](https://github.com/juanpacj-wq/juancespedes.dev/issues/79)) ([309976f](https://github.com/juanpacj-wq/juancespedes.dev/commit/309976fad43c836914bba788f6c064beedeb8996))
+* **content:** remove company data from the metering and mine captures ([#80](https://github.com/juanpacj-wq/juancespedes.dev/issues/80)) ([96fd62b](https://github.com/juanpacj-wq/juancespedes.dev/commit/96fd62b4349eef1c80c77f6cfa5ad298090eb5ef))
+
 ## [1.1.0](https://github.com/juanpacj-wq/juancespedes.dev/compare/juancespedes.dev-v1.0.0...juancespedes.dev-v1.1.0) (2026-10-20)
 
 
