@@ -1,0 +1,35 @@
+{
+  "cover": {
+    "es": "La ficha de una frontera: completitud de la hoja, secciones del formato y equipos, con la novedad en borrador abajo (fronteras, personas y datos ficticios en esta captura).",
+    "en": "A metering point's record: how complete the sheet is, the sections of the form and the equipment, with the draft change at the bottom (fictitious points, people and data in this capture)."
+  },
+  "gallery-1": {
+    "es": "El listado de fronteras con su estado ante el mercado, filtros y una campana en las que tienen una novedad abierta.",
+    "en": "The list of metering points with their market status, filters and a bell on those with an open change."
+  },
+  "gallery-2": {
+    "es": "El inicio: estado de todas las fronteras, novedades abiertas y lo publicado hace poco.",
+    "en": "The home page: the status of every metering point, open changes and what was published lately."
+  },
+  "gallery-3": {
+    "es": "La sección 2 en edición, con la numeración del formato oficial en cada campo.",
+    "en": "Section 2 being edited, with the official form's numbering on every field."
+  },
+  "gallery-4": {
+    "es": "Antes de publicar, la revisión muestra cada cambio de la novedad con su valor anterior y el nuevo.",
+    "en": "Before publishing, the review shows every change in the draft with its old and new value."
+  },
+  "gallery-5": {
+    "es": "Una versión publicada: queda congelada, con su PDF y su Word, y se compara con cualquier otra.",
+    "en": "A published version: it is frozen, comes with its PDF and Word file, and can be compared with any other."
+  },
+  "gallery-6": {
+    "es": "El PDF oficial que la aplicación genera desde una versión, con la estructura y la numeración del formato.",
+    "en": "The official PDF the app generates from a version, with the form's structure and numbering.",
+    "frame": "none"
+  },
+  "gallery-7": {
+    "es": "El inicio de sesión, implementado al píxel desde el diseño en Figma del responsable del proyecto.",
+    "en": "The sign-in page, built pixel for pixel from the project lead's Figma design."
+  }
+}

@@ -1,0 +1,128 @@
+---
+kind: case-study
+title: Hoja de vida digital del sistema de medición de fronteras de energía
+name: Hoja de vida de fronteras
+summary: Digitalicé el formato oficial de 18 secciones con el que se lleva la hoja de vida de cada frontera comercial de energía. Cada novedad se captura en un borrador, se revisa y se publica como una versión con su PDF oficial.
+role: Ingeniero full-stack, único desarrollador (requisitos, arquitectura, backend, frontend, base de datos y despliegue)
+track: full-stack
+period: { start: '2026-09', end: null }
+capabilities: [backend, frontend, data-bi, infrastructure]
+stack:
+  - React
+  - TypeScript
+  - Vite
+  - Tailwind CSS
+  - TanStack Query
+  - Node.js
+  - Express
+  - Kysely
+  - SQL Server
+  - Microsoft Entra ID
+  - Microsoft Graph
+  - Playwright
+  - WCAG 2.2
+  - Docker
+  - GitHub Actions
+  - Figma
+metrics:
+  - value: '950+'
+    label: casos de prueba automatizados entre unitarias, integración, end-to-end y accesibilidad
+    source: Suites de Vitest y Playwright del repositorio, octubre de 2026
+  - value: '13'
+    label: decisiones de arquitectura documentadas en cinco semanas
+    source: Registros de decisión (ADR) del repositorio, septiembre y octubre de 2026
+  - value: '60'
+    label: commits entre el arranque y el despliegue de pruebas
+    source: Historial de git, 22 de septiembre a 28 de octubre de 2026
+featured: false
+order: 6
+status: published
+confidentiality: anonymized
+story:
+  hook: 'La hoja de vida de cada frontera se diligenciaba en papel, y cada visita o cambio de equipo obligaba a volver a llenar el formato oficial.'
+  shifts:
+    - before: 'Cada cambio en campo se pasaba a mano al formato en papel.'
+      after: 'Cada novedad se captura en un borrador, se revisa campo por campo y se publica como una versión nueva.'
+    - before: 'Saber qué decía la hoja antes de un cambio exigía buscar entre documentos.'
+      after: 'Cada versión publicada queda congelada y se compara con cualquier otra.'
+    - before: 'Los equipos y sellos retirados se perdían entre hojas.'
+      after: 'Equipos y sellos se retiran con fecha y conservan su historial; un sello se busca por su serie.'
+    - before: 'El PDF oficial se armaba a mano.'
+      after: 'El PDF y el Word de cada versión salen con la estructura y la numeración del formato oficial.'
+problem: Cada frontera comercial de energía debe tener al día la hoja de vida de su sistema de medición, en un formato oficial de 18 secciones con cientos de campos numerados. Se diligenciaba en papel. Cada visita, calibración o cambio de medidor o de módem obligaba a rehacerla, y el historial de equipos y sellos quedaba repartido entre documentos.
+responsibilities:
+  - Levanté los requisitos con el área de medición y llevé las ambigüedades del formato oficial, incluidas sus erratas de numeración, a un registro de decisiones para el área funcional.
+  - Diseñé la arquitectura por capas y construí la API, el cliente, el modelo de datos en SQL Server y el generador de documentos.
+  - Integré el inicio de sesión corporativo con roles y la invitación de usuarios externos como invitados.
+  - Llevé el manual de marca de la empresa a un sistema de diseño con tokens y reglas de lint, e implementé al píxel el inicio de sesión que el responsable del proyecto diseñó en Figma.
+  - Documenté 13 decisiones de arquitectura y los runbooks de despliegue, restauración y rotación de secretos, y dejé la aplicación en un despliegue de pruebas con Docker.
+constraints:
+  - El formato oficial manda. Su estructura y su numeración, con las erratas, no se cambian sin una decisión del área funcional.
+  - Base de datos compartida con otros sistemas de la empresa. La aplicación solo vive en sus dos esquemas y con usuarios de mínimo privilegio.
+  - Lo publicado no se borra. La trazabilidad de cada hoja es un requisito.
+  - Las hojas llevan datos personales de la persona designada, con derecho de supresión.
+  - Usuarios internos con su cuenta corporativa y operadores externos como invitados.
+decisions:
+  - title: Toda edición ocurre dentro de una novedad en borrador
+    rationale: Cada cambio queda en un borrador con su tipo de novedad, se revisa con el valor anterior y el nuevo, y al publicarlo se guarda una instantánea de la hoja completa con su huella SHA-256. Las versiones anteriores nunca cambian y dos versiones se comparan sin reconstruir nada.
+    alternatives:
+      - Editar la hoja en sitio y guardar un historial de cambios por campo
+  - title: Un registro de secciones en vez de una pantalla escrita a mano por sección
+    rationale: Cada sección declara su contrato, sus campos y cómo se arma en la hoja. El ensamblador, la revisión, la completitud y el PDF salen de ese registro, así que agregar una sección no toca el flujo de la novedad.
+    alternatives:
+      - Un formulario y un endpoint escritos a mano para cada sección
+  - title: El PDF sale de HTML impreso por un Chromium sin red
+    rationale: La plantilla reproduce el formato oficial en HTML y un trabajo en segundo plano la imprime con un navegador sin red ni JavaScript, así que nada de lo que traiga la hoja puede salir a internet. El Word sale de la misma estructura.
+    alternatives:
+      - Dibujar el PDF por coordenadas con una librería de PDF
+  - title: Lo que no se borra, negado en la base de datos
+    rationale: Las tablas de solo inserción, como las versiones, los cambios y la auditoría, niegan UPDATE y DELETE al usuario de la aplicación. Una tabla nueva de ese tipo debe agregar su permiso en la misma migración, y el script que copia el esquema se niega a correr si falta alguno.
+    alternatives:
+      - Confiar solo en el código de la aplicación
+architecture:
+  summary: El navegador habla con una API en Node.js que valida cada entrada, autoriza por rol y guarda en SQL Server. Un trabajador en segundo plano genera el PDF y el Word de cada versión y maneja los adjuntos, y el inicio de sesión pasa por Microsoft Entra ID.
+  layers:
+    - name: Usuarios
+      nodes:
+        - {
+            id: web-app,
+            label: 'Aplicación web',
+            detail: 'React, formularios por sección y revisión de la novedad',
+          }
+    - name: Servicios
+      nodes:
+        - { id: api, label: 'API REST', detail: 'Express, Zod y contrato OpenAPI' }
+        - { id: worker, label: 'Trabajador', detail: 'PDF, Word y adjuntos en segundo plano' }
+    - name: Datos
+      nodes:
+        - {
+            id: database,
+            label: 'SQL Server',
+            detail: 'Dos esquemas propios, usuarios de mínimo privilegio',
+          }
+        - {
+            id: storage,
+            label: 'Almacén de adjuntos',
+            detail: 'Archivos fuera de la base, con su SHA-256',
+          }
+    - name: Integraciones
+      nodes:
+        - { id: identity, label: 'Microsoft Entra ID', detail: 'Roles e invitados externos' }
+        - { id: pdf-engine, label: 'Chromium sin red', detail: 'Imprime el formato oficial' }
+  flows:
+    - { from: web-app, to: api, label: 'Captura, revisa y publica novedades' }
+    - { from: api, to: database, label: 'Guarda cambios y versiones' }
+    - { from: api, to: identity, label: 'Valida la sesión y el rol' }
+    - { from: worker, to: database, label: 'Toma los trabajos encolados' }
+    - { from: worker, to: pdf-engine, label: 'Pide el PDF de cada versión' }
+    - { from: worker, to: storage, label: 'Guarda documentos y adjuntos' }
+outcomes:
+  - La aplicación corre en un despliegue de pruebas en la red de la empresa, con el inicio de sesión corporativo, mientras el área funcional valida las reglas del formato.
+  - Cada versión publicada genera su PDF y su Word con la estructura y la numeración del formato oficial, y el listado de fronteras se exporta a Excel.
+  - Las vistas pasan pruebas automáticas de accesibilidad con axe a 1280, 768 y 360 píxeles, y una regla de lint exige el contraste AA de cada par de colores.
+lessons:
+  - Habría pedido antes al área funcional las decisiones que bloquean secciones enteras, como la de los medidores, en vez de avanzar con decisiones provisionales.
+  - Habría dejado desde el primer día una base de datos en contenedor como única base de las pruebas, para que nunca compartieran datos con el despliegue de pruebas.
+---
+
+{/* La página del proyecto se arma con los campos de arriba. Guía: docs/adding-a-project.md */}

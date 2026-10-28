@@ -1,0 +1,124 @@
+---
+kind: case-study
+title: Digital life record of the metering system at energy trading points
+name: Metering point records
+summary: I digitized the official 18-section form that keeps the life record of every energy trading point. Each change is captured in a draft, reviewed and published as a version with its official PDF.
+role: Full-stack engineer, sole developer (requirements, architecture, backend, frontend, database, deployment)
+track: full-stack
+period: { start: '2026-09', end: null }
+capabilities: [backend, frontend, data-bi, infrastructure]
+stack:
+  - React
+  - TypeScript
+  - Vite
+  - Tailwind CSS
+  - TanStack Query
+  - Node.js
+  - Express
+  - Kysely
+  - SQL Server
+  - Microsoft Entra ID
+  - Microsoft Graph
+  - Playwright
+  - WCAG 2.2
+  - Docker
+  - GitHub Actions
+  - Figma
+metrics:
+  - value: '950+'
+    label: automated test cases across unit, integration, end-to-end and accessibility suites
+    source: Vitest and Playwright suites in the repository, October 2026
+  - value: '13'
+    label: architecture decisions documented in five weeks
+    source: Architecture decision records (ADR) in the repository, September and October 2026
+  - value: '60'
+    label: commits between kickoff and the test deployment
+    source: Git history, September 22 to October 28, 2026
+featured: false
+order: 6
+status: published
+confidentiality: anonymized
+story:
+  hook: 'Each metering point kept its life record on paper, and every site visit or equipment change meant filling in the official form again.'
+  shifts:
+    - before: 'Every change in the field was copied by hand onto the paper form.'
+      after: 'Each change is captured in a draft, reviewed field by field and published as a new version.'
+    - before: 'Finding out what the record said before a change meant searching through documents.'
+      after: 'Every published version is frozen and can be compared with any other.'
+    - before: 'Removed equipment and seals got lost between sheets.'
+      after: 'Equipment and seals are removed with a date and keep their history; a seal can be found by its serial number.'
+    - before: 'The official PDF was put together by hand.'
+      after: 'The PDF and Word file of each version come out with the official form structure and numbering.'
+problem: Every energy trading point must keep an up-to-date life record of its metering system, in an official 18-section form with hundreds of numbered fields. It was filled in on paper. Every visit, calibration or meter or modem change meant redoing it, and the history of equipment and seals was spread across documents.
+responsibilities:
+  - I gathered the requirements with the metering team and took the ambiguities of the official form, including its numbering errors, to a decision log for the business owners.
+  - I designed the layered architecture and built the API, the client, the SQL Server data model and the document generator.
+  - I integrated corporate sign-in with roles and the invitation of external users as guests.
+  - I turned the company's brand manual into a design system with tokens and lint rules, and built pixel for pixel the sign-in page the project lead designed in Figma.
+  - I documented 13 architecture decisions and the deployment, restore and secret rotation runbooks, and left the app in a test deployment with Docker.
+constraints:
+  - The official form rules. Its structure and numbering, errors included, do not change without a decision from the business owners.
+  - A database shared with other company systems. The app lives only in its two schemas, with least-privilege users.
+  - Nothing published is deleted. Traceability of every record is a requirement.
+  - Records carry personal data of the designated person, with a right to erasure.
+  - Internal users sign in with their corporate account and external operators come in as guests.
+decisions:
+  - title: Every edit happens inside a draft change
+    rationale: Each edit lives in a draft with its change type, is reviewed with its old and new value, and publishing it stores a snapshot of the whole record with its SHA-256 fingerprint. Earlier versions never change, and two versions are compared without rebuilding anything.
+    alternatives:
+      - Edit the record in place and keep a per-field change history
+  - title: A section registry instead of one hand-written screen per section
+    rationale: Each section declares its contract, its fields and how it is assembled into the record. The assembler, the review, the completeness score and the PDF all come from that registry, so adding a section does not touch the change workflow.
+    alternatives:
+      - A hand-written form and endpoint for every section
+  - title: The PDF is HTML printed by an offline Chromium
+    rationale: The template reproduces the official form in HTML, and a background job prints it with a browser that has no network and no JavaScript, so nothing a record carries can reach the internet. The Word file comes from the same structure.
+    alternatives:
+      - Draw the PDF by coordinates with a PDF library
+  - title: What must never be deleted is denied in the database
+    rationale: Insert-only tables, such as versions, changes and the audit log, deny UPDATE and DELETE to the app's user. A new table of that kind must add its permission in the same migration, and the script that copies the schema refuses to run if one is missing.
+    alternatives:
+      - Rely on application code alone
+architecture:
+  summary: The browser talks to a Node.js API that validates every input, authorizes by role and stores everything in SQL Server. A background worker generates the PDF and Word file of each version and handles attachments, and sign-in goes through Microsoft Entra ID.
+  layers:
+    - name: Users
+      nodes:
+        - { id: web-app, label: 'Web app', detail: 'React, per-section forms and change review' }
+    - name: Services
+      nodes:
+        - { id: api, label: 'REST API', detail: 'Express, Zod and an OpenAPI contract' }
+        - { id: worker, label: 'Worker', detail: 'PDF, Word and attachments in the background' }
+    - name: Data
+      nodes:
+        - {
+            id: database,
+            label: 'SQL Server',
+            detail: 'Two schemas of its own, least-privilege users',
+          }
+        - {
+            id: storage,
+            label: 'Attachment store',
+            detail: 'Files outside the database, with their SHA-256',
+          }
+    - name: Integrations
+      nodes:
+        - { id: identity, label: 'Microsoft Entra ID', detail: 'Roles and external guests' }
+        - { id: pdf-engine, label: 'Offline Chromium', detail: 'Prints the official form' }
+  flows:
+    - { from: web-app, to: api, label: 'Captures, reviews and publishes changes' }
+    - { from: api, to: database, label: 'Stores changes and versions' }
+    - { from: api, to: identity, label: 'Checks the session and role' }
+    - { from: worker, to: database, label: 'Picks up queued jobs' }
+    - { from: worker, to: pdf-engine, label: 'Requests the PDF of each version' }
+    - { from: worker, to: storage, label: 'Stores documents and attachments' }
+outcomes:
+  - The app runs in a test deployment on the company network, with corporate sign-in, while the business owners validate the form's rules.
+  - Every published version generates its PDF and Word file with the official form structure and numbering, and the list of metering points exports to Excel.
+  - The views pass automated accessibility tests with axe at 1280, 768 and 360 pixels, and a lint rule enforces AA contrast for every color pair.
+lessons:
+  - I would have asked the business owners earlier for the decisions that block whole sections, such as the meters, instead of moving ahead on provisional decisions.
+  - I would have set up a containerized database as the only test database from day one, so tests never shared data with the test deployment.
+---
+
+{/* The project page is built from the fields above. Guide: docs/adding-a-project.md */}
